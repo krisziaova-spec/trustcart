@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Page Not Found - TrustCart</title><link rel="stylesheet" th:href="@{/css/styles.css}"></head>
+<body>
+<nav class="nav"><div class="nav-inner"><a class="logo" th:href="@{/}"><span class="logo-badge">TC</span> TrustCart</a><div class="nav-links"><a th:href="@{/}">Buyer Shop</a><a th:href="@{/seller}">Seller Center</a><a th:href="@{/admin}">Admin</a></div></div></nav>
+<main class="container">
+    <section class="card success-card">
+        <h1>Page not available</h1>
+        <p>Status: <strong th:text="${status}">404</strong></p>
+        <p th:text="${message}">The page was not found.</p>
+        <div class="footer-actions" style="max-width:520px;margin:20px auto 0">
+            <a class="btn btn-primary" th:href="@{/}">Go to Buyer Shop</a>
+            <a class="btn btn-light" th:href="@{/seller}">Go to Seller Center</a>
+        </div>
+    </section>
+</main>
+</body>
+</html>

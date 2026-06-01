@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Seller Login - TrustCart</title><link rel="stylesheet" th:href="@{/css/styles.css}"></head>
+<body>
+<nav class="nav"><div class="nav-inner"><a class="logo" th:href="@{/}"><span class="logo-badge">TC</span> TrustCart</a><div class="nav-links"><a th:href="@{/}">Buyer Shop</a><a th:href="@{/seller/apply}">Apply as Seller</a><a th:href="@{/buyer/login}">Buyer Login</a></div></div></nav>
+<main class="container narrow">
+    <section class="card auth-card">
+        <span class="eyebrow green">Seller Access</span>
+        <h1>Seller Login</h1>
+        <p class="platform-note">Seller dashboard requires an approved seller account and password. Production deployment should use encrypted passwords.</p>
+        <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+        <form th:action="@{/seller/login}" method="post">
+            <label>Seller Email</label>
+            <input required type="email" name="email" value="greentech@trustcart.ph">
+            <label>Password</label>
+            <input required type="password" name="password" value="trust123">
+            <button class="btn btn-primary" type="submit" style="width:100%;margin-top:10px">Login to Seller Center</button>
+        </form>
+        <hr>
+        <p><strong>Approved sellers:</strong></p>
+        <p class="muted">greentech@trustcart.ph / trust123<br>localgoods@trustcart.ph / trust123<br>ecohome@trustcart.ph / trust123</p>
+    </section>
+</main>
+</body>
+</html>

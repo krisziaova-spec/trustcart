@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Seller Center - TrustCart</title><link rel="stylesheet" th:href="@{/css/styles.css}"></head>
+<body>
+<nav class="nav"><div class="nav-inner"><a class="logo" th:href="@{/}"><span class="logo-badge">TC</span> TrustCart</a><div class="nav-links"><a th:href="@{/}">Buyer Shop</a><a th:href="@{/seller/login}">Seller Login</a><a th:href="@{/seller/apply}">Apply as Seller</a><a th:href="@{/admin}">Admin</a></div></div></nav>
+<main class="container">
+    <section class="seller-hero premium-seller">
+        <div>
+            <span class="eyebrow green">Seller access is separate from buyer shop</span>
+            <h1>TrustCart Seller Center</h1>
+            <p>Similar to Shopee Seller Centre, buyers shop on the main platform while approved sellers use this separate area to apply, login, submit products, and monitor marketplace activity.</p>
+            <div class="footer-actions" style="max-width:520px">
+                <a class="btn btn-primary" th:href="@{/seller/login}">Seller Login</a>
+                <a class="btn btn-light" th:href="@{/seller/apply}">Become a Seller</a>
+            </div>
+        </div>
+        <div class="card">
+            <h2>Strict Approval Flow</h2>
+            <div class="timeline compact-timeline">
+                <div class="step active"><span class="dot"></span><div><strong>Apply</strong><br><span class="muted">Seller submits store details, exact location, and document proof.</span></div></div>
+                <div class="step active"><span class="dot"></span><div><strong>Admin Verification</strong><br><span class="muted">Business, identity, exact store location, product claims, and eco claims are checked.</span></div></div>
+                <div class="step active"><span class="dot"></span><div><strong>Seller Passport</strong><br><span class="muted">Approved sellers receive a passport status visible to buyers.</span></div></div>
+                <div class="step active"><span class="dot"></span><div><strong>Product Approval</strong><br><span class="muted">Products stay pending until admin approves them.</span></div></div>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>

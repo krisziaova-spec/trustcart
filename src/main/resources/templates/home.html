@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TrustCart - Verified Green Marketplace</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<nav class="nav">
+    <div class="nav-inner">
+        <a class="logo" th:href="@{/}"><span class="logo-badge">TC</span> TrustCart</a>
+        <div class="nav-links">
+            <a th:href="@{/}">Shop</a>
+            <a th:href="@{/track}">Track Order</a>
+            <a th:href="@{/refund}">Protection Center</a>
+            <a th:href="@{/autoship}" th:if="${buyerLoggedIn}">Subscriptions</a>
+            <a th:href="@{/seller}">Seller Center</a>
+            <a th:href="@{/admin}">Admin</a>
+            <a class="btn-light" th:href="@{/cart}">Cart (<span th:text="${cartCount}">0</span>)</a>
+            <a th:if="${!buyerLoggedIn}" th:href="@{/buyer/login}">Buyer Login</a>
+            <form th:if="${buyerLoggedIn}" th:action="@{/buyer/logout}" method="post" class="nav-form"><button type="submit">Logout</button></form>
+        </div>
+    </div>
+</nav>
+
+<main class="container">
+    <section class="hero hero-premium">
+        <div>
+            <span class="eyebrow">Verified sellers • Green checkout • Nearby market search</span>
+            <h1>Shop safer with proof, location integrity, and buyer protection.</h1>
+            <p>TrustCart is a marketplace with approved sellers only, protected seller locations, nearby seller filtering, verified reviews, transparent prices, and sustainability scoring.</p>
+            <div class="footer-actions" style="max-width:650px">
+                <a class="btn btn-white" th:href="@{/cart}">View Cart</a>
+                <a class="btn btn-ghost" th:href="@{/seller}">Open Seller Center</a>
+                <a class="btn btn-ghost" th:href="@{/buyer/register}" th:if="${!buyerLoggedIn}">Create Buyer Account</a>
+            </div>
+        </div>
+        <div class="hero-card shield-card">
+            <h3 style="margin-top:0">TrustCart Shield</h3>
+            <div class="shield-list">
+                <span>✓ Buyer login required for cart, checkout, tracking, and refunds</span>
+                <span>✓ Seller exact address hidden from buyers</span>
+                <span>✓ Nearby sellers ranked by selected target market</span>
+                <span>✓ Pickup only through TrustCart-protected hub flow</span>
+                <span>✓ TrustPoints rewards on every successful purchase</span>
+                <span>✓ Discount codes and autoship subscriptions for repeat orders</span>
+                <span>✓ Off-platform transaction warning included</span>
+            </div>
+        </div>
+    </section>
+
+    <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+    <section class="location-card">
+        <div>
+            <span class="eyebrow green">Target Market Location</span>
+            <h2>Find sellers closer to your preferred area</h2>
+            <p class="muted">Buyers can select a location and radius before searching. TrustCart shows the seller area only, not the exact store address, to prevent off-platform transactions.</p>
+            <div class="map-mock">
+                <div class="map-pin">●</div>
+                <strong th:text="${marketCity}">San Pablo City</strong>
+                <span th:text="${marketRadius} + ' km radius'">5 km radius</span>
+            </div>
+        </div>
+        <form th:action="@{/buyer/location}" method="post" class="location-form">
+            <label>Location preset</label>
+            <select id="locationPreset" onchange="applyPreset()">
+                <option value="San Pablo City|14.0683|121.3256">San Pablo City, Laguna</option>
+                <option value="Calamba|14.2117|121.1653">Calamba, Laguna</option>
+                <option value="Lipa City|13.9411|121.1631">Lipa City, Batangas</option>
+                <option value="Manila|14.5995|120.9842">Manila</option>
+                <option value="Quezon City|14.6760|121.0437">Quezon City</option>
+            </select>
+            <label>Target city / market area</label>
+            <input id="marketCity" name="marketCity" th:value="${marketCity}" required>
+            <div class="form-grid">
+                <div><label>Latitude</label><input id="latitude" name="latitude" type="number" step="0.0001" th:value="${marketLatitude}" required></div>
+                <div><label>Longitude</label><input id="longitude" name="longitude" type="number" step="0.0001" th:value="${marketLongitude}" required></div>
+            </div>
+            <label>Radius</label>
+            <select name="radiusKm">
+                <option value="2" th:selected="${marketRadius == 2}">2 kilometers</option>
+                <option value="5" th:selected="${marketRadius == 5}">5 kilometers</option>
+                <option value="10" th:selected="${marketRadius == 10}">10 kilometers</option>
+                <option value="25" th:selected="${marketRadius == 25}">25 kilometers</option>
+            </select>
+            <label class="checkline"><input type="checkbox" name="nearbyOnly" value="true" th:checked="${nearbyOnly}"> Show nearby sellers only</label>
+            <label class="checkline"><input type="checkbox" name="pickupOnly" value="true" th:checked="${pickupOnly}"> Show pickup-capable sellers only</label>
+            <button class="btn btn-primary" type="submit">Apply Location</button>
+        </form>
+    </section>
+
+    <section class="feature-strip">
+        <div><strong>Protected Location</strong><span>Exact seller store address hidden</span></div>
+        <div><strong>Pickup Hub Flow</strong><span>Pickup handled inside TrustCart</span></div>
+        <div><strong>TrustPoints</strong><span>Earn rewards on every protected order</span></div>
+        <div><strong>Autoshipment</strong><span>Repeat essentials by preferred frequency</span></div>
+    </section>
+
+    <section class="loyalty-banner" th:if="${buyerLoggedIn}">
+        <div>
+            <span class="eyebrow green">TrustCart Rewards</span>
+            <h2>Welcome back, <span th:text="${buyer.fullName}">Buyer</span></h2>
+            <p class="muted">Earn 1 TrustPoint for every ₱20 spent. Redeem 10 points for ₱1 discount at checkout.</p>
+        </div>
+        <div class="loyalty-points">
+            <span>Available Points</span>
+            <strong th:text="${buyer.loyaltyPointsBalance}">0</strong>
+            <small th:text="${buyer.loyaltyTier}">Starter Green Member</small>
+        </div>
+        <a class="btn btn-primary" th:href="@{/autoship}">Manage Subscriptions</a>
+    </section>
+
+    <form class="search-card" th:action="@{/}" method="get">
+        <div class="search-row">
+            <input type="text" name="q" placeholder="Search trusted products..." th:value="${query}">
+            <select name="category">
+                <option value="">All Categories</option>
+                <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat.displayName}" th:selected="${selectedCategory == cat}"></option>
+            </select>
+            <button class="btn btn-primary" type="submit">Search</button>
+        </div>
+        <div class="filter-hints">
+            <span>Verified Sellers Only</span><span>Eco-Friendly Products</span><span>Locally Sourced</span><span>Plastic-Free Packaging</span><span>Location Verified</span>
+        </div>
+    </form>
+
+    <div class="section-title">
+        <h2>Trusted Products</h2>
+        <span class="muted" th:text="${products.size()} + ' approved items shown'">0 items</span>
+    </div>
+
+    <div class="grid">
+        <article class="product-card premium-card" th:each="product : ${products}">
+            <div class="product-photo-wrap"><img class="product-photo" th:src="${product.imageUrl}" th:alt="${product.photoAltText}"></div>
+            <div class="product-body">
+                <div class="badges">
+                    <span class="badge shield">Shield</span>
+                    <span class="badge" th:text="${product.category.displayName}">Category</span>
+                    <span class="badge" th:if="${product.ecoFriendly}">Eco</span>
+                    <span class="badge" th:if="${product.subscriptionEligible}">Autoship</span>
+                    <span class="badge-gray badge" th:if="${product.seller.storeLocationVerified}">Location Verified</span>
+                </div>
+                <a class="product-name" th:href="@{/product/{id}(id=${product.id})}" th:text="${product.name}">Product Name</a>
+                <div class="price">₱<span th:text="${product.price}">0</span></div>
+                <div class="muted">Seller: <strong th:text="${product.seller.storeName}">Seller</strong></div>
+                <div class="mini-passport">
+                    <span th:text="${product.seller.publicLocationLabel}">San Pablo City area</span>
+                    <span th:text="${product.seller.protectedPickupLabel}">Pickup hub</span>
+                </div>
+                <div class="score-pair">
+                    <div><span>Trust</span><strong th:text="${product.trustScore} + '/100'">94/100</strong></div>
+                    <div><span>Green</span><strong th:text="${product.greenScore} + '/100'">88/100</strong></div>
+                </div>
+                <p class="tiny" th:text="${product.redFlagSummary}">No red flags.</p>
+                <form th:action="@{/cart/add/{id}(id=${product.id})}" method="post" class="footer-actions">
+                    <input type="hidden" name="quantity" value="1">
+                    <a class="btn btn-outline" th:href="@{/product/{id}(id=${product.id})}">Details</a>
+                    <button class="btn btn-primary" type="submit" th:text="${buyerLoggedIn ? 'Add' : 'Login to Add'}">Add</button>
+                </form>
+            </div>
+        </article>
+    </div>
+</main>
+<script>
+function applyPreset(){
+  const parts = document.getElementById('locationPreset').value.split('|');
+  document.getElementById('marketCity').value = parts[0];
+  document.getElementById('latitude').value = parts[1];
+  document.getElementById('longitude').value = parts[2];
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Refund Center - TrustCart</title><link rel="stylesheet" th:href="@{/css/styles.css}"></head>
+<body>
+<nav class="nav"><div class="nav-inner"><a class="logo" th:href="@{/}"><span class="logo-badge">TC</span> TrustCart</a><div class="nav-links"><a th:href="@{/}">Shop</a><a th:href="@{/track}">Track Order</a><a th:href="@{/seller}">Seller Center</a></div></div></nav>
+<main class="container">
+    <div class="two-col">
+        <section class="card">
+            <h1>Refund and Return Center</h1>
+            <p class="muted">Submit evidence and track request status through admin dashboard.</p>
+            <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+            <form th:action="@{/refund}" method="post">
+                <label>Order Code</label>
+                <input required name="orderCode" th:value="${orderCode}" placeholder="TC-YYYYMMDD-0000">
+                <label>Email Used in Order</label>
+                <input required type="email" name="email" placeholder="buyer@email.com">
+                <label>Reason</label>
+                <textarea required name="reason" placeholder="Explain the issue clearly. Example: wrong item, damaged item, suspected fake item."></textarea>
+                <label>Evidence Link / Notes</label>
+                <input name="evidenceUrl" placeholder="Paste Google Drive image link or write evidence note">
+                <br><br>
+                <button class="btn btn-primary" type="submit" style="width:100%">Submit Refund Request</button>
+            </form>
+        </section>
+        <aside class="card">
+            <h2>Buyer Protection Rules</h2>
+            <p>✓ Only verified buyers can file claims.</p>
+            <p>✓ Admin reviews evidence.</p>
+            <p>✓ Seller response is checked.</p>
+            <p>✓ Refund status can be updated in admin dashboard.</p>
+        </aside>
+    </div>
+</main>
+</body>
+</html>

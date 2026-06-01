@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Order Success - TrustCart</title><link rel="stylesheet" th:href="@{/css/styles.css}"></head>
+<body>
+<nav class="nav"><div class="nav-inner"><a class="logo" th:href="@{/}"><span class="logo-badge">TC</span> TrustCart</a><div class="nav-links"><a th:href="@{/}">Shop Again</a><a th:href="@{/track}">Track Order</a></div></div></nav>
+<main class="container">
+    <section class="card success-card">
+        <div class="success-icon">✓</div>
+        <h1>Order placed successfully</h1>
+        <p>Your protected TrustCart order has been created.</p>
+        <h2 th:text="${order.orderCode}">TC-ORDER</h2>
+        <p><strong>Total Paid/Due:</strong> ₱<span th:text="${order.total}">0</span></p>
+        <p th:if="${order.discountCode != null && !order.discountCode.isBlank()}"><strong>Discount Code:</strong> <span th:text="${order.discountCode}">CODE</span> - ₱<span th:text="${order.promoDiscount}">0</span></p>
+        <p th:if="${order.loyaltyPointsRedeemed > 0}"><strong>TrustPoints Redeemed:</strong> <span th:text="${order.loyaltyPointsRedeemed}">0</span> points = ₱<span th:text="${order.loyaltyPointsDiscount}">0</span></p>
+        <div class="loyalty-mini success-loyalty"><strong>Earned <span th:text="${order.loyaltyPointsEarned}">0</span> TrustPoints</strong><span th:text="${order.loyaltyTierAfterOrder}">Starter Green Member</span></div>
+        <p><strong>Payment:</strong> <span th:text="${order.paymentMethod.displayName}">Payment</span></p>
+        <p><strong>Fulfillment:</strong> <span th:text="${order.deliveryOption.displayName}">Delivery</span></p>
+        <p><strong>Target Market:</strong> <span th:text="${order.buyerMarketLocation}">San Pablo City</span></p>
+        <p><strong>Green Checkout:</strong> <span th:text="${order.greenDeliveryLabel}">Green</span></p>
+        <div class="protection-box"><strong>Platform-only protection</strong><span th:text="${order.platformProtectionNote}">Protection note</span></div>
+        <div class="checkout-badges">
+            <span th:class="${order.ecoPackaging ? 'badge' : 'badge-gray badge'}">Eco-Packaging</span>
+            <span th:class="${order.noExtraPlastic ? 'badge' : 'badge-gray badge'}">No Extra Plastic</span>
+            <span th:class="${order.consolidatedDelivery ? 'badge' : 'badge-gray badge'}">Eco Delivery</span>
+        </div>
+        <div class="footer-actions" style="max-width:520px;margin:20px auto 0">
+            <a class="btn btn-primary" th:href="@{/track(orderCode=${order.orderCode},email=${order.email})}">Track Order</a>
+            <a class="btn btn-light" th:href="@{/refund(orderCode=${order.orderCode})}">Open Refund Center</a>
+            <a class="btn btn-outline" th:href="@{/autoship}">View Subscriptions</a>
+        </div>
+    </section>
+</main>
+</body>
+</html>

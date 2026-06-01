@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Admin Dashboard - TrustCart</title><link rel="stylesheet" th:href="@{/css/styles.css}"></head>
+<body>
+<nav class="nav"><div class="nav-inner"><a class="logo" th:href="@{/}"><span class="logo-badge">TC</span> TrustCart</a><div class="nav-links"><a th:href="@{/}">Buyer Shop</a><a th:href="@{/seller}">Seller Center</a></div></div></nav>
+<main class="container">
+    <h1>TrustCart Admin Control Center</h1>
+    <p class="platform-note">This is where the platform protects buyers by approving sellers, approving products, monitoring orders, and resolving refund requests.</p>
+    <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+
+    <section class="three-col">
+        <div class="kpi"><span>Pending Sellers</span><strong th:text="${pendingSellers.size()}">0</strong></div>
+        <div class="kpi"><span>Approved Sellers</span><strong th:text="${approvedSellers.size()}">0</strong></div>
+        <div class="kpi"><span>Pending Products</span><strong th:text="${pendingProducts.size()}">0</strong></div>
+    </section>
+
+    <br>
+    <section class="card">
+        <h2>Discount Code Management</h2>
+        <p class="muted">Create platform-approved vouchers to increase repeat purchases while still keeping transactions inside TrustCart.</p>
+        <form th:action="@{/admin/discounts}" method="post" class="discount-admin-form">
+            <input required name="code" placeholder="CODE e.g., GREEN5">
+            <input name="description" placeholder="Description">
+            <input type="number" step="0.01" min="0" name="minimumSpend" value="0" placeholder="Minimum spend">
+            <input type="number" min="0" max="90" name="percentOff" value="0" placeholder="% off">
+            <input type="number" step="0.01" min="0" name="amountOff" value="0" placeholder="₱ off">
+            <input type="number" min="0" name="maxRedemptions" value="0" placeholder="Max uses, 0 unlimited">
+            <button class="btn btn-primary" type="submit">Create Code</button>
+        </form>
+        <table class="table compact">
+            <thead><tr><th>Code</th><th>Description</th><th>Minimum</th><th>Value</th><th>Uses</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody>
+            <tr th:if="${discountCodes.isEmpty()}"><td colspan="7" class="muted">No discount codes yet.</td></tr>
+            <tr th:each="code : ${discountCodes}">
+                <td><strong th:text="${code.code}">CODE</strong></td>
+                <td th:text="${code.description}">Description</td>
+                <td>₱<span th:text="${code.minimumSpend}">0</span></td>
+                <td><span th:text="${code.percentOff}">0</span>% / ₱<span th:text="${code.amountOff}">0</span></td>
+                <td><span th:text="${code.timesRedeemed}">0</span> / <span th:text="${code.maxRedemptions == 0 ? 'Unlimited' : code.maxRedemptions}">0</span></td>
+                <td><span class="badge" th:text="${code.active ? 'Active' : 'Inactive'}">Active</span></td>
+                <td><form th:action="@{/admin/discounts/{id}/toggle(id=${code.id})}" method="post"><button class="btn btn-light" type="submit" th:text="${code.active ? 'Disable' : 'Enable'}">Toggle</button></form></td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <br>
+    <section class="feature-strip admin-strip">
+        <div><strong>Review Integrity</strong><span>Verified buyer reviews only</span></div>
+        <div><strong>Anti-Fake Items</strong><span>Admin product approval gate</span></div>
+        <div><strong>Sustainability Guard</strong><span>Eco claims visible and checked</span></div>
+        <div><strong>Location Integrity</strong><span>Exact address checked but hidden</span></div>
+    </section>
+
+    <br>
+    <section class="card">
+        <h2>Seller Applications</h2>
+        <table class="table">
+            <thead><tr><th>Store</th><th>Email</th><th>Claim</th><th>Location</th><th>Proof / Commitment</th><th>Action</th></tr></thead>
+            <tbody>
+            <tr th:if="${pendingSellers.isEmpty()}"><td colspan="6" class="muted">No pending seller applications.</td></tr>
+            <tr th:each="seller : ${pendingSellers}">
+                <td><strong th:text="${seller.storeName}">Store</strong><br><span class="muted" th:text="${seller.businessType}">Type</span></td>
+                <td th:text="${seller.email}">Email</td>
+                <td th:text="${seller.sustainabilityBadge}">Badge</td>
+                <td><strong th:text="${seller.publicLocationLabel}">Area</strong><br><span class="muted" th:text="${seller.storeExactAddress}">Exact address</span><br><span class="muted" th:text="${seller.locationProofUrl}">Location proof</span></td>
+                <td><span class="muted" th:text="${seller.documentProofUrl}">Proof</span><br><span class="muted" th:text="${seller.ecoCommitment}">Commitment</span></td>
+                <td style="display:flex;gap:6px;flex-wrap:wrap">
+                    <form th:action="@{/admin/sellers/{id}/approve(id=${seller.id})}" method="post"><button class="btn btn-primary" type="submit">Approve</button></form>
+                    <form th:action="@{/admin/sellers/{id}/reject(id=${seller.id})}" method="post"><button class="btn btn-danger" type="submit">Reject</button></form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <br>
+    <section class="card">
+        <h2>Approved Seller Passport Monitor</h2>
+        <table class="table compact">
+            <thead><tr><th>Seller</th><th>Passport</th><th>Location</th><th>Reliability</th><th>Complaint</th><th>Green</th></tr></thead>
+            <tbody>
+            <tr th:each="seller : ${approvedSellers}">
+                <td><strong th:text="${seller.storeName}">Store</strong><br><span class="muted" th:text="${seller.sustainabilityBadge}">Badge</span></td>
+                <td><span class="badge" th:text="${seller.passportStatus}">Complete</span></td>
+                <td><strong th:text="${seller.publicLocationLabel}">Area</strong><br><span class="muted" th:text="${seller.storeLocationVerified ? 'Verified' : 'Pending'}">Verified</span></td>
+                <td th:text="${seller.reliabilityScore} + '/100'">92/100</td>
+                <td th:text="${seller.complaintRateScore} + '/100'">95/100</td>
+                <td th:text="${seller.greenComplianceScore} + '/100'">88/100</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <br>
+    <section class="card">
+        <h2>Product Approval Queue</h2>
+        <table class="table">
+            <thead><tr><th>Product</th><th>Seller</th><th>Category</th><th>Trust</th><th>Green</th><th>Action</th></tr></thead>
+            <tbody>
+            <tr th:if="${pendingProducts.isEmpty()}"><td colspan="6" class="muted">No pending products.</td></tr>
+            <tr th:each="product : ${pendingProducts}">
+                <td><strong th:text="${product.name}">Product</strong><br><span class="muted" th:text="${product.sustainabilityTag}">tag</span></td>
+                <td th:text="${product.seller.storeName}">Seller</td>
+                <td th:text="${product.category.displayName}">Category</td>
+                <td th:text="${product.trustScore} + '/100'">0</td>
+                <td th:text="${product.greenScore} + '/100'">0</td>
+                <td style="display:flex;gap:6px;flex-wrap:wrap">
+                    <form th:action="@{/admin/products/{id}/approve(id=${product.id})}" method="post"><button class="btn btn-primary" type="submit">Approve</button></form>
+                    <form th:action="@{/admin/products/{id}/reject(id=${product.id})}" method="post"><button class="btn btn-danger" type="submit">Reject</button></form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <br>
+    <section class="card">
+        <h2>Recent Orders</h2>
+        <table class="table">
+            <thead><tr><th>Order</th><th>Buyer</th><th>Total</th><th>Savings / Points</th><th>Fulfillment</th><th>Green Checkout</th><th>Current Status</th><th>Update</th></tr></thead>
+            <tbody>
+            <tr th:if="${orders.isEmpty()}"><td colspan="8" class="muted">No orders yet.</td></tr>
+            <tr th:each="order : ${orders}">
+                <td th:text="${order.orderCode}">Code</td>
+                <td><span th:text="${order.fullName}">Buyer</span><br><span class="muted" th:text="${order.email}">email</span></td>
+                <td>₱<span th:text="${order.total}">0</span></td>
+                <td><span class="muted">Code: </span><strong th:text="${order.discountCode == null || order.discountCode.isBlank() ? 'None' : order.discountCode}">None</strong><br><span class="muted">Earned </span><strong th:text="${order.loyaltyPointsEarned}">0</strong><span class="muted"> pts</span></td>
+                <td><span class="badge" th:text="${order.deliveryOption.displayName}">Delivery</span><br><span class="muted" th:text="${order.buyerMarketLocation}">Market</span></td>
+                <td><span class="badge" th:text="${order.greenDeliveryLabel}">Green</span></td>
+                <td><span class="badge" th:text="${order.orderStatus.displayName}">Status</span></td>
+                <td>
+                    <form th:action="@{/admin/orders/{id}/status(id=${order.id})}" method="post" style="display:flex;gap:6px">
+                        <select name="status"><option th:each="status : ${orderStatuses}" th:value="${status}" th:text="${status.displayName}" th:selected="${status == order.orderStatus}"></option></select>
+                        <button class="btn btn-primary" type="submit">Save</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <br>
+    <section class="card">
+        <h2>Autoshipment Subscriptions</h2>
+        <table class="table compact">
+            <thead><tr><th>Buyer</th><th>Product</th><th>Frequency</th><th>Recurring Price</th><th>Next Shipment</th><th>Status</th></tr></thead>
+            <tbody>
+            <tr th:if="${subscriptions.isEmpty()}"><td colspan="6" class="muted">No autoshipment subscriptions yet.</td></tr>
+            <tr th:each="sub : ${subscriptions}">
+                <td><strong th:text="${sub.buyer.fullName}">Buyer</strong><br><span class="muted" th:text="${sub.buyer.email}">email</span></td>
+                <td th:text="${sub.product.name}">Product</td>
+                <td th:text="${sub.frequency.displayName}">Monthly</td>
+                <td>₱<span th:text="${sub.recurringPrice}">0</span></td>
+                <td th:text="${sub.nextShipmentDate}">date</td>
+                <td><span class="badge" th:text="${sub.status}">ACTIVE</span></td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <br>
+    <section class="card">
+        <h2>Refund Requests</h2>
+        <table class="table">
+            <thead><tr><th>Order Code</th><th>Email</th><th>Reason</th><th>Status</th><th>Update</th></tr></thead>
+            <tbody>
+            <tr th:if="${refunds.isEmpty()}"><td colspan="5" class="muted">No refund requests yet.</td></tr>
+            <tr th:each="refund : ${refunds}">
+                <td th:text="${refund.orderCode}">Code</td>
+                <td th:text="${refund.email}">Email</td>
+                <td><span th:text="${refund.reason}">Reason</span><br><span class="muted" th:text="${refund.evidenceUrl}">Evidence</span></td>
+                <td><span class="badge-warn badge" th:text="${refund.status.displayName}">Status</span></td>
+                <td>
+                    <form th:action="@{/admin/refunds/{id}/status(id=${refund.id})}" method="post" style="display:flex;gap:6px">
+                        <select name="status"><option th:each="status : ${refundStatuses}" th:value="${status}" th:text="${status.displayName}" th:selected="${status == refund.status}"></option></select>
+                        <button class="btn btn-primary" type="submit">Save</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+</body>
+</html>

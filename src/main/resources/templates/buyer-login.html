@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Buyer Login - TrustCart</title><link rel="stylesheet" th:href="@{/css/styles.css}"></head>
+<body>
+<nav class="nav"><div class="nav-inner"><a class="logo" th:href="@{/}"><span class="logo-badge">TC</span> TrustCart</a><div class="nav-links"><a th:href="@{/}">Shop</a><a th:href="@{/buyer/register}">Create Buyer Account</a><a th:href="@{/seller/login}">Seller Login</a></div></div></nav>
+<main class="container narrow">
+    <section class="card auth-card">
+        <span class="eyebrow green">Buyer Access</span>
+        <h1>Login to shop with protection</h1>
+        <p class="muted">Buyer login is required for cart, checkout, order tracking, refund requests, and protected pickup flow.</p>
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+        <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+        <form th:action="@{/buyer/login}" method="post">
+            <label>Email</label>
+            <input type="email" name="email" value="buyer@trustcart.ph" required>
+            <label>Password</label>
+            <input type="password" name="password" value="trust123" required>
+            <button class="btn btn-primary" style="width:100%;margin-top:10px" type="submit">Login as Buyer</button>
+        </form>
+        <p class="tiny">Access account: buyer@trustcart.ph / trust123</p>
+        <a class="btn btn-outline" style="width:100%;margin-top:8px" th:href="@{/buyer/register}">Create New Buyer Account</a>
+    </section>
+</main>
+</body>
+</html>

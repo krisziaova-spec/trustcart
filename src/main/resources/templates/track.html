@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Track Order - TrustCart</title><link rel="stylesheet" th:href="@{/css/styles.css}"></head>
+<body>
+<nav class="nav"><div class="nav-inner"><a class="logo" th:href="@{/}"><span class="logo-badge">TC</span> TrustCart</a><div class="nav-links"><a th:href="@{/}">Shop</a><a th:href="@{/refund}">Refund Center</a><a th:href="@{/seller}">Seller Center</a></div></div></nav>
+<main class="container">
+    <h1>Order Tracking</h1>
+    <form class="card" th:action="@{/track}" method="get">
+        <div class="search-row">
+            <input required name="orderCode" placeholder="Order Code e.g. TC-20260601-1234" th:value="${param.orderCode}">
+            <input required name="email" placeholder="Buyer Email" th:value="${param.email}">
+            <button class="btn btn-primary" type="submit">Track</button>
+        </div>
+    </form>
+    <br>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+    <section class="card" th:if="${order != null}">
+        <h2>Order <span th:text="${order.orderCode}">Code</span></h2>
+        <p><strong>Status:</strong> <span class="badge" th:text="${order.orderStatus.displayName}">Placed</span></p>
+        <p><strong>Payment:</strong> <span th:text="${order.paymentStatus}">Payment</span></p>
+        <div class="timeline">
+            <div class="step active"><span class="dot"></span><div><strong>Order Placed</strong><br><span class="muted">Your order has been created.</span></div></div>
+            <div class="step" th:classappend="${order.orderStatus.name() == 'PACKING' or order.orderStatus.name() == 'SHIPPED' or order.orderStatus.name() == 'OUT_FOR_DELIVERY' or order.orderStatus.name() == 'DELIVERED'} ? 'active' : ''"><span class="dot"></span><div><strong>Seller Packing</strong><br><span class="muted">Seller prepares verified items.</span></div></div>
+            <div class="step" th:classappend="${order.orderStatus.name() == 'SHIPPED' or order.orderStatus.name() == 'OUT_FOR_DELIVERY' or order.orderStatus.name() == 'DELIVERED'} ? 'active' : ''"><span class="dot"></span><div><strong>Shipped</strong><br><span class="muted">Package is with courier.</span></div></div>
+            <div class="step" th:classappend="${order.orderStatus.name() == 'OUT_FOR_DELIVERY' or order.orderStatus.name() == 'DELIVERED'} ? 'active' : ''"><span class="dot"></span><div><strong>Out for Delivery</strong><br><span class="muted">Courier is delivering today.</span></div></div>
+            <div class="step" th:classappend="${order.orderStatus.name() == 'DELIVERED'} ? 'active' : ''"><span class="dot"></span><div><strong>Delivered</strong><br><span class="muted">Order completed.</span></div></div>
+        </div>
+        <h3>Items</h3>
+        <table class="table"><tbody><tr th:each="item : ${order.items}"><td th:text="${item.productName}">Item</td><td th:text="${item.sellerName}">Seller</td><td>₱<span th:text="${item.lineTotal}">0</span></td></tr></tbody></table>
+    </section>
+</main>
+</body>
+</html>

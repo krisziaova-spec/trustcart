@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${product.name} + ' - TrustCart'">Product</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<nav class="nav"><div class="nav-inner"><a class="logo" th:href="@{/}"><span class="logo-badge">TC</span> TrustCart</a><div class="nav-links"><a th:href="@{/}">Shop</a><a th:href="@{/autoship}" th:if="${buyerLoggedIn}">Subscriptions</a><a th:href="@{/seller}">Seller Center</a><a th:href="@{/buyer/login}" th:if="${!buyerLoggedIn}">Buyer Login</a><a class="btn-light" th:href="@{/cart}">Cart (<span th:text="${cartCount}">0</span>)</a></div></div></nav>
+<main class="container">
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+    <div class="two-col wide-left">
+        <section class="card product-detail-card">
+            <div class="product-photo-wrap detail-photo"><img class="product-photo" th:src="${product.imageUrl}" th:alt="${product.photoAltText}"></div>
+            <div class="badges">
+                <span class="badge shield" th:text="${product.shieldLabel}">TrustCart Shield Verified</span>
+                <span class="badge" th:text="${product.category.displayName}">Category</span>
+                <span class="badge" th:if="${product.ecoFriendly}">Eco-Friendly</span>
+                <span class="badge-gray badge" th:text="${product.sustainabilityTag}">Tag</span>
+                <span class="badge-gray badge" th:if="${product.seller.storeLocationVerified}">Location Verified</span>
+                <span class="badge" th:if="${product.subscriptionEligible}">Subscribe & Save</span>
+            </div>
+            <h1 th:text="${product.name}">Product</h1>
+            <p th:text="${product.description}">Description</p>
+
+            <section class="location-protection-box">
+                <h2>Nearby Seller and Location Protection</h2>
+                <div class="two-mini">
+                    <div class="mini-card"><strong>Seller public area</strong><p th:text="${product.seller.publicLocationLabel}">San Pablo City area</p></div>
+                    <div class="mini-card"><strong>Distance estimate</strong><p th:if="${distanceKm != null}"><span th:text="${distanceKm}">0</span> km from your target market</p><p th:if="${distanceKm == null}">Select a target market location to estimate distance.</p></div>
+                </div>
+                <div class="protection-box">
+                    <strong>Exact address is hidden for buyer protection.</strong>
+                    <span>TrustCart prevents direct buyer-to-seller deals that may bypass payment proof, refund tracking, fake-item reports, and buyer protection. Pickup is allowed only through a TrustCart-confirmed pickup hub or platform-approved release instruction.</span>
+                </div>
+            </section>
+
+            <section class="score-panel">
+                <h2>Product Trust Score Breakdown</h2>
+                <div class="breakdown-row"><span>Seller Verification</span><strong th:text="${product.sellerVerificationScore} + '/25'">25/25</strong></div>
+                <div class="bar"><span th:style="${'width:' + (product.sellerVerificationScore * 4) + '%'}"></span></div>
+                <div class="breakdown-row"><span>Product Authenticity</span><strong th:text="${product.productAuthenticityScore} + '/25'">25/25</strong></div>
+                <div class="bar"><span th:style="${'width:' + (product.productAuthenticityScore * 4) + '%'}"></span></div>
+                <div class="breakdown-row"><span>Review Quality</span><strong th:text="${product.reviewQualityScore} + '/25'">22/25</strong></div>
+                <div class="bar"><span th:style="${'width:' + (product.reviewQualityScore * 4) + '%'}"></span></div>
+                <div class="breakdown-row"><span>Delivery Reliability</span><strong th:text="${product.deliveryReliabilityScore} + '/20'">18/20</strong></div>
+                <div class="bar"><span th:style="${'width:' + (product.deliveryReliabilityScore * 5) + '%'}"></span></div>
+                <div class="breakdown-row"><span>Sustainability</span><strong th:text="${product.sustainabilityScore} + '/10'">10/10</strong></div>
+                <div class="bar"><span th:style="${'width:' + (product.sustainabilityScore * 10) + '%'}"></span></div>
+            </section>
+
+            <section class="two-mini">
+                <div class="mini-card"><strong>Smart Review Summary</strong><p th:text="${product.reviewSummary}">Review summary</p></div>
+                <div class="mini-card"><strong>Red Flag Check</strong><p th:text="${product.redFlagSummary}">No red flags</p></div>
+            </section>
+        </section>
+
+        <aside class="card sticky-card">
+            <div class="price">₱<span th:text="${product.price}">0</span></div>
+            <div class="score-pair large">
+                <div><span>Trust Score</span><strong th:text="${product.trustScore} + '/100'">94/100</strong></div>
+                <div><span>Green Score</span><strong th:text="${product.greenScore} + '/100'">88/100</strong></div>
+            </div>
+            <p class="muted">Stock: <span th:text="${product.stock}">0</span></p>
+            <h3>Seller Passport</h3>
+            <div class="passport-list">
+                <span>Business Verified: <strong th:text="${product.seller.businessVerified ? 'Yes' : 'Pending'}">Yes</strong></span>
+                <span>ID Verified: <strong th:text="${product.seller.identityVerified ? 'Yes' : 'Pending'}">Yes</strong></span>
+                <span>Location Verified: <strong th:text="${product.seller.storeLocationVerified ? 'Yes' : 'Pending'}">Yes</strong></span>
+                <span>Public Area: <strong th:text="${product.seller.publicLocationLabel}">Area</strong></span>
+                <span>Pickup: <strong th:text="${product.seller.pickupAvailable ? 'TrustCart Hub Eligible' : 'Delivery Only'}">Hub</strong></span>
+                <span>Complaint Score: <strong th:text="${product.seller.complaintRateScore} + '/100'">95/100</strong></span>
+                <span>Green Compliance: <strong th:text="${product.seller.greenComplianceScore} + '/100'">88/100</strong></span>
+            </div>
+            <div class="checkout-badges">
+                <span class="badge" th:if="${product.plasticFreePackaging}">Plastic-Free</span>
+                <span class="badge" th:if="${product.locallySourced}">Locally Sourced</span>
+                <span class="badge" th:if="${product.lowWasteDelivery}">Low-Waste Delivery</span>
+            </div>
+            <div class="protection-box"><strong>Off-platform warning</strong><span>Do not pay or meet outside TrustCart. Orders outside the platform are not covered by refund, tracking, or dispute protection.</span></div>
+            <div class="subscription-box" th:if="${product.subscriptionEligible}">
+                <h3>Subscribe & Save</h3>
+                <p class="muted">Best for household, grocery, pet, beauty, and wellness essentials. Choose your preferred shipment frequency and keep orders protected inside TrustCart.</p>
+                <form th:action="@{/autoship/start/{id}(id=${product.id})}" method="post">
+                    <label>Frequency</label>
+                    <select name="frequency">
+                        <option th:each="freq : ${autoshipFrequencies}" th:value="${freq}" th:text="${freq.displayName}"></option>
+                    </select>
+                    <label>Quantity</label>
+                    <input type="number" name="quantity" value="1" min="1">
+                    <button class="btn btn-light" style="width:100%;margin-top:10px" type="submit" th:text="${buyerLoggedIn ? 'Start Autoshipment - Save ' + product.subscriptionDiscountPercent + '%' : 'Login to Subscribe'}">Start Autoshipment</button>
+                </form>
+            </div>
+            <form th:action="@{/cart/add/{id}(id=${product.id})}" method="post">
+                <label>Quantity</label>
+                <input type="number" name="quantity" value="1" min="1">
+                <button class="btn btn-primary" style="width:100%;margin-top:10px" type="submit" th:text="${buyerLoggedIn ? 'Add to Cart' : 'Login to Add to Cart'}">Add to Cart</button>
+            </form>
+        </aside>
+    </div>
+</main>
+</body>
+</html>

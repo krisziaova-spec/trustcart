@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Seller Dashboard - TrustCart</title><link rel="stylesheet" th:href="@{/css/styles.css}"></head>
+<body>
+<nav class="nav"><div class="nav-inner"><a class="logo" th:href="@{/}"><span class="logo-badge">TC</span> TrustCart</a><div class="nav-links"><a th:href="@{/}">Buyer Shop</a><a th:href="@{/seller/products/new}">Add Product</a><form th:action="@{/seller/logout}" method="post"><button class="btn btn-outline" type="submit">Logout</button></form></div></div></nav>
+<main class="container">
+    <div class="section-title"><h1>Seller Dashboard</h1><a class="btn btn-primary" th:href="@{/seller/products/new}">Add Product</a></div>
+    <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+    <section class="three-col">
+        <div class="kpi"><span>Store</span><strong th:text="${seller.storeName}">Store</strong></div>
+        <div class="kpi"><span>Seller Passport</span><strong th:text="${seller.passportStatus}">Complete</strong></div>
+        <div class="kpi"><span>Reliability</span><strong th:text="${seller.reliabilityScore} + '/100'">92/100</strong></div>
+    </section>
+    <br>
+    <section class="card">
+        <h2>Seller Passport</h2>
+        <div class="passport-grid">
+            <div><span>Business Verified</span><strong th:text="${seller.businessVerified ? 'Yes' : 'Pending'}">Yes</strong></div>
+            <div><span>ID Verified</span><strong th:text="${seller.identityVerified ? 'Yes' : 'Pending'}">Yes</strong></div>
+            <div><span>Documents Checked</span><strong th:text="${seller.documentVerified ? 'Yes' : 'Pending'}">Yes</strong></div>
+            <div><span>Product Compliance</span><strong th:text="${seller.productComplianceChecked ? 'Checked' : 'Pending'}">Checked</strong></div>
+            <div><span>Response Rate</span><strong th:text="${seller.responseRateScore} + '/100'">96/100</strong></div>
+            <div><span>Green Compliance</span><strong th:text="${seller.greenComplianceScore} + '/100'">88/100</strong></div>
+        </div>
+        <p class="muted" th:text="${seller.verificationNote}">Verification note</p>
+    </section>
+    <br>
+    <section class="card">
+        <h2>Store Location Integrity</h2>
+        <div class="passport-grid">
+            <div><span>Exact Address</span><strong th:text="${seller.storeExactAddress}">Hidden</strong></div>
+            <div><span>Public Buyer Area</span><strong th:text="${seller.publicLocationLabel}">Area</strong></div>
+            <div><span>Location Verified</span><strong th:text="${seller.storeLocationVerified ? 'Yes' : 'Pending'}">Yes</strong></div>
+            <div><span>Pickup</span><strong th:text="${seller.pickupAvailable ? 'TrustCart Hub Only' : 'Not Available'}">Hub</strong></div>
+            <div><span>Service Radius</span><strong th:text="${seller.serviceRadiusKm} + ' km'">5 km</strong></div>
+            <div><span>Buyer View</span><strong>Exact address hidden</strong></div>
+        </div>
+        <p class="muted" th:text="${seller.locationIntegrityNote}">Location note</p>
+    </section>
+    <br>
+    <section class="card">
+        <h2>My Products</h2>
+        <table class="table">
+            <thead><tr><th>Name</th><th>Category</th><th>Price</th><th>Status</th><th>Trust</th><th>Green</th></tr></thead>
+            <tbody><tr th:each="product : ${products}"><td><strong th:text="${product.name}">Product</strong><br><span class="muted" th:text="${product.sustainabilityTag}">Tag</span></td><td th:text="${product.category.displayName}">Category</td><td>₱<span th:text="${product.price}">0</span></td><td><span class="badge" th:text="${product.status}">Status</span></td><td th:text="${product.trustScore} + '/100'">0</td><td th:text="${product.greenScore} + '/100'">0</td></tr></tbody>
+        </table>
+    </section>
+    <br>
+    <section class="card">
+        <h2>Recent Platform Orders</h2>
+        <p class="muted">This section shows recent orders from the marketplace.</p>
+        <table class="table"><thead><tr><th>Order</th><th>Buyer</th><th>Status</th><th>Green Checkout</th><th>Total</th></tr></thead><tbody><tr th:each="order : ${orders}"><td th:text="${order.orderCode}">Code</td><td th:text="${order.fullName}">Buyer</td><td th:text="${order.orderStatus.displayName}">Status</td><td th:text="${order.greenDeliveryLabel}">Green</td><td>₱<span th:text="${order.total}">0</span></td></tr></tbody></table>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Cart - TrustCart</title><link rel="stylesheet" th:href="@{/css/styles.css}"></head>
+<body>
+<nav class="nav"><div class="nav-inner"><a class="logo" th:href="@{/}"><span class="logo-badge">TC</span> TrustCart</a><div class="nav-links"><a th:href="@{/}">Continue Shopping</a><a th:href="@{/seller}">Seller Center</a><a class="btn-light" th:href="@{/cart}">Cart (<span th:text="${cartCount}">0</span>)</a></div></div></nav>
+<main class="container">
+    <h1>Your Cart</h1>
+    <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+    <div th:if="${summary.lines.isEmpty()}" class="card">
+        <h2>Your cart is empty.</h2>
+        <a class="btn btn-primary" th:href="@{/}">Shop Now</a>
+    </div>
+    <div class="two-col" th:if="${!summary.lines.isEmpty()}">
+        <section class="card">
+            <table class="table">
+                <thead><tr><th>Product</th><th>Qty</th><th>Subtotal</th><th></th></tr></thead>
+                <tbody>
+                <tr th:each="line : ${summary.lines}">
+                    <td><strong th:text="${line.product.name}">Product</strong><br><span class="muted" th:text="${line.product.seller.storeName}">Seller</span><br><span class="muted" th:text="${line.product.seller.publicLocationLabel}">Area</span></td>
+                    <td>
+                        <form th:action="@{/cart/update/{id}(id=${line.product.id})}" method="post" style="display:flex;gap:6px">
+                            <input type="number" name="quantity" min="0" th:value="${line.quantity}" style="width:80px">
+                            <button class="btn btn-outline" type="submit">Update</button>
+                        </form>
+                    </td>
+                    <td>₱<span th:text="${line.lineTotal}">0</span></td>
+                    <td><form th:action="@{/cart/remove/{id}(id=${line.product.id})}" method="post"><button class="btn btn-danger" type="submit">Remove</button></form></td>
+                </tr>
+                </tbody>
+            </table>
+        </section>
+        <aside class="card">
+            <h2>Order Summary</h2>
+            <p>Subtotal: <strong>₱<span th:text="${summary.subtotal}">0</span></strong></p>
+            <p>Estimated Shipping: <strong>₱<span th:text="${summary.shippingFee}">0</span></strong></p>
+            <p>Discount: <strong>-₱<span th:text="${summary.discount}">0</span></strong></p>
+            <hr>
+            <h2>Total: ₱<span th:text="${summary.total}">0</span></h2>
+            <div class="protection-box"><strong>Protected cart</strong><span>Seller exact addresses are hidden. Direct seller payment is not covered by TrustCart buyer protection.</span></div>
+            <a class="btn btn-primary" style="width:100%" th:href="@{/checkout}">Proceed to Checkout</a>
+        </aside>
+    </div>
+</main>
+</body>
+</html>

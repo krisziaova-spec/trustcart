@@ -2,14 +2,15 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Seller Dashboard - TrustCart</title><link rel="stylesheet" th:href="@{/css/styles.css}"></head>
 <body>
-<nav class="nav"><div class="nav-inner"><a class="logo" th:href="@{/}"><span class="logo-badge">TC</span> TrustCart</a><div class="nav-links"><a th:href="@{/}">Buyer Shop</a><a th:href="@{/seller/products/new}">Add Product</a><form th:action="@{/seller/logout}" method="post"><button class="btn btn-outline" type="submit">Logout</button></form><a th:href="@{/faq}">FAQ</a><a th:href="@{/site-map}">Site Map</a></div></div></nav>
+<nav class="nav"><div class="nav-inner"><a class="logo" th:href="@{/}"><span class="logo-badge">TC</span> TrustCart</a><div class="nav-links"><a th:href="@{/}">Buyer Shop</a><a th:href="@{/seller/products/new}">Add Product</a><a th:href="@{/seller-policy}">Seller Policy</a><a th:href="@{/faq}">FAQ</a><a th:href="@{/site-map}">Site Map</a><form th:action="@{/seller/logout}" method="post" class="nav-form"><button type="submit">Logout</button></form></div></div></nav>
 <main class="container">
     <div class="section-title"><h1>Seller Dashboard</h1><a class="btn btn-primary" th:href="@{/seller/products/new}">Add Product</a></div>
     <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
     <section class="three-col">
-        <div class="kpi"><span>Store</span><strong th:text="${seller.storeName}">Store</strong></div>
-        <div class="kpi"><span>Seller Passport</span><strong th:text="${seller.passportStatus}">Complete</strong></div>
-        <div class="kpi"><span>Reliability</span><strong th:text="${seller.reliabilityScore} + '/100'">92/100</strong></div>
+        <a class="kpi clickable-kpi" th:href="@{/seller/products/new}"><span>Published Products</span><strong th:text="${products.size()}">0</strong></a>
+        <a class="kpi clickable-kpi" th:href="@{/seller-policy}"><span>Seller Passport</span><strong th:text="${seller.passportStatus}">Complete</strong></a>
+        <a class="kpi clickable-kpi" th:href="@{/sustainability-policy}"><span>Reliability</span><strong th:text="${seller.reliabilityScore} + '/100'">92/100</strong></a>
     </section>
     <br>
     <section class="card">
@@ -39,27 +40,46 @@
     </section>
     <br>
     <section class="card">
+        <div class="section-title compact-title"><h2>Seller Discount Codes</h2><span class="muted">Created and controlled by seller accounts only</span></div>
+        <form th:action="@{/seller/discounts}" method="post" class="discount-seller-form seller-discount-form">
+            <input name="code" placeholder="Code e.g. ECOHOME10" required>
+            <input name="description" placeholder="Description">
+            <input name="minimumSpend" type="number" step="0.01" min="0" placeholder="Min spend">
+            <input name="percentOff" type="number" min="0" max="100" placeholder="% off">
+            <input name="amountOff" type="number" step="0.01" min="0" placeholder="₱ off">
+            <input name="maxRedemptions" type="number" min="0" placeholder="Max uses">
+            <button class="btn btn-primary" type="submit">Create Code</button>
+        </form>
+        <table class="table compact">
+            <thead><tr><th>Code</th><th>Description</th><th>Minimum</th><th>Discount</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody>
+            <tr th:each="code : ${discountCodes}">
+                <td><strong th:text="${code.code}">CODE</strong><br><span class="muted" th:text="${code.createdBySeller}">Seller</span></td>
+                <td th:text="${code.description}">Description</td>
+                <td>₱<span th:text="${code.minimumSpend}">0</span></td>
+                <td><span th:text="${code.percentOff > 0 ? code.percentOff + '% off' : '₱' + code.amountOff + ' off'}">Discount</span></td>
+                <td><span class="badge" th:text="${code.active ? 'Active' : 'Inactive'}">Active</span></td>
+                <td><form th:action="@{/seller/discounts/{id}/toggle(id=${code.id})}" method="post"><button class="btn btn-light" type="submit" th:text="${code.active ? 'Disable' : 'Enable'}">Toggle</button></form></td>
+            </tr>
+            <tr th:if="${discountCodes.isEmpty()}"><td colspan="6" class="muted">No seller-created discount codes yet.</td></tr>
+            </tbody>
+        </table>
+    </section>
+    <br>
+    <section class="card">
         <h2>My Products</h2>
         <table class="table">
-            <thead><tr><th>Name</th><th>Category</th><th>Price</th><th>Status</th><th>Trust</th><th>Green</th></tr></thead>
-            <tbody><tr th:each="product : ${products}"><td><strong th:text="${product.name}">Product</strong><br><span class="muted" th:text="${product.sustainabilityTag}">Tag</span></td><td th:text="${product.category.displayName}">Category</td><td>₱<span th:text="${product.price}">0</span></td><td><span class="badge" th:text="${product.status}">Status</span></td><td th:text="${product.trustScore} + '/100'">0</td><td th:text="${product.greenScore} + '/100'">0</td></tr></tbody>
+            <thead><tr><th>Name</th><th>Category</th><th>Price</th><th>Status</th><th>Trust</th><th>Green</th><th>View</th></tr></thead>
+            <tbody><tr th:each="product : ${products}"><td><strong th:text="${product.name}">Product</strong><br><span class="muted" th:text="${product.sustainabilityTag}">Tag</span></td><td th:text="${product.category.displayName}">Category</td><td>₱<span th:text="${product.price}">0</span></td><td><span class="badge" th:text="${product.status}">Status</span></td><td th:text="${product.trustScore} + '/100'">0</td><td th:text="${product.greenScore} + '/100'">0</td><td><a class="btn btn-outline" th:href="@{/product/{id}(id=${product.id})}">Open</a></td></tr></tbody>
         </table>
     </section>
     <br>
     <section class="card">
         <h2>Recent Platform Orders</h2>
-        <p class="muted">This section shows recent orders from the marketplace.</p>
-        <table class="table"><thead><tr><th>Order</th><th>Buyer</th><th>Status</th><th>Green Checkout</th><th>Total</th></tr></thead><tbody><tr th:each="order : ${orders}"><td th:text="${order.orderCode}">Code</td><td th:text="${order.fullName}">Buyer</td><td th:text="${order.orderStatus.displayName}">Status</td><td th:text="${order.greenDeliveryLabel}">Green</td><td>₱<span th:text="${order.total}">0</span></td></tr></tbody></table>
+        <p class="muted">For this prototype, sellers can monitor recent protected orders from the marketplace. Buyers remain protected when checkout stays inside TrustCart.</p>
+        <table class="table"><thead><tr><th>Order</th><th>Buyer</th><th>Status</th><th>Green Checkout</th><th>Total</th><th>Track</th></tr></thead><tbody><tr th:each="order : ${orders}"><td th:text="${order.orderCode}">Code</td><td th:text="${order.fullName}">Buyer</td><td th:text="${order.orderStatus.displayName}">Status</td><td th:text="${order.greenDeliveryLabel}">Green</td><td>₱<span th:text="${order.total}">0</span></td><td><a class="btn btn-outline" th:href="@{/track(orderCode=${order.orderCode}, email=${order.email})}">Track</a></td></tr></tbody></table>
     </section>
 </main>
-
-<footer class="site-footer">
-    <div class="container footer-grid">
-        <div><strong>TrustCart</strong><p>Verified green marketplace with buyer protection, seller verification, and sustainable checkout.</p></div>
-        <div><h4>Customer Care</h4><a th:href="@{/help-center}">Help Center</a><a th:href="@{/faq}">FAQ</a><a th:href="@{/track}">Track Order</a><a th:href="@{/refund}">Protection Center</a></div>
-        <div><h4>Policies</h4><a th:href="@{/privacy-policy}">Privacy Policy</a><a th:href="@{/terms-and-conditions}">Terms and Conditions</a><a th:href="@{/return-refund-policy}">Returns and Refunds</a><a th:href="@{/shipping-delivery-policy}">Shipping and Delivery</a></div>
-        <div><h4>Marketplace</h4><a th:href="@{/buyer-protection-policy}">Buyer Protection</a><a th:href="@{/seller-policy}">Seller Policy</a><a th:href="@{/sustainability-policy}">Sustainability</a><a th:href="@{/site-map}">Site Map</a></div>
-    </div>
-</footer>
+<footer class="site-footer"><div class="container footer-grid"><div><strong>TrustCart</strong><p>Seller tools for products, discount codes, location integrity, and protected orders.</p></div><div><h4>Seller Tools</h4><a th:href="@{/seller/products/new}">Add Product</a><a th:href="@{/seller-policy}">Seller Policy</a><a th:href="@{/prohibited-items-policy}">Prohibited Items</a></div><div><h4>Customer Care</h4><a th:href="@{/help-center}">Help Center</a><a th:href="@{/faq}">FAQ</a><a th:href="@{/contact-us}">Contact Us</a></div><div><h4>Marketplace</h4><a th:href="@{/}">Buyer Shop</a><a th:href="@{/sustainability-policy}">Sustainability</a><a th:href="@{/site-map}">Site Map</a></div></div></footer>
 </body>
 </html>

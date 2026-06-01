@@ -6,7 +6,7 @@
 <main class="container">
     <section class="card" style="max-width:900px;margin:auto">
         <h1>Become a TrustCart Seller</h1>
-        <p class="platform-note">Only legitimate and admin-approved sellers can sell. Seller must provide exact store location to admin, but buyers only see the public area to prevent off-platform transactions.</p>
+        <p class="platform-note">Only legitimate sellers can sell. Seller must provide exact store location for platform verification, but buyers only see the public area to prevent off-platform transactions.</p>
         <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
         <form th:action="@{/seller/apply}" method="post">
             <div class="form-grid">
@@ -20,7 +20,7 @@
             <input required name="sustainabilityBadge" placeholder="Plastic-Free Packaging, Locally Sourced, Low-Waste Packaging">
 
             <h2>Verified Store Location</h2>
-            <p class="muted">Exact address is for admin verification only. Buyers will see public area, distance estimate, and TrustCart pickup hub notice only.</p>
+            <p class="muted">Exact address is for platform verification only. Buyers will see public area, distance estimate, and TrustCart pickup hub notice only.</p>
             <select id="locationPreset" onchange="applyPreset()">
                 <option value="San Pablo City|Laguna|14.0683|121.3256">San Pablo City, Laguna</option>
                 <option value="Calamba|Laguna|14.2117|121.1653">Calamba, Laguna</option>
@@ -29,7 +29,7 @@
                 <option value="Quezon City|Metro Manila|14.6760|121.0437">Quezon City</option>
             </select>
             <label>Exact Store Address</label>
-            <textarea required name="storeExactAddress" placeholder="Exact address for admin verification only"></textarea>
+            <textarea required name="storeExactAddress" placeholder="Exact address for platform verification only"></textarea>
             <div class="form-grid">
                 <div><label>City</label><input id="storeCity" required name="storeCity" value="San Pablo City"></div>
                 <div><label>Province</label><input id="storeProvince" required name="storeProvince" value="Laguna"></div>
@@ -50,7 +50,7 @@
                 <strong>Seller Rules</strong>
                 <span>No fake products, no fake reviews, no misleading price, no unsupported eco claim, no fake virtual store, and no attempt to redirect buyers outside TrustCart.</span>
             </div>
-            <button class="btn btn-primary" type="submit" style="width:100%;margin-top:12px">Submit Seller Application</button>
+            <button class="btn btn-primary" type="submit" style="width:100%;margin-top:12px">Create Seller Account</button>
         </form>
     </section>
 </main>

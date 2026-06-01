@@ -1,104 +1,23 @@
-# TrustCart Platform Presentation Script
+# TrustCart Presentation Script
 
-## 1. Buyer Login
+## Opening
+TrustCart is a buyer-seller e-commerce platform focused on verified sellers, buyer protection, sustainability, location-based shopping, and customer retention.
 
-Open `/buyer/login`.
+## Buyer Flow
+Open `/`. Show the Shopee-like marketplace homepage, search, categories, promo cards, TrustCart Shield, and target market location filter.
 
-Sample account:
-- Email: buyer@trustcart.ph
-- Password: trust123
+Click a category. Open product details. Explain Trust Score, Green Score, protected seller location, and buyer protection.
 
-Explain: Buyer login is required for cart, checkout, tracking, and refund requests.
+Login as buyer, add to cart, go to checkout, apply discount code, redeem TrustPoints, choose payment option, and place order.
 
-## 2. Target Market Location
+Show order tracking and refund request.
 
-Open `/`.
+## Seller Flow
+Open `/seller`. Explain that seller access is separate from buyer shopping.
 
-Show the target market location card.
+Login as seller. Show Seller Passport, exact address hidden from buyers, product list, seller discount code creation, and recent platform orders.
 
-Try:
-- San Pablo City, 5 km radius
-- Calamba, 10 km radius
-- Manila, 10 km radius
+Publish a product from `/seller/products/new` and confirm it appears in the buyer marketplace.
 
-Tick:
-- Nearby sellers only
-- Pickup-capable sellers only
-
-Explain: Buyers can search products based on nearby verified sellers for faster delivery and possible pickup.
-
-## 3. Product Search and Seller Location Protection
-
-Open any product.
-
-Show:
-- Seller public area only
-- Distance estimate from target market
-- Exact address hidden notice
-- Off-platform warning
-
-Explain: TrustCart does not reveal exact seller location to prevent buyers from purchasing outside the platform. Outside transactions are not covered by refund, tracking, or dispute support.
-
-## 4. Cart and Checkout
-
-Add product to cart and checkout.
-
-Show fulfillment options:
-- Standard delivery
-- Eco consolidated delivery
-- TrustCart pickup hub
-
-Show payment options:
-- COD
-- GCash presentation
-- Maya presentation
-- Card presentation
-- Bank transfer presentation
-
-Explain: Payment is routed through a presentation gateway for academic review.
-
-## 5. Seller Center
-
-Open `/seller/login`.
-
-Sample sellers:
-- greentech@trustcart.ph / trust123
-- localgoods@trustcart.ph / trust123
-- ecohome@trustcart.ph / trust123
-
-Show:
-- Seller passport
-- Exact address visible to seller/admin only
-- Public area shown to buyers only
-- Location verified status
-
-## 6. Seller Application
-
-Open `/seller/apply`.
-
-Show that sellers must submit:
-- Business details
-- Password
-- Sustainability claim
-- Exact store address
-- City/province
-- Latitude/longitude
-- Location proof
-- Service radius
-- Pickup availability
-
-Explain: This prevents fake virtual stores and supports faster local delivery.
-
-## 7. Admin Dashboard
-
-Open `/admin`.
-
-Show:
-- Seller applications
-- Exact address/location proof for admin review
-- Approved seller passport monitor
-- Product approval queue
-- Order fulfillment and target market
-- Refund requests
-
-Explain: Admin is the gatekeeper for legitimate sellers, verified products, location proof, sustainability claims, and customer protection.
+## Closing
+TrustCart reduces fake items, fake reviews, misleading seller locations, hidden pricing, and off-platform transaction risks while supporting sustainability and customer retention.

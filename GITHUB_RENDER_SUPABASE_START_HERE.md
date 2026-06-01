@@ -1,132 +1,85 @@
-# TrustCart Deployment Guide: GitHub + Render + Supabase
+# GitHub + Supabase + Render Start Here
 
-This folder is ready for:
+## 1. Supabase
 
-- GitHub repository upload
-- Render web service deployment
-- Supabase PostgreSQL database connection
-
-## 1. Confirm GitHub root folder
-
-When you open the GitHub repository, these files must be visible immediately in the root:
+For fresh setup, run only:
 
 ```text
-pom.xml
-Dockerfile
-render.yaml
-src/
-database/
-README.md
+database/supabase-setup.sql
 ```
 
-Do not upload a parent folder that hides these files one level deeper.
+This creates the tables and loads sample products, sellers, buyer account, and discount codes.
 
-## 2. Create Supabase database
+## 2. Render
 
-1. Open Supabase.
-2. Create a new project.
-3. Go to **Connect**.
-4. Copy the **Postgres connection details**.
-5. For Render, use the Supabase **pooler/session** connection details if available.
+Create a Web Service from your GitHub repository.
 
-Spring Boot needs this format:
+Use:
 
 ```text
-jdbc:postgresql://HOST:PORT/DATABASE?sslmode=require
+Runtime: Docker
+Branch: main
+Root Directory: blank, unless your files are inside a folder
+Health Check Path: /health
 ```
 
-Example format only:
-
-```text
-jdbc:postgresql://aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres?sslmode=require
-```
-
-Your username may look like:
-
-```text
-postgres.your_project_ref
-```
-
-## 3. Push to GitHub
-
-```bash
-git init
-git add .
-git commit -m "TrustCart Render Supabase ready"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/trustcart.git
-git push -u origin main
-```
-
-## 4. Deploy on Render
-
-Recommended method:
-
-1. Go to Render Dashboard.
-2. New > Web Service.
-3. Connect your GitHub repository.
-4. Choose Docker runtime / Dockerfile deployment.
-5. Set Health Check Path to:
-
-```text
-/health
-```
-
-6. Add environment variables:
+Environment variables:
 
 ```text
 SPRING_PROFILES_ACTIVE=postgres
-SPRING_DATASOURCE_URL=jdbc:postgresql://YOUR_SUPABASE_HOST:6543/postgres?sslmode=require
+SPRING_DATASOURCE_URL=jdbc:postgresql://YOUR_SUPABASE_HOST:5432/postgres?sslmode=require
 SPRING_DATASOURCE_USERNAME=postgres.YOUR_PROJECT_REF
-SPRING_DATASOURCE_PASSWORD=YOUR_SUPABASE_PASSWORD
-JAVA_TOOL_OPTIONS=-XX:MaxRAMPercentage=75.0 -Dserver.address=0.0.0.0
+SPRING_DATASOURCE_PASSWORD=YOUR_SUPABASE_DATABASE_PASSWORD
+PORT=8080
+SERVER_ADDRESS=0.0.0.0
+JAVA_TOOL_OPTIONS=-XX:MaxRAMPercentage=75.0
 ```
 
-7. Deploy.
-
-## 5. Optional: Render Blueprint
-
-This folder includes `render.yaml`. You can use Render Blueprint deployment if your instructor or team prefers infrastructure-as-code.
-
-The `render.yaml` intentionally does not include real Supabase credentials. Render will ask for them because secret values are marked with `sync: false`.
-
-## 6. Test live site
-
-After Render gives you the live URL, open:
+## 3. Test Pages
 
 ```text
 /
 /buyer/login
-/seller
-/seller/login
-/admin
+/buyer/register
 /cart
 /checkout
-/health
+/autoship
+/track
+/refund
+/seller
+/seller/login
+/seller/apply
+/seller/dashboard
+/seller/products/new
+/faq
+/site-map
+/privacy-policy
+/terms-and-conditions
+/return-refund-policy
+/shipping-delivery-policy
+/payment-policy
+/buyer-protection-policy
+/seller-policy
+/authenticity-policy
+/sustainability-policy
+/prohibited-items-policy
+/off-platform-policy
 ```
 
-## 7. Sample accounts
+## 4. Demo Flow
 
-Buyer:
-
-```text
-buyer@trustcart.ph
-Password: trust123
-```
-
-Sellers:
-
-```text
-greentech@trustcart.ph / trust123
-localgoods@trustcart.ph / trust123
-ecohome@trustcart.ph / trust123
-```
-
-## 8. Important prototype notes
-
-- Payment is simulated only.
-- Seller location is verified by admin in the prototype.
-- Exact seller address is not exposed publicly to protect marketplace transactions.
-- Buyers are warned that off-platform transactions are not covered by TrustCart buyer protection.
-- Tables can be auto-created by Spring Boot JPA.
-- Manual SQL is available at `database/supabase-setup.sql` only if required.
+1. Open buyer homepage.
+2. Click categories and quick action tiles.
+3. Apply target market location.
+4. Open product details.
+5. Login buyer.
+6. Add product to cart.
+7. Apply discount code.
+8. Checkout with green option.
+9. Track order.
+10. Submit refund request.
+11. Open Seller Centre.
+12. Login seller.
+13. Publish product.
+14. Create seller discount code.
+15. Return to shop and confirm product/page links work.

@@ -102,7 +102,7 @@ public class Product {
         if (greenScore == 0) greenScore = ecoFriendly ? 88 : 65;
         if (returnRiskScore == 0) returnRiskScore = 94;
         if (redFlagSummary == null || redFlagSummary.isBlank()) {
-            redFlagSummary = suspiciousReviewFlag ? "Review pattern needs admin review." : "No major red flags detected in verified buyer feedback.";
+            redFlagSummary = suspiciousReviewFlag ? "Review pattern needs platform review." : "No major red flags detected in verified buyer feedback.";
         }
         if (warrantyPolicy == null || warrantyPolicy.isBlank()) {
             warrantyPolicy = "7-day buyer protection with digital refund request tracking.";

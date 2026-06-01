@@ -1,5 +1,6 @@
--- TrustCart PostgreSQL Schema
+-- TrustCart PostgreSQL Schema and seed data
 -- Compatible with Supabase PostgreSQL and Spring Boot JPA.
+-- This file resets and loads the buyer-seller live version.
 
 DROP TABLE IF EXISTS autoship_subscription CASCADE;
 DROP TABLE IF EXISTS discount_code CASCADE;
@@ -169,7 +170,9 @@ CREATE TABLE discount_code (
     max_redemptions INTEGER DEFAULT 0,
     times_redeemed INTEGER DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    expires_at TIMESTAMP
+    expires_at TIMESTAMP,
+    seller_id BIGINT,
+    created_by_seller VARCHAR(255)
 );
 
 CREATE TABLE autoship_subscription (

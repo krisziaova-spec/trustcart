@@ -102,7 +102,7 @@ public class Seller {
             this.verificationNote = "Business identity, product compliance, location proof, and sustainability claims checked for platform approval.";
         }
         if (this.approvedBy == null || this.approvedBy.isBlank()) {
-            this.approvedBy = "TrustCart Admin";
+            this.approvedBy = "TrustCart Seller Verification";
         }
         if (this.approvedAt == null) {
             this.approvedAt = LocalDateTime.now();
@@ -110,7 +110,7 @@ public class Seller {
     }
 
     public String getPassportStatus() {
-        return businessVerified && identityVerified && documentVerified && productComplianceChecked && storeLocationVerified ? "Complete" : "Needs Admin Review";
+        return businessVerified && identityVerified && documentVerified && productComplianceChecked && storeLocationVerified ? "Complete" : "Verification Needed";
     }
 
     public String getPublicLocationLabel() {
@@ -130,7 +130,7 @@ public class Seller {
     }
 
     public String getLocationIntegrityNote() {
-        return storeLocationVerified ? "Store location verified by TrustCart admin; exact address hidden from buyers to prevent off-platform transactions." : "Store location pending admin verification.";
+        return storeLocationVerified ? "Store location verified for platform use; exact address hidden from buyers to prevent off-platform transactions." : "Store location needs verification before pickup can be enabled.";
     }
 
     public boolean hasCoordinates() {

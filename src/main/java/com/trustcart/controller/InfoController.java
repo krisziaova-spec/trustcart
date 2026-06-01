@@ -72,30 +72,23 @@ public class InfoController {
 
         List<String> paths = List.of(
                 "/", "/buyer/login", "/buyer/register", "/cart", "/checkout", "/autoship", "/track", "/refund",
-                "/seller", "/seller/login", "/seller/apply", "/admin", "/faq", "/site-map", "/about", "/help-center", "/contact-us",
+                "/seller", "/seller/login", "/seller/apply", "/seller/dashboard", "/seller/products/new",
+                "/faq", "/site-map", "/about", "/help-center", "/contact-us",
                 "/privacy-policy", "/terms-and-conditions", "/return-refund-policy", "/shipping-delivery-policy", "/payment-policy",
                 "/buyer-protection-policy", "/seller-policy", "/authenticity-policy", "/sustainability-policy", "/prohibited-items-policy", "/off-platform-policy"
         );
 
         String today = LocalDate.now().toString();
         StringBuilder xml = new StringBuilder();
-        xml.append("<?xml version="1.0" encoding="UTF-8"?>
-");
-        xml.append("<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-");
+        xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+        xml.append("<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n");
         for (String path : paths) {
-            xml.append("  <url>
-");
-            xml.append("    <loc>").append(baseUrl).append(path).append("</loc>
-");
-            xml.append("    <lastmod>").append(today).append("</lastmod>
-");
-            xml.append("    <changefreq>weekly</changefreq>
-");
-            xml.append("    <priority>").append("/".equals(path) ? "1.0" : "0.7").append("</priority>
-");
-            xml.append("  </url>
-");
+            xml.append("  <url>\n");
+            xml.append("    <loc>").append(baseUrl).append(path).append("</loc>\n");
+            xml.append("    <lastmod>").append(today).append("</lastmod>\n");
+            xml.append("    <changefreq>weekly</changefreq>\n");
+            xml.append("    <priority>").append("/".equals(path) ? "1.0" : "0.7").append("</priority>\n");
+            xml.append("  </url>\n");
         }
         xml.append("</urlset>");
         return xml.toString();

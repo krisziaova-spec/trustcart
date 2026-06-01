@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
@@ -28,4 +29,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     List<Product> findBySellerIdOrderByCreatedAtDesc(Long sellerId);
     List<Product> findByStatus(ProductStatus status);
+    Optional<Product> findByNameIgnoreCase(String name);
 }
+

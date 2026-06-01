@@ -9,5 +9,5 @@ import java.util.Optional;
 public interface DiscountCodeRepository extends JpaRepository<DiscountCode, Long> {
     Optional<DiscountCode> findByCodeIgnoreCase(String code);
     List<DiscountCode> findTop20ByOrderByCreatedAtDesc();
-    List<DiscountCode> findByActiveTrueOrderByCreatedAtDesc();
+    List<DiscountCode> findBySellerIdOrderByCreatedAtDesc(Long sellerId);
 }

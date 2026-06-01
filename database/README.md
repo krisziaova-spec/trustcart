@@ -1,11 +1,33 @@
 # TrustCart Database Files
 
-The application can automatically create/update tables through Spring Boot JPA using `spring.jpa.hibernate.ddl-auto=update`.
+Use only one setup method.
 
-Manual database files are provided for instructor review or optional manual setup:
+## Fresh Supabase setup
 
-- `schema.sql` - full PostgreSQL schema with buyer accounts, sellers, products, orders, refunds, discount codes, rewards, and autoshipment subscriptions.
-- `seed-data.sql` - sample users, sellers, products, product photo URLs, and active discount codes.
-- `supabase-setup.sql` - same schema prepared for Supabase PostgreSQL.
+Run:
 
-Recommended for deployment: let Spring Boot create the tables first, then use the app's DataSeeder and Admin dashboard to manage sample data and discount codes.
+```text
+supabase-setup.sql
+```
+
+This creates tables and inserts the starter data.
+
+## Reload sample data only
+
+Run:
+
+```text
+seed-data.sql
+```
+
+This resets sample data and loads 42 products, 3 sellers, 1 buyer, and discount codes.
+
+## Schema only
+
+Run:
+
+```text
+schema.sql
+```
+
+This creates only tables with no sample records.

@@ -5,8 +5,8 @@
 <nav class="nav"><div class="nav-inner"><a class="logo" th:href="@{/}"><span class="logo-badge">TC</span> TrustCart</a><div class="nav-links"><a th:href="@{/seller/dashboard}">Seller Dashboard</a><a th:href="@{/faq}">FAQ</a><a th:href="@{/site-map}">Site Map</a></div></div></nav>
 <main class="container">
     <section class="card" style="max-width:860px;margin:auto">
-        <h1>Add Product for Approval</h1>
-        <p class="platform-note">New products are pending by default. Admin must approve before the item appears in the buyer marketplace.</p>
+        <h1>Add Product</h1>
+        <p class="platform-note">New products are pending by default. A seller account is required. Submitted products publish to the buyer marketplace with TrustCart Shield indicators.</p>
         <form th:action="@{/seller/products}" method="post">
             <label>Product Name</label><input required name="name">
             <label>Description</label><textarea required name="description"></textarea>
@@ -28,7 +28,7 @@
                 <label class="option-card"><input type="checkbox" name="subscriptionEligible" value="true"><strong>Autoship Eligible</strong><span>Recommended for household, grocery, pet, beauty, wellness, and repeat-use products.</span></label>
             </div>
             <label>Autoship Savings Percent</label><input type="number" name="subscriptionDiscountPercent" min="0" max="50" value="5">
-            <button class="btn btn-primary" type="submit" style="width:100%;margin-top:14px">Submit Product for Admin Approval</button>
+            <button class="btn btn-primary" type="submit" style="width:100%;margin-top:14px">Publish Product</button>
         </form>
     </section>
 </main>

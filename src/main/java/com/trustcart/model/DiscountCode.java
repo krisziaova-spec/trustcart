@@ -29,6 +29,10 @@ public class DiscountCode {
     private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime expiresAt;
 
+    private Long sellerId;
+
+    private String createdBySeller;
+
     public DiscountCode() {}
 
     public DiscountCode(String code, String description, BigDecimal minimumSpend, Integer percentOff, BigDecimal amountOff, boolean active) {
@@ -99,4 +103,8 @@ public class DiscountCode {
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public LocalDateTime getExpiresAt() { return expiresAt; }
     public void setExpiresAt(LocalDateTime expiresAt) { this.expiresAt = expiresAt; }
+    public Long getSellerId() { return sellerId; }
+    public void setSellerId(Long sellerId) { this.sellerId = sellerId; }
+    public String getCreatedBySeller() { return createdBySeller; }
+    public void setCreatedBySeller(String createdBySeller) { this.createdBySeller = createdBySeller; }
 }

@@ -7,57 +7,76 @@
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
-<nav class="nav">
+<nav class="top-strip">
+    <div class="nav-inner thin">
+        <div class="top-links">
+            <a th:href="@{/seller}">Seller Centre</a>
+            <a th:href="@{/seller/apply}">Start Selling</a>
+            <a th:href="@{/help-center}">Help Center</a>
+            <a th:href="@{/faq}">FAQ</a>
+        </div>
+        <div class="top-links">
+            <a th:href="@{/track}">Track Order</a>
+            <a th:href="@{/buyer/register}" th:if="${!buyerLoggedIn}">Sign Up</a>
+            <a th:href="@{/buyer/login}" th:if="${!buyerLoggedIn}">Login</a>
+            <form th:if="${buyerLoggedIn}" th:action="@{/buyer/logout}" method="post" class="nav-form"><button type="submit">Logout</button></form>
+        </div>
+    </div>
+</nav>
+<nav class="nav marketplace-nav">
     <div class="nav-inner">
         <a class="logo" th:href="@{/}"><span class="logo-badge">TC</span> TrustCart</a>
+        <form class="header-search" th:action="@{/}" method="get">
+            <input type="text" name="q" placeholder="Search verified products, local goods, sustainable items" th:value="${query}">
+            <button class="btn btn-primary" type="submit">Search</button>
+        </form>
         <div class="nav-links">
-            <a th:href="@{/}">Shop</a>
-            <a th:href="@{/track}">Track Order</a>
-            <a th:href="@{/refund}">Protection Center</a>
-            <a th:href="@{/autoship}" th:if="${buyerLoggedIn}">Subscriptions</a>
-            <a th:href="@{/seller}">Seller Center</a>
-            <a th:href="@{/admin}">Admin</a>
-            <a th:href="@{/faq}">FAQ</a><a th:href="@{/site-map}">Site Map</a><a class="btn-light" th:href="@{/cart}">Cart (<span th:text="${cartCount}">0</span>)</a>
-            <a th:if="${!buyerLoggedIn}" th:href="@{/buyer/login}">Buyer Login</a>
-            <form th:if="${buyerLoggedIn}" th:action="@{/buyer/logout}" method="post" class="nav-form"><button type="submit">Logout</button></form>
+            <a th:href="@{/cart}" class="cart-pill">Cart (<span th:text="${cartCount}">0</span>)</a>
+            <a th:href="@{/buyer/login}" th:if="${!buyerLoggedIn}">Buyer Login</a>
         </div>
     </div>
 </nav>
 
 <main class="container">
-    <section class="hero hero-premium">
-        <div>
-            <span class="eyebrow">Verified sellers • Green checkout • Nearby market search</span>
-            <h1>Shop safer with proof, location integrity, and buyer protection.</h1>
-            <p>TrustCart is a marketplace with approved sellers only, protected seller locations, nearby seller filtering, verified reviews, transparent prices, and sustainability scoring.</p>
-            <div class="footer-actions" style="max-width:650px">
-                <a class="btn btn-white" th:href="@{/cart}">View Cart</a>
-                <a class="btn btn-ghost" th:href="@{/seller}">Open Seller Center</a>
-                <a class="btn btn-ghost" th:href="@{/buyer/register}" th:if="${!buyerLoggedIn}">Create Buyer Account</a>
-            </div>
-        </div>
-        <div class="hero-card shield-card">
-            <h3 style="margin-top:0">TrustCart Shield</h3>
-            <div class="shield-list">
-                <span>✓ Buyer login required for cart, checkout, tracking, and refunds</span>
-                <span>✓ Seller exact address hidden from buyers</span>
-                <span>✓ Nearby sellers ranked by selected target market</span>
-                <span>✓ Pickup only through TrustCart-protected hub flow</span>
-                <span>✓ TrustPoints rewards on every successful purchase</span>
-                <span>✓ Discount codes and autoship subscriptions for repeat orders</span>
-                <span>✓ Off-platform transaction warning included</span>
-            </div>
+    <section class="shop-hero-grid">
+        <a class="main-banner" th:href="@{/(category=${T(com.trustcart.model.ProductCategory).SCHOOL_OFFICE})}">
+            <span class="eyebrow green">Back to School</span>
+            <h1>Trusted essentials from verified sellers</h1>
+            <p>Shop products with Trust Score, Green Score, protected checkout, and nearby seller filtering.</p>
+            <span class="btn btn-white">Shop School & Office</span>
+        </a>
+        <div class="side-banners">
+            <a class="side-banner orange" th:href="@{/(q='discount')}"><strong>Apply discount codes</strong><span>Use WELCOME100, GREEN5, or seller-created codes at checkout.</span></a>
+            <a class="side-banner green" th:href="@{/autoship}"><strong>Autoship essentials</strong><span>Subscribe to repeat-use items and earn TrustPoints.</span></a>
         </div>
     </section>
 
-    <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
-    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+    <section class="quick-actions">
+        <a th:href="@{/buyer-protection-policy}"><span>🛡</span><strong>Buyer Protection</strong></a>
+        <a th:href="@{/(nearbyOnly=true)}"><span>📍</span><strong>Nearby Sellers</strong></a>
+        <a th:href="@{/(category=${T(com.trustcart.model.ProductCategory).SUSTAINABLE_PRODUCTS})}"><span>♻</span><strong>Eco Deals</strong></a>
+        <a th:href="@{/autoship}"><span>🔁</span><strong>Autoship</strong></a>
+        <a th:href="@{/refund}"><span>↩</span><strong>Returns</strong></a>
+        <a th:href="@{/payment-policy}"><span>💳</span><strong>Payments</strong></a>
+        <a th:href="@{/seller}"><span>🏪</span><strong>Seller Centre</strong></a>
+        <a th:href="@{/site-map}"><span>🗺</span><strong>Site Map</strong></a>
+    </section>
+
+    <section class="category-panel">
+        <div class="section-title compact-title"><h2>Categories</h2><span class="muted">Click a category to filter products</span></div>
+        <div class="category-grid">
+            <a th:each="cat : ${categories}" th:href="@{/(category=${cat})}" class="category-tile">
+                <span class="category-icon" th:text="${#strings.substring(cat.displayName,0,1)}">E</span>
+                <strong th:text="${cat.displayName}">Category</strong>
+            </a>
+        </div>
+    </section>
 
     <section class="location-card">
         <div>
             <span class="eyebrow green">Target Market Location</span>
             <h2>Find sellers closer to your preferred area</h2>
-            <p class="muted">Buyers can select a location and radius before searching. TrustCart shows the seller area only, not the exact store address, to prevent off-platform transactions.</p>
+            <p class="muted">Buyers can select a location and radius before searching. TrustCart shows only the seller area, not the exact store address, to prevent off-platform transactions.</p>
             <div class="map-mock">
                 <div class="map-pin">●</div>
                 <strong th:text="${marketCity}">San Pablo City</strong>
@@ -92,11 +111,11 @@
         </form>
     </section>
 
-    <section class="feature-strip">
-        <div><strong>Protected Location</strong><span>Exact seller store address hidden</span></div>
-        <div><strong>Pickup Hub Flow</strong><span>Pickup handled inside TrustCart</span></div>
-        <div><strong>TrustPoints</strong><span>Earn rewards on every protected order</span></div>
-        <div><strong>Autoshipment</strong><span>Repeat essentials by preferred frequency</span></div>
+    <section class="feature-strip clickable-strip">
+        <a th:href="@{/off-platform-policy}"><strong>Protected Location</strong><span>Exact seller store address hidden</span></a>
+        <a th:href="@{/shipping-delivery-policy}"><strong>Pickup Hub Flow</strong><span>Pickup handled inside TrustCart</span></a>
+        <a th:href="@{/buyer-protection-policy}"><strong>TrustPoints</strong><span>Earn rewards on every protected order</span></a>
+        <a th:href="@{/autoship}"><strong>Autoshipment</strong><span>Repeat essentials by preferred frequency</span></a>
     </section>
 
     <section class="loyalty-banner" th:if="${buyerLoggedIn}">
@@ -122,8 +141,12 @@
             </select>
             <button class="btn btn-primary" type="submit">Search</button>
         </div>
-        <div class="filter-hints">
-            <span>Verified Sellers Only</span><span>Eco-Friendly Products</span><span>Locally Sourced</span><span>Plastic-Free Packaging</span><span>Location Verified</span>
+        <div class="filter-hints filter-clicks">
+            <a th:href="@{/}">Verified Sellers Only</a>
+            <a th:href="@{/(category=${T(com.trustcart.model.ProductCategory).SUSTAINABLE_PRODUCTS})}">Eco-Friendly Products</a>
+            <a th:href="@{/(category=${T(com.trustcart.model.ProductCategory).LOCAL_FILIPINO_PRODUCTS})}">Locally Sourced</a>
+            <a th:href="@{/(q='plastic free')}">Plastic-Free Packaging</a>
+            <a th:href="@{/(nearbyOnly=true)}">Location Verified</a>
         </div>
     </form>
 
@@ -134,13 +157,13 @@
 
     <div class="grid">
         <article class="product-card premium-card" th:each="product : ${products}">
-            <div class="product-photo-wrap"><img class="product-photo" th:src="${product.imageUrl}" th:alt="${product.photoAltText}"></div>
+            <a class="product-photo-wrap" th:href="@{/product/{id}(id=${product.id})}"><img class="product-photo" th:src="${product.imageUrl}" th:alt="${product.photoAltText}"></a>
             <div class="product-body">
                 <div class="badges">
                     <span class="badge shield">Shield</span>
-                    <span class="badge" th:text="${product.category.displayName}">Category</span>
+                    <a class="badge" th:href="@{/(category=${product.category})}" th:text="${product.category.displayName}">Category</a>
                     <span class="badge" th:if="${product.ecoFriendly}">Eco</span>
-                    <span class="badge" th:if="${product.subscriptionEligible}">Autoship</span>
+                    <a class="badge" th:if="${product.subscriptionEligible}" th:href="@{/autoship}">Autoship</a>
                     <span class="badge-gray badge" th:if="${product.seller.storeLocationVerified}">Location Verified</span>
                 </div>
                 <a class="product-name" th:href="@{/product/{id}(id=${product.id})}" th:text="${product.name}">Product Name</a>
@@ -175,10 +198,10 @@ function applyPreset(){
 
 <footer class="site-footer">
     <div class="container footer-grid">
-        <div><strong>TrustCart</strong><p>Verified green marketplace with buyer protection, seller verification, and sustainable checkout.</p></div>
+        <div><strong>TrustCart</strong><p>Verified green marketplace with buyer protection, seller verification, discount codes, TrustPoints, autoshipment, and sustainable checkout.</p></div>
         <div><h4>Customer Care</h4><a th:href="@{/help-center}">Help Center</a><a th:href="@{/faq}">FAQ</a><a th:href="@{/track}">Track Order</a><a th:href="@{/refund}">Protection Center</a></div>
         <div><h4>Policies</h4><a th:href="@{/privacy-policy}">Privacy Policy</a><a th:href="@{/terms-and-conditions}">Terms and Conditions</a><a th:href="@{/return-refund-policy}">Returns and Refunds</a><a th:href="@{/shipping-delivery-policy}">Shipping and Delivery</a></div>
-        <div><h4>Marketplace</h4><a th:href="@{/buyer-protection-policy}">Buyer Protection</a><a th:href="@{/seller-policy}">Seller Policy</a><a th:href="@{/sustainability-policy}">Sustainability</a><a th:href="@{/site-map}">Site Map</a></div>
+        <div><h4>Marketplace</h4><a th:href="@{/seller}">Seller Centre</a><a th:href="@{/buyer-protection-policy}">Buyer Protection</a><a th:href="@{/sustainability-policy}">Sustainability</a><a th:href="@{/site-map}">Site Map</a></div>
     </div>
 </footer>
 </body>

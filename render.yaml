@@ -1,0 +1,23 @@
+# Render Blueprint for TrustCart
+# Use this when deploying from GitHub to Render.
+# Secrets such as database password are intentionally set to sync: false.
+
+services:
+  - type: web
+    name: trustcart
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: postgres
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+      - key: JAVA_TOOL_OPTIONS
+        value: -XX:MaxRAMPercentage=75.0 -Dserver.address=0.0.0.0

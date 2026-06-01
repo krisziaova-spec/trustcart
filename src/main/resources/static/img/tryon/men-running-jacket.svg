@@ -1,1 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 420"><g opacity=".92"><path fill="#065f46" d="M103 70l57-28 57 28 68 49-38 67-36-22v190H109V164l-36 22-38-67 68-49z"/><path fill="rgba(255,255,255,.25)" d="M132 75c18 14 38 14 56 0l-11 34h-34z"/></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 430">
+<defs><linearGradient id="fabric" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#065f46"/><stop offset="1" stop-color="#10b981"/></linearGradient><linearGradient id="shade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="rgba(255,255,255,.28)"/><stop offset="1" stop-color="rgba(0,0,0,.22)"/></linearGradient><filter id="shadow"><feDropShadow dx="0" dy="10" stdDeviation="8" flood-color="#000" flood-opacity=".23"/></filter></defs>
+<g filter="url(#shadow)" opacity=".96">
+
+<path d="M111 72l59-30 59 30 72 54-42 74-38-24v186H119V176l-38 24-42-74 72-54z" fill="url(#fabric)"/>
+<path d="M114 76c32 34 80 34 112 0" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="8"/>
+<path d="M132 68l38 46 38-46-18 95h-40z" fill="rgba(255,255,255,.25)"/><path d="M170 80v250" stroke="rgba(255,255,255,.35)" stroke-width="5"/>
+<path d="M121 176v184M219 176v184" stroke="rgba(0,0,0,.15)" stroke-width="4"/>
+<path d="M87 139l-22 53M253 139l22 53" stroke="rgba(0,0,0,.18)" stroke-width="6" stroke-linecap="round"/>
+<g opacity=".16"><rect x="100" y="125" width="140" height="5" fill="#fff"/><rect x="100" y="149" width="140" height="5" fill="#fff"/><rect x="100" y="173" width="140" height="5" fill="#fff"/><rect x="100" y="197" width="140" height="5" fill="#fff"/><rect x="100" y="221" width="140" height="5" fill="#fff"/><rect x="100" y="245" width="140" height="5" fill="#fff"/><rect x="100" y="269" width="140" height="5" fill="#fff"/><rect x="100" y="293" width="140" height="5" fill="#fff"/><rect x="100" y="317" width="140" height="5" fill="#fff"/></g>
+<path d="M103 96c24 18 110 18 134 0" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="4"/>
+</g></svg>

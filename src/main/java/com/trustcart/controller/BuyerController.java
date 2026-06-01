@@ -1,14 +1,8 @@
 package com.trustcart.controller;
 
 import com.trustcart.model.*;
-import com.trustcart.repository.AutoshipSubscriptionRepository;
-import com.trustcart.repository.BuyerAccountRepository;
-import com.trustcart.repository.CustomerOrderRepository;
-import com.trustcart.repository.DiscountCodeRepository;
-import com.trustcart.repository.ProductRepository;
-import com.trustcart.repository.RefundRequestRepository;
+import com.trustcart.repository.*;
 import com.trustcart.service.CartService;
-import com.trustcart.service.OrderService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,407 +10,381 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 public class BuyerController {
-
-    public static final String BUYER_SESSION_KEY = "TRUSTCART_BUYER_ID";
-    private static final String MARKET_CITY = "TRUSTCART_MARKET_CITY";
-    private static final String MARKET_LAT = "TRUSTCART_MARKET_LAT";
-    private static final String MARKET_LNG = "TRUSTCART_MARKET_LNG";
-    private static final String MARKET_RADIUS = "TRUSTCART_MARKET_RADIUS";
-
+    private final BuyerAccountRepository buyerRepository;
     private final ProductRepository productRepository;
+    private final DiscountCodeRepository discountCodeRepository;
     private final CustomerOrderRepository orderRepository;
     private final RefundRequestRepository refundRepository;
-    private final BuyerAccountRepository buyerRepository;
-    private final DiscountCodeRepository discountCodeRepository;
     private final AutoshipSubscriptionRepository autoshipRepository;
     private final CartService cartService;
-    private final OrderService orderService;
 
-    public BuyerController(ProductRepository productRepository,
-                           CustomerOrderRepository orderRepository,
-                           RefundRequestRepository refundRepository,
-                           BuyerAccountRepository buyerRepository,
-                           DiscountCodeRepository discountCodeRepository,
-                           AutoshipSubscriptionRepository autoshipRepository,
-                           CartService cartService,
-                           OrderService orderService) {
+    public BuyerController(BuyerAccountRepository buyerRepository, ProductRepository productRepository,
+                           DiscountCodeRepository discountCodeRepository, CustomerOrderRepository orderRepository,
+                           RefundRequestRepository refundRepository, AutoshipSubscriptionRepository autoshipRepository,
+                           CartService cartService) {
+        this.buyerRepository = buyerRepository;
         this.productRepository = productRepository;
+        this.discountCodeRepository = discountCodeRepository;
         this.orderRepository = orderRepository;
         this.refundRepository = refundRepository;
-        this.buyerRepository = buyerRepository;
-        this.discountCodeRepository = discountCodeRepository;
         this.autoshipRepository = autoshipRepository;
         this.cartService = cartService;
-        this.orderService = orderService;
+    }
+
+    private void addCommon(Model model, HttpSession session) {
+        BuyerAccount buyer = currentBuyer(session);
+        model.addAttribute("buyerLoggedIn", buyer != null);
+        model.addAttribute("buyer", buyer);
+        model.addAttribute("cartCount", cartService.countItems(session));
+        model.addAttribute("categories", ProductCategory.values());
+        model.addAttribute("marketCity", session.getAttribute("marketCity") != null ? session.getAttribute("marketCity") : "San Pablo City");
+        model.addAttribute("marketLatitude", session.getAttribute("marketLatitude") != null ? session.getAttribute("marketLatitude") : 14.0683);
+        model.addAttribute("marketLongitude", session.getAttribute("marketLongitude") != null ? session.getAttribute("marketLongitude") : 121.3256);
+        model.addAttribute("marketRadius", session.getAttribute("marketRadius") != null ? session.getAttribute("marketRadius") : 5);
+        model.addAttribute("nearbyOnly", session.getAttribute("nearbyOnly") != null ? session.getAttribute("nearbyOnly") : false);
+        model.addAttribute("pickupOnly", session.getAttribute("pickupOnly") != null ? session.getAttribute("pickupOnly") : false);
+    }
+
+    private BuyerAccount currentBuyer(HttpSession session) {
+        Object id = session.getAttribute("buyerId");
+        if (id instanceof Long buyerId) return buyerRepository.findById(buyerId).orElse(null);
+        return null;
     }
 
     @GetMapping("/")
-    public String home(@RequestParam(required = false) ProductCategory category,
-                       @RequestParam(required = false) String q,
-                       @RequestParam(required = false) String marketCity,
-                       @RequestParam(required = false) Double latitude,
-                       @RequestParam(required = false) Double longitude,
-                       @RequestParam(required = false) Integer radiusKm,
-                       @RequestParam(defaultValue = "false") boolean nearbyOnly,
-                       @RequestParam(defaultValue = "false") boolean pickupOnly,
-                       Model model,
-                       HttpSession session) {
-        saveMarketIfProvided(session, marketCity, latitude, longitude, radiusKm);
-
+    public String home(@RequestParam(required = false) String q,
+                       @RequestParam(required = false) ProductCategory category,
+                       @RequestParam(required = false) Boolean nearbyOnly,
+                       @RequestParam(required = false) Boolean pickupOnly,
+                       Model model, HttpSession session) {
+        addCommon(model, session);
+        if (nearbyOnly != null) session.setAttribute("nearbyOnly", nearbyOnly);
+        if (pickupOnly != null) session.setAttribute("pickupOnly", pickupOnly);
         List<Product> products;
-        if (q != null && !q.isBlank()) {
-            products = productRepository.searchLiveProducts(ProductStatus.APPROVED, SellerStatus.APPROVED, q.trim());
-        } else if (category != null) {
-            products = productRepository.findLiveProductsByCategory(ProductStatus.APPROVED, SellerStatus.APPROVED, category);
+        if (category != null) {
+            products = productRepository.findByCategoryAndStatusOrderByCreatedAtDesc(category, "APPROVED");
+        } else if (q != null && !q.isBlank()) {
+            products = productRepository.findByNameContainingIgnoreCaseAndStatusOrderByCreatedAtDesc(q.trim(), "APPROVED");
         } else {
-            products = productRepository.findLiveProducts(ProductStatus.APPROVED, SellerStatus.APPROVED);
+            products = productRepository.findByStatusOrderByCreatedAtDesc("APPROVED");
         }
-
-        Double targetLat = getDoubleSession(session, MARKET_LAT);
-        Double targetLng = getDoubleSession(session, MARKET_LNG);
-        Integer targetRadius = getIntegerSession(session, MARKET_RADIUS, 5);
-        if ((nearbyOnly || pickupOnly) && targetLat != null && targetLng != null) {
-            products = products.stream()
-                    .filter(product -> product.getSeller().hasCoordinates())
-                    .filter(product -> distanceKm(targetLat, targetLng, product.getSeller().getLatitude(), product.getSeller().getLongitude()) <= targetRadius)
-                    .filter(product -> !pickupOnly || product.getSeller().isPickupAvailable())
-                    .sorted(Comparator.comparingDouble(product -> distanceKm(targetLat, targetLng, product.getSeller().getLatitude(), product.getSeller().getLongitude())))
-                    .toList();
-        }
-
-        addCommonModel(model, session);
-        model.addAttribute("products", products);
-        model.addAttribute("categories", ProductCategory.values());
-        model.addAttribute("selectedCategory", category);
+        // Keep homepage clean but make all results accessible.
+        model.addAttribute("products", products.stream().limit(24).collect(Collectors.toList()));
         model.addAttribute("query", q);
-        model.addAttribute("nearbyOnly", nearbyOnly);
-        model.addAttribute("pickupOnly", pickupOnly);
+        model.addAttribute("selectedCategory", category);
+        model.addAttribute("discounts", discountCodeRepository.findByActiveTrueOrderByCreatedAtDesc().stream().limit(4).collect(Collectors.toList()));
         return "home";
     }
 
     @PostMapping("/buyer/location")
-    public String updateMarketLocation(@RequestParam String marketCity,
-                                       @RequestParam Double latitude,
-                                       @RequestParam Double longitude,
-                                       @RequestParam(defaultValue = "5") Integer radiusKm,
-                                       @RequestParam(defaultValue = "false") boolean nearbyOnly,
-                                       @RequestParam(defaultValue = "false") boolean pickupOnly,
-                                       HttpSession session,
-                                       RedirectAttributes redirectAttributes) {
-        saveMarketIfProvided(session, marketCity, latitude, longitude, radiusKm);
-        currentBuyer(session).ifPresent(buyer -> {
-            buyer.setPreferredCity(marketCity);
-            buyer.setPreferredLatitude(latitude);
-            buyer.setPreferredLongitude(longitude);
-            buyer.setPreferredRadiusKm(radiusKm);
-            buyer.setNearbySellerFirst(nearbyOnly);
-            buyer.setPickupInterested(pickupOnly);
-            buyerRepository.save(buyer);
-        });
-        redirectAttributes.addFlashAttribute("message", "Target market location updated. Nearby sellers will be prioritized.");
-        return "redirect:/?nearbyOnly=" + nearbyOnly + "&pickupOnly=" + pickupOnly;
+    public String setLocation(@RequestParam String marketCity,
+                              @RequestParam Double latitude,
+                              @RequestParam Double longitude,
+                              @RequestParam Integer radiusKm,
+                              @RequestParam(required = false, defaultValue = "false") boolean nearbyOnly,
+                              @RequestParam(required = false, defaultValue = "false") boolean pickupOnly,
+                              HttpSession session) {
+        session.setAttribute("marketCity", marketCity);
+        session.setAttribute("marketLatitude", latitude);
+        session.setAttribute("marketLongitude", longitude);
+        session.setAttribute("marketRadius", radiusKm);
+        session.setAttribute("nearbyOnly", nearbyOnly);
+        session.setAttribute("pickupOnly", pickupOnly);
+        return "redirect:/";
     }
 
     @GetMapping("/product/{id}")
-    public String productDetails(@PathVariable Long id, Model model, HttpSession session) {
+    public String product(@PathVariable Long id, Model model, HttpSession session) {
         Product product = productRepository.findById(id).orElseThrow();
-        addCommonModel(model, session);
+        addCommon(model, session);
         model.addAttribute("product", product);
-        model.addAttribute("autoshipFrequencies", AutoshipFrequency.values());
-        Double targetLat = getDoubleSession(session, MARKET_LAT);
-        Double targetLng = getDoubleSession(session, MARKET_LNG);
-        if (targetLat != null && targetLng != null && product.getSeller().hasCoordinates()) {
-            model.addAttribute("distanceKm", Math.round(distanceKm(targetLat, targetLng, product.getSeller().getLatitude(), product.getSeller().getLongitude()) * 10.0) / 10.0);
-        }
+        model.addAttribute("related", productRepository.findByCategoryAndStatusOrderByCreatedAtDesc(product.getCategory(), "APPROVED").stream().filter(p -> !Objects.equals(p.getId(), id)).limit(4).toList());
         return "product-detail";
     }
 
+    @GetMapping("/buyer/login")
+    public String buyerLogin(Model model, HttpSession session) {
+        addCommon(model, session);
+        return "buyer-login";
+    }
+
+    @PostMapping("/buyer/login")
+    public String doBuyerLogin(@RequestParam String email, @RequestParam String password, HttpSession session, RedirectAttributes ra) {
+        Optional<BuyerAccount> buyer = buyerRepository.findByEmailIgnoreCase(email);
+        if (buyer.isPresent() && Objects.equals(buyer.get().getPassword(), password)) {
+            session.setAttribute("buyerId", buyer.get().getId());
+            return "redirect:/";
+        }
+        ra.addFlashAttribute("error", "Invalid buyer email or password.");
+        return "redirect:/buyer/login";
+    }
+
+    @GetMapping("/buyer/register")
+    public String register(Model model, HttpSession session) {
+        addCommon(model, session);
+        return "buyer-register";
+    }
+
+    @PostMapping("/buyer/register")
+    public String doRegister(@RequestParam String fullName, @RequestParam String email, @RequestParam String password,
+                             @RequestParam(required = false) String phone, @RequestParam(required = false) String defaultAddress,
+                             HttpSession session, RedirectAttributes ra) {
+        if (buyerRepository.existsByEmailIgnoreCase(email)) {
+            ra.addFlashAttribute("error", "Email already registered.");
+            return "redirect:/buyer/register";
+        }
+        BuyerAccount buyer = new BuyerAccount();
+        buyer.setFullName(fullName);
+        buyer.setEmail(email);
+        buyer.setPassword(password);
+        buyer.setPhone(phone);
+        buyer.setDefaultAddress(defaultAddress);
+        buyer.setPreferredCity("San Pablo City");
+        buyer.setPreferredLatitude(14.0683);
+        buyer.setPreferredLongitude(121.3256);
+        buyerRepository.save(buyer);
+        session.setAttribute("buyerId", buyer.getId());
+        return "redirect:/";
+    }
+
+    @PostMapping("/buyer/logout")
+    public String logout(HttpSession session) {
+        session.removeAttribute("buyerId");
+        return "redirect:/";
+    }
+
     @PostMapping("/cart/add/{id}")
-    public String addToCart(@PathVariable Long id,
-                            @RequestParam(defaultValue = "1") int quantity,
-                            HttpSession session,
-                            RedirectAttributes redirectAttributes) {
-        if (!isBuyerLoggedIn(session)) {
-            redirectAttributes.addFlashAttribute("error", "Please login as a buyer before adding items to cart.");
+    public String addToCart(@PathVariable Long id, @RequestParam(defaultValue = "1") int quantity, HttpSession session, RedirectAttributes ra) {
+        if (currentBuyer(session) == null) {
+            ra.addFlashAttribute("error", "Please login as buyer before adding to cart.");
             return "redirect:/buyer/login";
         }
-        cartService.add(session, id, quantity);
-        redirectAttributes.addFlashAttribute("message", "Product added to cart.");
+        Map<Long, Integer> cart = cartService.getCart(session);
+        cart.put(id, cart.getOrDefault(id, 0) + Math.max(1, quantity));
         return "redirect:/cart";
     }
 
     @GetMapping("/cart")
-    public String cart(Model model, HttpSession session, RedirectAttributes redirectAttributes) {
-        if (!isBuyerLoggedIn(session)) {
-            redirectAttributes.addFlashAttribute("error", "Buyer login is required to view the cart.");
-            return "redirect:/buyer/login";
+    public String cart(Model model, HttpSession session) {
+        addCommon(model, session);
+        Map<Long, Integer> cart = cartService.getCart(session);
+        List<Map<String, Object>> items = new ArrayList<>();
+        BigDecimal subtotal = BigDecimal.ZERO;
+        for (Map.Entry<Long, Integer> e : cart.entrySet()) {
+            Product p = productRepository.findById(e.getKey()).orElse(null);
+            if (p != null) {
+                BigDecimal line = p.getPrice().multiply(BigDecimal.valueOf(e.getValue()));
+                subtotal = subtotal.add(line);
+                Map<String,Object> row = new HashMap<>();
+                row.put("product", p);
+                row.put("qty", e.getValue());
+                row.put("line", line);
+                items.add(row);
+            }
         }
-        addCommonModel(model, session);
-        model.addAttribute("summary", cartService.summarize(session, false));
+        model.addAttribute("items", items);
+        model.addAttribute("subtotal", subtotal);
         return "cart";
     }
 
-    @PostMapping("/cart/update/{id}")
-    public String updateCart(@PathVariable Long id, @RequestParam int quantity, HttpSession session) {
-        cartService.update(session, id, quantity);
-        return "redirect:/cart";
-    }
-
     @PostMapping("/cart/remove/{id}")
-    public String removeCart(@PathVariable Long id, HttpSession session) {
-        cartService.remove(session, id);
+    public String removeItem(@PathVariable Long id, HttpSession session) {
+        cartService.getCart(session).remove(id);
         return "redirect:/cart";
     }
 
     @GetMapping("/checkout")
-    public String checkout(@RequestParam(defaultValue = "false") boolean ecoPackaging,
-                           @RequestParam(defaultValue = "false") boolean noExtraPlastic,
-                           @RequestParam(defaultValue = "false") boolean consolidatedDelivery,
-                           @RequestParam(defaultValue = "STANDARD_DELIVERY") DeliveryOption deliveryOption,
-                           @RequestParam(required = false) String discountCode,
-                           @RequestParam(defaultValue = "0") int pointsToRedeem,
-                           Model model,
-                           HttpSession session,
-                           RedirectAttributes redirectAttributes) {
-        if (!isBuyerLoggedIn(session)) {
-            redirectAttributes.addFlashAttribute("error", "Buyer login is required before checkout.");
-            return "redirect:/buyer/login";
-        }
-        BuyerAccount buyer = currentBuyer(session).orElse(null);
-        int safePoints = buyer == null ? 0 : Math.min(Math.max(0, pointsToRedeem), buyer.getLoyaltyPointsBalance());
-        String effectiveDiscountCode = eligibleDiscountForBuyer(discountCode, buyer);
-        CartSummary summary = cartService.summarize(session, ecoPackaging, noExtraPlastic, consolidatedDelivery, deliveryOption, effectiveDiscountCode, safePoints);
-        if (summary.getLines().isEmpty()) {
-            return "redirect:/cart";
-        }
-        addCommonModel(model, session);
-        model.addAttribute("summary", summary);
-        model.addAttribute("ecoPackaging", ecoPackaging);
-        model.addAttribute("noExtraPlastic", noExtraPlastic);
-        model.addAttribute("consolidatedDelivery", consolidatedDelivery);
-        model.addAttribute("deliveryOption", deliveryOption);
-        model.addAttribute("deliveryOptions", DeliveryOption.values());
-        model.addAttribute("paymentMethods", PaymentMethod.values());
-        model.addAttribute("discountCode", discountCode == null ? "" : discountCode);
-        model.addAttribute("pointsToRedeem", safePoints);
-        model.addAttribute("activeDiscountCodes", discountCodeRepository.findByActiveTrueOrderByCreatedAtDesc());
+    public String checkout(Model model, HttpSession session) {
+        BuyerAccount buyer = currentBuyer(session);
+        if (buyer == null) return "redirect:/buyer/login";
+        cart(model, session);
+        model.addAttribute("discounts", discountCodeRepository.findByActiveTrueOrderByCreatedAtDesc());
         return "checkout";
     }
 
     @PostMapping("/checkout")
-    public String placeOrder(@RequestParam String fullName,
-                             @RequestParam String email,
-                             @RequestParam String phone,
-                             @RequestParam String shippingAddress,
-                             @RequestParam PaymentMethod paymentMethod,
-                             @RequestParam(defaultValue = "STANDARD_DELIVERY") DeliveryOption deliveryOption,
-                             @RequestParam(defaultValue = "false") boolean ecoPackaging,
-                             @RequestParam(defaultValue = "false") boolean noExtraPlastic,
-                             @RequestParam(defaultValue = "false") boolean consolidatedDelivery,
+    public String placeOrder(@RequestParam String fullName, @RequestParam String email, @RequestParam String phone,
+                             @RequestParam String shippingAddress, @RequestParam String paymentMethod,
                              @RequestParam(required = false) String discountCode,
-                             @RequestParam(defaultValue = "0") int pointsToRedeem,
-                             HttpSession session,
-                             RedirectAttributes redirectAttributes) {
-        if (!isBuyerLoggedIn(session)) {
-            redirectAttributes.addFlashAttribute("error", "Buyer login is required before checkout.");
-            return "redirect:/buyer/login";
+                             @RequestParam(required = false, defaultValue = "false") boolean ecoPackaging,
+                             @RequestParam(required = false, defaultValue = "false") boolean noExtraPlastic,
+                             @RequestParam(required = false, defaultValue = "false") boolean consolidatedDelivery,
+                             @RequestParam(required = false, defaultValue = "STANDARD_DELIVERY") String deliveryOption,
+                             @RequestParam(required = false, defaultValue = "0") int pointsToRedeem,
+                             HttpSession session, RedirectAttributes ra) {
+        BuyerAccount buyer = currentBuyer(session);
+        if (buyer == null) return "redirect:/buyer/login";
+        Map<Long, Integer> cart = cartService.getCart(session);
+        if (cart.isEmpty()) {
+            ra.addFlashAttribute("error", "Your cart is empty.");
+            return "redirect:/cart";
         }
-        String marketLabel = getStringSession(session, MARKET_CITY, "No target market selected");
-        BuyerAccount buyer = currentBuyer(session).orElse(null);
-        String effectiveDiscountCode = eligibleDiscountForBuyer(discountCode, buyer);
-        CustomerOrder order = orderService.createOrder(session, fullName, email, phone, shippingAddress, paymentMethod, ecoPackaging, noExtraPlastic, consolidatedDelivery, deliveryOption, marketLabel, effectiveDiscountCode, pointsToRedeem);
-        redirectAttributes.addFlashAttribute("message", "Order placed successfully.");
-        return "redirect:/orders/" + order.getOrderCode() + "/success";
+        CustomerOrder order = new CustomerOrder();
+        order.setOrderCode("TC-" + System.currentTimeMillis());
+        order.setFullName(fullName);
+        order.setEmail(email);
+        order.setPhone(phone);
+        order.setShippingAddress(shippingAddress);
+        order.setPaymentMethod(paymentMethod);
+        order.setPaymentStatus("Payment option selected");
+        order.setEcoPackaging(ecoPackaging);
+        order.setNoExtraPlastic(noExtraPlastic);
+        order.setConsolidatedDelivery(consolidatedDelivery);
+        order.setDeliveryOption(deliveryOption);
+        order.setBuyerMarketLocation(String.valueOf(session.getAttribute("marketCity") != null ? session.getAttribute("marketCity") : "San Pablo City"));
+        order.setPlatformProtectionNote("For buyer protection, checkout, payment, tracking, and refund requests must remain inside TrustCart.");
+
+        BigDecimal subtotal = BigDecimal.ZERO;
+        for (Map.Entry<Long, Integer> e : cart.entrySet()) {
+            Product p = productRepository.findById(e.getKey()).orElse(null);
+            if (p != null) {
+                int qty = Math.max(1, e.getValue());
+                BigDecimal line = p.getPrice().multiply(BigDecimal.valueOf(qty));
+                subtotal = subtotal.add(line);
+                OrderItem item = new OrderItem();
+                item.setProduct(p);
+                item.setProductName(p.getName());
+                item.setSellerName(p.getSeller().getStoreName());
+                item.setQuantity(qty);
+                item.setUnitPrice(p.getPrice());
+                item.setLineTotal(line);
+                order.addItem(item);
+                p.setStock(Math.max(0, p.getStock() - qty));
+                productRepository.save(p);
+            }
+        }
+        BigDecimal shipping = deliveryOption.equals("PICKUP_HUB") ? BigDecimal.ZERO : BigDecimal.valueOf(80);
+        BigDecimal ecoFee = ecoPackaging ? BigDecimal.valueOf(10) : BigDecimal.ZERO;
+        BigDecimal ecoDiscount = consolidatedDelivery ? BigDecimal.valueOf(20) : BigDecimal.ZERO;
+        BigDecimal promoDiscount = calculateDiscount(discountCode, subtotal, email);
+        if (promoDiscount.compareTo(BigDecimal.ZERO) > 0) {
+            discountCodeRepository.findByCodeIgnoreCase(discountCode).ifPresent(dc -> {
+                dc.setTimesRedeemed(dc.getTimesRedeemed() + 1);
+                discountCodeRepository.save(dc);
+                order.setDiscountCode(dc.getCode());
+                order.setDiscountCodeDescription(dc.getDescription());
+            });
+        }
+        int safeRedeem = Math.min(pointsToRedeem, buyer.getLoyaltyPointsBalance());
+        BigDecimal pointsDiscount = BigDecimal.valueOf(safeRedeem).divide(BigDecimal.TEN, 2, RoundingMode.HALF_UP);
+        BigDecimal total = subtotal.add(shipping).add(ecoFee).subtract(ecoDiscount).subtract(promoDiscount).subtract(pointsDiscount);
+        if (total.compareTo(BigDecimal.ZERO) < 0) total = BigDecimal.ZERO;
+        int earned = subtotal.divide(BigDecimal.valueOf(20), 0, RoundingMode.DOWN).intValue();
+        buyer.setLoyaltyPointsBalance(buyer.getLoyaltyPointsBalance() - safeRedeem + earned);
+        buyer.setLifetimeLoyaltyPoints(buyer.getLifetimeLoyaltyPoints() + earned);
+        buyer.setLifetimeSpend(buyer.getLifetimeSpend().add(total));
+        if (buyer.getLifetimeSpend().compareTo(BigDecimal.valueOf(5000)) > 0) buyer.setLoyaltyTier("TrustCart Gold Green Member");
+        buyerRepository.save(buyer);
+
+        order.setSubtotal(subtotal);
+        order.setShippingFee(shipping);
+        order.setEcoPackagingFee(ecoFee);
+        order.setEcoDeliveryDiscount(ecoDiscount);
+        order.setDiscount(promoDiscount.add(pointsDiscount));
+        order.setPromoDiscount(promoDiscount);
+        order.setLoyaltyPointsDiscount(pointsDiscount);
+        order.setLoyaltyPointsRedeemed(safeRedeem);
+        order.setLoyaltyPointsEarned(earned);
+        order.setLoyaltyTierAfterOrder(buyer.getLoyaltyTier());
+        order.setTotal(total);
+        orderRepository.save(order);
+        cartService.clear(session);
+        return "redirect:/order-success?code=" + order.getOrderCode();
     }
 
-    @GetMapping("/orders/{orderCode}/success")
-    public String orderSuccess(@PathVariable String orderCode, Model model, HttpSession session, RedirectAttributes redirectAttributes) {
-        if (!isBuyerLoggedIn(session)) {
-            redirectAttributes.addFlashAttribute("error", "Buyer login is required to view order details.");
-            return "redirect:/buyer/login";
-        }
-        CustomerOrder order = orderRepository.findByOrderCodeIgnoreCase(orderCode).orElseThrow();
-        addCommonModel(model, session);
-        model.addAttribute("order", order);
+    private BigDecimal calculateDiscount(String code, BigDecimal subtotal, String email) {
+        if (code == null || code.isBlank()) return BigDecimal.ZERO;
+        Optional<DiscountCode> optional = discountCodeRepository.findByCodeIgnoreCase(code.trim());
+        if (optional.isEmpty()) return BigDecimal.ZERO;
+        DiscountCode dc = optional.get();
+        if (!dc.isActive()) return BigDecimal.ZERO;
+        if (dc.getMinimumSpend() != null && subtotal.compareTo(dc.getMinimumSpend()) < 0) return BigDecimal.ZERO;
+        if (dc.isFirstOrderOnly() && orderRepository.countByEmailIgnoreCase(email) > 0) return BigDecimal.ZERO;
+        BigDecimal percent = subtotal.multiply(BigDecimal.valueOf(dc.getPercentOff())).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+        BigDecimal amount = dc.getAmountOff() == null ? BigDecimal.ZERO : dc.getAmountOff();
+        return percent.add(amount).min(subtotal);
+    }
+
+    @GetMapping("/order-success")
+    public String success(@RequestParam String code, Model model, HttpSession session) {
+        addCommon(model, session);
+        orderRepository.findByOrderCodeIgnoreCase(code).ifPresent(o -> model.addAttribute("order", o));
         return "order-success";
     }
 
     @GetMapping("/track")
-    public String track(@RequestParam(required = false) String orderCode,
-                        @RequestParam(required = false) String email,
-                        Model model,
-                        HttpSession session,
-                        RedirectAttributes redirectAttributes) {
-        if (!isBuyerLoggedIn(session)) {
-            redirectAttributes.addFlashAttribute("error", "Buyer login is required to track orders.");
-            return "redirect:/buyer/login";
+    public String track(@RequestParam(required = false) String code, Model model, HttpSession session) {
+        addCommon(model, session);
+        if (code != null && !code.isBlank()) {
+            orderRepository.findByOrderCodeIgnoreCase(code).ifPresent(o -> model.addAttribute("order", o));
         }
-        if (orderCode != null && !orderCode.isBlank() && email != null && !email.isBlank()) {
-            orderRepository.findByOrderCodeIgnoreCaseAndEmailIgnoreCase(orderCode.trim(), email.trim())
-                    .ifPresentOrElse(
-                            order -> model.addAttribute("order", order),
-                            () -> model.addAttribute("error", "No matching order found. Check the order code and email.")
-                    );
-        }
-        addCommonModel(model, session);
         return "track";
     }
 
     @GetMapping("/refund")
-    public String refundForm(@RequestParam(required = false) String orderCode, Model model, HttpSession session, RedirectAttributes redirectAttributes) {
-        if (!isBuyerLoggedIn(session)) {
-            redirectAttributes.addFlashAttribute("error", "Buyer login is required to use the Protection Center.");
-            return "redirect:/buyer/login";
-        }
-        addCommonModel(model, session);
-        model.addAttribute("orderCode", orderCode);
+    public String refund(Model model, HttpSession session) {
+        addCommon(model, session);
         return "refund";
     }
 
     @PostMapping("/refund")
-    public String submitRefund(@RequestParam String orderCode,
-                               @RequestParam String email,
-                               @RequestParam String reason,
-                               @RequestParam(required = false) String evidenceUrl,
-                               HttpSession session,
-                               RedirectAttributes redirectAttributes) {
-        if (!isBuyerLoggedIn(session)) {
-            redirectAttributes.addFlashAttribute("error", "Buyer login is required to submit a refund request.");
-            return "redirect:/buyer/login";
-        }
-        RefundRequest refund = new RefundRequest();
-        refund.setOrderCode(orderCode.trim());
-        refund.setEmail(email.trim());
-        refund.setReason(reason.trim());
-        refund.setEvidenceUrl(evidenceUrl);
-        refund.setStatus(RefundStatus.SUBMITTED);
-        orderRepository.findByOrderCodeIgnoreCaseAndEmailIgnoreCase(orderCode.trim(), email.trim())
-                .ifPresent(refund::setOrder);
-        refundRepository.save(refund);
-        redirectAttributes.addFlashAttribute("message", "Refund request submitted. Admin will review it inside the platform.");
+    public String doRefund(@RequestParam String orderCode, @RequestParam String email,
+                           @RequestParam String reason, @RequestParam(required = false) String evidenceUrl,
+                           RedirectAttributes ra) {
+        RefundRequest r = new RefundRequest();
+        r.setOrderCode(orderCode);
+        r.setEmail(email);
+        r.setReason(reason);
+        r.setEvidenceUrl(evidenceUrl);
+        orderRepository.findByOrderCodeIgnoreCase(orderCode).ifPresent(r::setOrder);
+        refundRepository.save(r);
+        ra.addFlashAttribute("success", "Refund request submitted. Status: SUBMITTED");
         return "redirect:/refund";
     }
 
-
     @GetMapping("/autoship")
-    public String autoshipList(Model model, HttpSession session, RedirectAttributes redirectAttributes) {
-        BuyerAccount buyer = currentBuyer(session).orElse(null);
-        if (buyer == null) {
-            redirectAttributes.addFlashAttribute("error", "Buyer login is required to view subscriptions.");
-            return "redirect:/buyer/login";
-        }
-        addCommonModel(model, session);
-        model.addAttribute("subscriptions", autoshipRepository.findByBuyerIdOrderByCreatedAtDesc(buyer.getId()));
+    public String autoship(Model model, HttpSession session) {
+        addCommon(model, session);
+        model.addAttribute("eligibleProducts", productRepository.findByStatusOrderByCreatedAtDesc("APPROVED").stream().filter(Product::isSubscriptionEligible).limit(20).toList());
+        BuyerAccount buyer = currentBuyer(session);
+        model.addAttribute("subscriptions", buyer == null ? List.of() : autoshipRepository.findByBuyerOrderByCreatedAtDesc(buyer));
         return "autoship";
     }
 
-    @PostMapping("/autoship/start/{productId}")
-    public String startAutoship(@PathVariable Long productId,
-                                @RequestParam(defaultValue = "MONTHLY") AutoshipFrequency frequency,
-                                @RequestParam(defaultValue = "1") int quantity,
-                                HttpSession session,
-                                RedirectAttributes redirectAttributes) {
-        BuyerAccount buyer = currentBuyer(session).orElse(null);
-        if (buyer == null) {
-            redirectAttributes.addFlashAttribute("error", "Buyer login is required to create a subscription.");
-            return "redirect:/buyer/login";
-        }
+    @PostMapping("/autoship/create")
+    public String createAutoship(@RequestParam Long productId, @RequestParam String frequency, @RequestParam(defaultValue = "1") int quantity,
+                                 HttpSession session, RedirectAttributes ra) {
+        BuyerAccount buyer = currentBuyer(session);
+        if (buyer == null) return "redirect:/buyer/login";
         Product product = productRepository.findById(productId).orElseThrow();
-        if (!product.isSubscriptionEligible()) {
-            redirectAttributes.addFlashAttribute("error", "This item is not available for autoshipment.");
-            return "redirect:/product/" + productId;
-        }
-        AutoshipSubscription subscription = new AutoshipSubscription(buyer, product, frequency, quantity);
-        autoshipRepository.save(subscription);
-        redirectAttributes.addFlashAttribute("message", "Autoshipment created for " + product.getName() + ".");
+        AutoshipSubscription sub = new AutoshipSubscription();
+        sub.setBuyer(buyer);
+        sub.setProduct(product);
+        sub.setFrequency(frequency);
+        sub.setQuantity(quantity);
+        sub.setRecurringPrice(product.getPrice().multiply(BigDecimal.valueOf(quantity)));
+        sub.setSubscriptionDiscountPercent(product.getSubscriptionDiscountPercent());
+        sub.setNextShipmentDate(LocalDate.now().plusMonths(1));
+        sub.setProtectionNote("Autoship remains protected inside TrustCart. Seller exact address is not shown to buyers.");
+        autoshipRepository.save(sub);
+        ra.addFlashAttribute("success", "Autoship subscription created.");
         return "redirect:/autoship";
     }
 
-
-    private String eligibleDiscountForBuyer(String discountCode, BuyerAccount buyer) {
-        if (discountCode == null || discountCode.isBlank()) {
-            return discountCode;
-        }
-        return discountCodeRepository.findByCodeIgnoreCase(DiscountCode.normalizeCode(discountCode))
-                .map(code -> {
-                    if (code.isFirstOrderOnly() && buyer != null && buyer.getLifetimeSpend().compareTo(BigDecimal.ZERO) > 0) {
-                        return "";
-                    }
-                    return discountCode;
-                })
-                .orElse(discountCode);
-    }
-
-    @ModelAttribute("allCategories")
-    public List<ProductCategory> allCategories() {
-        return Arrays.asList(ProductCategory.values());
-    }
-
-    private void addCommonModel(Model model, HttpSession session) {
-        model.addAttribute("cartCount", cartService.countItems(session));
-        model.addAttribute("buyer", currentBuyer(session).orElse(null));
-        model.addAttribute("buyerLoggedIn", isBuyerLoggedIn(session));
-        model.addAttribute("marketCity", getStringSession(session, MARKET_CITY, "San Pablo City"));
-        model.addAttribute("marketLatitude", getDoubleSession(session, MARKET_LAT) == null ? 14.0683 : getDoubleSession(session, MARKET_LAT));
-        model.addAttribute("marketLongitude", getDoubleSession(session, MARKET_LNG) == null ? 121.3256 : getDoubleSession(session, MARKET_LNG));
-        model.addAttribute("marketRadius", getIntegerSession(session, MARKET_RADIUS, 5));
-        currentBuyer(session).ifPresent(b -> model.addAttribute("buyerSubscriptions", autoshipRepository.findByBuyerIdOrderByCreatedAtDesc(b.getId())));
-    }
-
-    private java.util.Optional<BuyerAccount> currentBuyer(HttpSession session) {
-        Object buyerId = session.getAttribute(BUYER_SESSION_KEY);
-        if (buyerId instanceof Long id) {
-            return buyerRepository.findById(id);
-        }
-        return java.util.Optional.empty();
-    }
-
-    private boolean isBuyerLoggedIn(HttpSession session) {
-        return currentBuyer(session).isPresent();
-    }
-
-    private void saveMarketIfProvided(HttpSession session, String city, Double lat, Double lng, Integer radius) {
-        if (city != null && !city.isBlank() && lat != null && lng != null) {
-            session.setAttribute(MARKET_CITY, city.trim());
-            session.setAttribute(MARKET_LAT, lat);
-            session.setAttribute(MARKET_LNG, lng);
-            session.setAttribute(MARKET_RADIUS, radius == null ? 5 : Math.max(1, Math.min(radius, 50)));
-        }
-    }
-
-    private String getStringSession(HttpSession session, String key, String fallback) {
-        Object value = session.getAttribute(key);
-        return value == null ? fallback : value.toString();
-    }
-
-    private Double getDoubleSession(HttpSession session, String key) {
-        Object value = session.getAttribute(key);
-        if (value instanceof Double d) return d;
-        if (value instanceof Number n) return n.doubleValue();
-        return null;
-    }
-
-    private Integer getIntegerSession(HttpSession session, String key, Integer fallback) {
-        Object value = session.getAttribute(key);
-        if (value instanceof Integer i) return i;
-        if (value instanceof Number n) return n.intValue();
-        return fallback;
-    }
-
-    private double distanceKm(double lat1, double lon1, double lat2, double lon2) {
-        double radius = 6371.0;
-        double dLat = Math.toRadians(lat2 - lat1);
-        double dLon = Math.toRadians(lon2 - lon1);
-        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
-                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
-                * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return radius * c;
+    @GetMapping("/try-on")
+    public String tryOn(Model model, HttpSession session) {
+        addCommon(model, session);
+        List<Product> items = productRepository.findByTryOnEligibleTrueAndStatusOrderByNameAsc("APPROVED");
+        model.addAttribute("tryOnItems", items);
+        model.addAttribute("menItems", items.stream().filter(p -> "MEN".equalsIgnoreCase(p.getTryOnGender())).toList());
+        model.addAttribute("womenItems", items.stream().filter(p -> "WOMEN".equalsIgnoreCase(p.getTryOnGender())).toList());
+        return "try-on";
     }
 }

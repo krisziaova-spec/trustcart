@@ -1,120 +1,58 @@
 package com.trustcart.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 public class Product {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @NotBlank
     private String name;
-
-    @Column(length = 1400)
+    @Column(length = 1800)
     private String description;
-
     @Enumerated(EnumType.STRING)
     private ProductCategory category;
-
-    @DecimalMin("1.00")
-    private BigDecimal price;
-
-    @Min(0)
-    private int stock;
-
+    private BigDecimal price = BigDecimal.ZERO;
+    private int stock = 0;
     private boolean ecoFriendly;
     private String sustainabilityTag;
-
     private boolean trustCartShield = true;
     private boolean authenticItemChecked = true;
     private boolean verifiedReviewsOnly = true;
     private boolean suspiciousReviewFlag = false;
-    private boolean plasticFreePackaging = false;
+    private boolean plasticFreePackaging = true;
     private boolean locallySourced = false;
-    private boolean lowWasteDelivery = false;
-
-    private int trustScore;
-    private int greenScore;
-    private int sellerVerificationScore;
-    private int productAuthenticityScore;
-    private int reviewQualityScore;
-    private int deliveryReliabilityScore;
-    private int sustainabilityScore;
-    private int returnRiskScore;
-
+    private boolean lowWasteDelivery = true;
+    private int trustScore = 90;
+    private int greenScore = 90;
+    private int sellerVerificationScore = 25;
+    private int productAuthenticityScore = 24;
+    private int reviewQualityScore = 23;
+    private int deliveryReliabilityScore = 18;
+    private int sustainabilityScore = 10;
+    private int returnRiskScore = 94;
     @Column(length = 1400)
     private String reviewSummary;
-
     @Column(length = 1200)
     private String redFlagSummary;
-
+    @Column(length = 1200)
     private String imageUrl;
     private String productOrigin;
     private String warrantyPolicy;
-
-    private boolean subscriptionEligible = false;
-    private Integer subscriptionDiscountPercent = 5;
+    private boolean subscriptionEligible;
+    private int subscriptionDiscountPercent = 5;
     private String photoAltText;
-
-    @Enumerated(EnumType.STRING)
-    private ProductStatus status = ProductStatus.PENDING;
-
+    private String status = "APPROVED";
+    private boolean tryOnEligible = false;
+    private String tryOnGender;
+    @Column(length = 1000)
+    private String tryOnAssetUrl;
+    private String stockStatus = "In Stock";
+    private String estimatedDelivery = "ETA: 1-2 days";
     private LocalDateTime createdAt = LocalDateTime.now();
-
     @ManyToOne(optional = false)
     private Seller seller;
-
-    public Product() {
-    }
-
-    public Product(String name, String description, ProductCategory category, BigDecimal price, int stock,
-                   boolean ecoFriendly, String sustainabilityTag, int trustScore, String reviewSummary,
-                   String imageUrl, ProductStatus status, Seller seller) {
-        this.name = name;
-        this.description = description;
-        this.category = category;
-        this.price = price;
-        this.stock = stock;
-        this.ecoFriendly = ecoFriendly;
-        this.sustainabilityTag = sustainabilityTag;
-        this.trustScore = trustScore;
-        this.reviewSummary = reviewSummary;
-        this.imageUrl = imageUrl;
-        this.status = status;
-        this.seller = seller;
-        applyDefaultTrustBreakdown();
-    }
-
-    public void applyDefaultTrustBreakdown() {
-        if (sellerVerificationScore == 0) sellerVerificationScore = 25;
-        if (productAuthenticityScore == 0) productAuthenticityScore = 25;
-        if (reviewQualityScore == 0) reviewQualityScore = 22;
-        if (deliveryReliabilityScore == 0) deliveryReliabilityScore = 18;
-        if (sustainabilityScore == 0) sustainabilityScore = ecoFriendly ? 10 : 6;
-        if (trustScore == 0) trustScore = Math.min(100, sellerVerificationScore + productAuthenticityScore + reviewQualityScore + deliveryReliabilityScore + sustainabilityScore);
-        if (greenScore == 0) greenScore = ecoFriendly ? 88 : 65;
-        if (returnRiskScore == 0) returnRiskScore = 94;
-        if (redFlagSummary == null || redFlagSummary.isBlank()) {
-            redFlagSummary = suspiciousReviewFlag ? "Review pattern needs TrustCart review." : "No major red flags detected in verified buyer feedback.";
-        }
-        if (warrantyPolicy == null || warrantyPolicy.isBlank()) {
-            warrantyPolicy = "7-day buyer protection with digital refund request tracking.";
-        }
-        if (productOrigin == null || productOrigin.isBlank()) {
-            productOrigin = locallySourced ? "Philippines / Local MSME source" : "Verified marketplace source";
-        }
-    }
-
-    public String getShieldLabel() {
-        return trustCartShield ? "TrustCart Shield Verified" : "Pending Shield Review";
-    }
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -174,12 +112,22 @@ public class Product {
     public void setWarrantyPolicy(String warrantyPolicy) { this.warrantyPolicy = warrantyPolicy; }
     public boolean isSubscriptionEligible() { return subscriptionEligible; }
     public void setSubscriptionEligible(boolean subscriptionEligible) { this.subscriptionEligible = subscriptionEligible; }
-    public Integer getSubscriptionDiscountPercent() { return subscriptionDiscountPercent == null ? 5 : subscriptionDiscountPercent; }
-    public void setSubscriptionDiscountPercent(Integer subscriptionDiscountPercent) { this.subscriptionDiscountPercent = subscriptionDiscountPercent == null ? 5 : subscriptionDiscountPercent; }
-    public String getPhotoAltText() { return photoAltText == null || photoAltText.isBlank() ? name : photoAltText; }
+    public int getSubscriptionDiscountPercent() { return subscriptionDiscountPercent; }
+    public void setSubscriptionDiscountPercent(int subscriptionDiscountPercent) { this.subscriptionDiscountPercent = subscriptionDiscountPercent; }
+    public String getPhotoAltText() { return photoAltText; }
     public void setPhotoAltText(String photoAltText) { this.photoAltText = photoAltText; }
-    public ProductStatus getStatus() { return status; }
-    public void setStatus(ProductStatus status) { this.status = status; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+    public boolean isTryOnEligible() { return tryOnEligible; }
+    public void setTryOnEligible(boolean tryOnEligible) { this.tryOnEligible = tryOnEligible; }
+    public String getTryOnGender() { return tryOnGender; }
+    public void setTryOnGender(String tryOnGender) { this.tryOnGender = tryOnGender; }
+    public String getTryOnAssetUrl() { return tryOnAssetUrl; }
+    public void setTryOnAssetUrl(String tryOnAssetUrl) { this.tryOnAssetUrl = tryOnAssetUrl; }
+    public String getStockStatus() { return stockStatus; }
+    public void setStockStatus(String stockStatus) { this.stockStatus = stockStatus; }
+    public String getEstimatedDelivery() { return estimatedDelivery; }
+    public void setEstimatedDelivery(String estimatedDelivery) { this.estimatedDelivery = estimatedDelivery; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public Seller getSeller() { return seller; }

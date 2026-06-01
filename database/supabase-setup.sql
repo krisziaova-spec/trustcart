@@ -1,249 +1,36 @@
--- TrustCart PostgreSQL Schema and seed data
--- Compatible with Supabase PostgreSQL and Spring Boot JPA.
--- This file resets and loads the buyer-seller live version.
-
+-- TrustCart Supabase PostgreSQL setup
+-- Run this only if you want to reset the database. The Spring Boot app also seeds full data on first run.
 DROP TABLE IF EXISTS autoship_subscription CASCADE;
 DROP TABLE IF EXISTS discount_code CASCADE;
 DROP TABLE IF EXISTS refund_request CASCADE;
 DROP TABLE IF EXISTS order_item CASCADE;
+DROP TABLE IF EXISTS customer_order CASCADE;
 DROP TABLE IF EXISTS customer_orders CASCADE;
 DROP TABLE IF EXISTS product CASCADE;
 DROP TABLE IF EXISTS seller CASCADE;
 DROP TABLE IF EXISTS buyer_account CASCADE;
 
 CREATE TABLE buyer_account (
-    id BIGSERIAL PRIMARY KEY,
-    full_name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) UNIQUE,
-    phone VARCHAR(50),
-    default_address VARCHAR(1000),
-    password VARCHAR(255),
-    preferred_city VARCHAR(255),
-    preferred_latitude DOUBLE PRECISION,
-    preferred_longitude DOUBLE PRECISION,
-    preferred_radius_km INTEGER DEFAULT 5,
-    nearby_seller_first BOOLEAN NOT NULL DEFAULT TRUE,
-    pickup_interested BOOLEAN NOT NULL DEFAULT FALSE,
-    loyalty_points_balance INTEGER DEFAULT 0,
-    lifetime_loyalty_points INTEGER DEFAULT 0,
-    lifetime_spend NUMERIC(12,2) DEFAULT 0,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+ id BIGSERIAL PRIMARY KEY, full_name VARCHAR(255), email VARCHAR(255) UNIQUE, phone VARCHAR(50), default_address VARCHAR(1000), password VARCHAR(255), preferred_city VARCHAR(255), preferred_latitude DOUBLE PRECISION, preferred_longitude DOUBLE PRECISION, preferred_radius_km INTEGER DEFAULT 5, nearby_seller_first BOOLEAN DEFAULT TRUE, pickup_interested BOOLEAN DEFAULT FALSE, loyalty_points_balance INTEGER DEFAULT 0, lifetime_loyalty_points INTEGER DEFAULT 0, lifetime_spend NUMERIC(12,2) DEFAULT 0, loyalty_tier VARCHAR(255) DEFAULT 'Starter Green Member', created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
 CREATE TABLE seller (
-    id BIGSERIAL PRIMARY KEY,
-    store_name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) UNIQUE,
-    phone VARCHAR(50),
-    password VARCHAR(255),
-    business_type VARCHAR(255),
-    sustainability_badge VARCHAR(255),
-    reliability_score INTEGER NOT NULL DEFAULT 0,
-    response_rate_score INTEGER NOT NULL DEFAULT 0,
-    complaint_rate_score INTEGER NOT NULL DEFAULT 0,
-    return_rate_score INTEGER NOT NULL DEFAULT 0,
-    green_compliance_score INTEGER NOT NULL DEFAULT 0,
-    business_verified BOOLEAN NOT NULL DEFAULT FALSE,
-    identity_verified BOOLEAN NOT NULL DEFAULT FALSE,
-    document_verified BOOLEAN NOT NULL DEFAULT FALSE,
-    product_compliance_checked BOOLEAN NOT NULL DEFAULT FALSE,
-    invited_or_approved_only BOOLEAN NOT NULL DEFAULT TRUE,
-    document_proof_url VARCHAR(1000),
-    eco_commitment VARCHAR(1000),
-    verification_note VARCHAR(1000),
-    approved_by VARCHAR(255),
-    store_exact_address VARCHAR(1000),
-    store_city VARCHAR(255),
-    store_province VARCHAR(255),
-    latitude DOUBLE PRECISION,
-    longitude DOUBLE PRECISION,
-    service_radius_km INTEGER DEFAULT 5,
-    pickup_available BOOLEAN NOT NULL DEFAULT TRUE,
-    store_location_verified BOOLEAN NOT NULL DEFAULT FALSE,
-    location_proof_url VARCHAR(1000),
-    status VARCHAR(50) NOT NULL DEFAULT 'PENDING',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    approved_at TIMESTAMP
+ id BIGSERIAL PRIMARY KEY, store_name VARCHAR(255), email VARCHAR(255) UNIQUE, phone VARCHAR(50), password VARCHAR(255), business_type VARCHAR(255), sustainability_badge VARCHAR(255), reliability_score INTEGER DEFAULT 90, response_rate_score INTEGER DEFAULT 95, complaint_rate_score INTEGER DEFAULT 95, return_rate_score INTEGER DEFAULT 94, green_compliance_score INTEGER DEFAULT 90, business_verified BOOLEAN DEFAULT TRUE, identity_verified BOOLEAN DEFAULT TRUE, document_verified BOOLEAN DEFAULT TRUE, product_compliance_checked BOOLEAN DEFAULT TRUE, invited_or_approved_only BOOLEAN DEFAULT TRUE, document_proof_url VARCHAR(1000), eco_commitment VARCHAR(1000), verification_note VARCHAR(1000), approved_by VARCHAR(255), store_exact_address VARCHAR(1000), store_city VARCHAR(255), store_province VARCHAR(255), latitude DOUBLE PRECISION, longitude DOUBLE PRECISION, service_radius_km INTEGER DEFAULT 5, pickup_available BOOLEAN DEFAULT TRUE, store_location_verified BOOLEAN DEFAULT TRUE, location_proof_url VARCHAR(1000), status VARCHAR(50) DEFAULT 'APPROVED', created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, approved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
 CREATE TABLE product (
-    id BIGSERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    description VARCHAR(1400),
-    category VARCHAR(80),
-    price NUMERIC(12,2) NOT NULL,
-    stock INTEGER NOT NULL DEFAULT 0,
-    eco_friendly BOOLEAN NOT NULL DEFAULT FALSE,
-    sustainability_tag VARCHAR(255),
-    trust_cart_shield BOOLEAN NOT NULL DEFAULT TRUE,
-    authentic_item_checked BOOLEAN NOT NULL DEFAULT TRUE,
-    verified_reviews_only BOOLEAN NOT NULL DEFAULT TRUE,
-    suspicious_review_flag BOOLEAN NOT NULL DEFAULT FALSE,
-    plastic_free_packaging BOOLEAN NOT NULL DEFAULT FALSE,
-    locally_sourced BOOLEAN NOT NULL DEFAULT FALSE,
-    low_waste_delivery BOOLEAN NOT NULL DEFAULT FALSE,
-    trust_score INTEGER NOT NULL DEFAULT 0,
-    green_score INTEGER NOT NULL DEFAULT 0,
-    seller_verification_score INTEGER NOT NULL DEFAULT 0,
-    product_authenticity_score INTEGER NOT NULL DEFAULT 0,
-    review_quality_score INTEGER NOT NULL DEFAULT 0,
-    delivery_reliability_score INTEGER NOT NULL DEFAULT 0,
-    sustainability_score INTEGER NOT NULL DEFAULT 0,
-    return_risk_score INTEGER NOT NULL DEFAULT 0,
-    review_summary VARCHAR(1400),
-    red_flag_summary VARCHAR(1200),
-    image_url VARCHAR(1200),
-    product_origin VARCHAR(255),
-    warranty_policy VARCHAR(255),
-    subscription_eligible BOOLEAN NOT NULL DEFAULT FALSE,
-    subscription_discount_percent INTEGER DEFAULT 5,
-    photo_alt_text VARCHAR(255),
-    status VARCHAR(50) NOT NULL DEFAULT 'PENDING',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    seller_id BIGINT NOT NULL REFERENCES seller(id)
+ id BIGSERIAL PRIMARY KEY, name VARCHAR(255), description VARCHAR(1800), category VARCHAR(80), price NUMERIC(12,2), stock INTEGER DEFAULT 0, eco_friendly BOOLEAN DEFAULT FALSE, sustainability_tag VARCHAR(255), trust_cart_shield BOOLEAN DEFAULT TRUE, authentic_item_checked BOOLEAN DEFAULT TRUE, verified_reviews_only BOOLEAN DEFAULT TRUE, suspicious_review_flag BOOLEAN DEFAULT FALSE, plastic_free_packaging BOOLEAN DEFAULT TRUE, locally_sourced BOOLEAN DEFAULT FALSE, low_waste_delivery BOOLEAN DEFAULT TRUE, trust_score INTEGER DEFAULT 90, green_score INTEGER DEFAULT 90, seller_verification_score INTEGER DEFAULT 25, product_authenticity_score INTEGER DEFAULT 24, review_quality_score INTEGER DEFAULT 23, delivery_reliability_score INTEGER DEFAULT 18, sustainability_score INTEGER DEFAULT 10, return_risk_score INTEGER DEFAULT 94, review_summary VARCHAR(1400), red_flag_summary VARCHAR(1200), image_url VARCHAR(1200), product_origin VARCHAR(255), warranty_policy VARCHAR(255), subscription_eligible BOOLEAN DEFAULT FALSE, subscription_discount_percent INTEGER DEFAULT 5, photo_alt_text VARCHAR(255), status VARCHAR(50) DEFAULT 'APPROVED', try_on_eligible BOOLEAN DEFAULT FALSE, try_on_gender VARCHAR(20), try_on_asset_url VARCHAR(1000), stock_status VARCHAR(80) DEFAULT 'In Stock', estimated_delivery VARCHAR(80) DEFAULT 'ETA: 1-2 days', created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, seller_id BIGINT REFERENCES seller(id)
 );
-
-CREATE TABLE customer_orders (
-    id BIGSERIAL PRIMARY KEY,
-    order_code VARCHAR(255) UNIQUE,
-    full_name VARCHAR(255),
-    email VARCHAR(255),
-    phone VARCHAR(50),
-    shipping_address VARCHAR(1000),
-    payment_method VARCHAR(80),
-    payment_status VARCHAR(100),
-    order_status VARCHAR(80) NOT NULL DEFAULT 'PLACED',
-    eco_packaging BOOLEAN NOT NULL DEFAULT FALSE,
-    no_extra_plastic BOOLEAN NOT NULL DEFAULT FALSE,
-    consolidated_delivery BOOLEAN NOT NULL DEFAULT FALSE,
-    delivery_option VARCHAR(80) DEFAULT 'STANDARD_DELIVERY',
-    buyer_market_location VARCHAR(255),
-    platform_protection_note VARCHAR(1000),
-    subtotal NUMERIC(12,2) DEFAULT 0,
-    shipping_fee NUMERIC(12,2) DEFAULT 0,
-    eco_packaging_fee NUMERIC(12,2) DEFAULT 0,
-    eco_delivery_discount NUMERIC(12,2) DEFAULT 0,
-    discount NUMERIC(12,2) DEFAULT 0,
-    promo_discount NUMERIC(12,2) DEFAULT 0,
-    loyalty_points_discount NUMERIC(12,2) DEFAULT 0,
-    discount_code VARCHAR(80),
-    discount_code_description VARCHAR(255),
-    loyalty_points_earned INTEGER DEFAULT 0,
-    loyalty_points_redeemed INTEGER DEFAULT 0,
-    loyalty_tier_after_order VARCHAR(100),
-    total NUMERIC(12,2) DEFAULT 0,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE customer_order (
+ id BIGSERIAL PRIMARY KEY, order_code VARCHAR(255) UNIQUE, full_name VARCHAR(255), email VARCHAR(255), phone VARCHAR(50), shipping_address VARCHAR(1000), payment_method VARCHAR(80), payment_status VARCHAR(100), order_status VARCHAR(80) DEFAULT 'PLACED', eco_packaging BOOLEAN DEFAULT FALSE, no_extra_plastic BOOLEAN DEFAULT FALSE, consolidated_delivery BOOLEAN DEFAULT FALSE, delivery_option VARCHAR(80) DEFAULT 'STANDARD_DELIVERY', buyer_market_location VARCHAR(255), platform_protection_note VARCHAR(1000), subtotal NUMERIC(12,2) DEFAULT 0, shipping_fee NUMERIC(12,2) DEFAULT 0, eco_packaging_fee NUMERIC(12,2) DEFAULT 0, eco_delivery_discount NUMERIC(12,2) DEFAULT 0, discount NUMERIC(12,2) DEFAULT 0, promo_discount NUMERIC(12,2) DEFAULT 0, loyalty_points_discount NUMERIC(12,2) DEFAULT 0, discount_code VARCHAR(80), discount_code_description VARCHAR(255), loyalty_points_earned INTEGER DEFAULT 0, loyalty_points_redeemed INTEGER DEFAULT 0, loyalty_tier_after_order VARCHAR(100), total NUMERIC(12,2) DEFAULT 0, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+CREATE TABLE order_item (id BIGSERIAL PRIMARY KEY, order_id BIGINT REFERENCES customer_order(id) ON DELETE CASCADE, product_id BIGINT REFERENCES product(id), product_name VARCHAR(255), seller_name VARCHAR(255), quantity INTEGER, unit_price NUMERIC(12,2), line_total NUMERIC(12,2));
+CREATE TABLE refund_request (id BIGSERIAL PRIMARY KEY, order_code VARCHAR(255), email VARCHAR(255), reason VARCHAR(1500), evidence_url VARCHAR(255), status VARCHAR(80) DEFAULT 'SUBMITTED', created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, order_id BIGINT REFERENCES customer_order(id));
+CREATE TABLE discount_code (id BIGSERIAL PRIMARY KEY, code VARCHAR(80) UNIQUE, description VARCHAR(600), minimum_spend NUMERIC(12,2) DEFAULT 0, percent_off INTEGER DEFAULT 0, amount_off NUMERIC(12,2) DEFAULT 0, active BOOLEAN DEFAULT TRUE, first_order_only BOOLEAN DEFAULT FALSE, subscription_boost BOOLEAN DEFAULT FALSE, max_redemptions INTEGER DEFAULT 0, times_redeemed INTEGER DEFAULT 0, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, expires_at TIMESTAMP, seller_id BIGINT REFERENCES seller(id), created_by_seller VARCHAR(255));
+CREATE TABLE autoship_subscription (id BIGSERIAL PRIMARY KEY, buyer_id BIGINT REFERENCES buyer_account(id), product_id BIGINT REFERENCES product(id), frequency VARCHAR(80) DEFAULT 'MONTHLY', quantity INTEGER DEFAULT 1, recurring_price NUMERIC(12,2) DEFAULT 0, subscription_discount_percent INTEGER DEFAULT 5, next_shipment_date DATE, status VARCHAR(80) DEFAULT 'ACTIVE', created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, protection_note VARCHAR(1000));
 
-CREATE TABLE order_item (
-    id BIGSERIAL PRIMARY KEY,
-    order_id BIGINT NOT NULL REFERENCES customer_orders(id) ON DELETE CASCADE,
-    product_id BIGINT NOT NULL REFERENCES product(id),
-    product_name VARCHAR(255),
-    seller_name VARCHAR(255),
-    quantity INTEGER NOT NULL,
-    unit_price NUMERIC(12,2),
-    line_total NUMERIC(12,2)
-);
-
-CREATE TABLE refund_request (
-    id BIGSERIAL PRIMARY KEY,
-    order_code VARCHAR(255),
-    email VARCHAR(255),
-    reason VARCHAR(1500),
-    evidence_url VARCHAR(255),
-    status VARCHAR(80) NOT NULL DEFAULT 'SUBMITTED',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    order_id BIGINT REFERENCES customer_orders(id)
-);
-
-CREATE TABLE discount_code (
-    id BIGSERIAL PRIMARY KEY,
-    code VARCHAR(80) UNIQUE NOT NULL,
-    description VARCHAR(600),
-    minimum_spend NUMERIC(12,2) DEFAULT 0,
-    percent_off INTEGER DEFAULT 0,
-    amount_off NUMERIC(12,2) DEFAULT 0,
-    active BOOLEAN NOT NULL DEFAULT TRUE,
-    first_order_only BOOLEAN NOT NULL DEFAULT FALSE,
-    subscription_boost BOOLEAN NOT NULL DEFAULT FALSE,
-    max_redemptions INTEGER DEFAULT 0,
-    times_redeemed INTEGER DEFAULT 0,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    expires_at TIMESTAMP,
-    seller_id BIGINT,
-    created_by_seller VARCHAR(255)
-);
-
-CREATE TABLE autoship_subscription (
-    id BIGSERIAL PRIMARY KEY,
-    buyer_id BIGINT NOT NULL REFERENCES buyer_account(id),
-    product_id BIGINT NOT NULL REFERENCES product(id),
-    frequency VARCHAR(80) NOT NULL DEFAULT 'MONTHLY',
-    quantity INTEGER DEFAULT 1,
-    recurring_price NUMERIC(12,2) DEFAULT 0,
-    subscription_discount_percent INTEGER DEFAULT 5,
-    next_shipment_date DATE,
-    status VARCHAR(80) DEFAULT 'ACTIVE',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    protection_note VARCHAR(1000)
-);
-
-
--- Starter accounts
-INSERT INTO buyer_account (full_name, email, phone, default_address, password, preferred_city, preferred_latitude, preferred_longitude, preferred_radius_km, loyalty_points_balance, lifetime_loyalty_points) VALUES
-('Juan Trust', 'buyer@trustcart.ph', '09179990000', 'San Pablo City, Laguna', 'trust123', 'San Pablo City', 14.0683, 121.3256, 5, 350, 350);
-
-INSERT INTO seller (store_name, email, phone, password, business_type, sustainability_badge, reliability_score, response_rate_score, complaint_rate_score, return_rate_score, green_compliance_score, business_verified, identity_verified, document_verified, product_compliance_checked, invited_or_approved_only, document_proof_url, eco_commitment, verification_note, approved_by, store_exact_address, store_city, store_province, latitude, longitude, service_radius_km, pickup_available, store_location_verified, location_proof_url, status, created_at, approved_at) VALUES
-('GreenTech Manila', 'greentech@trustcart.ph', '09170000001', 'trust123', 'Verified electronics reseller', 'Plastic-Free Packaging', 95, 96, 95, 94, 88, true, true, true, true, true, 'Verified business proof', 'Plastic-reduced electronics packaging', 'Business, product, location, and eco claims checked.', 'TrustCart Seller Verification', 'GreenTech Manila Fulfillment Office, Sampaloc', 'Manila', 'Metro Manila', 14.5995, 120.9842, 8, true, true, 'Verified map pin proof', 'APPROVED', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('Local Goods PH', 'localgoods@trustcart.ph', '09170000002', 'trust123', 'Local Filipino MSME', 'Locally Sourced', 93, 96, 95, 94, 90, true, true, true, true, true, 'Verified business proof', 'Local sourcing and recyclable packaging', 'Business, product, location, and eco claims checked.', 'TrustCart Seller Verification', 'Local Goods Hub, San Pablo City', 'San Pablo City', 'Laguna', 14.0683, 121.3256, 6, true, true, 'Verified map pin proof', 'APPROVED', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('EcoHome Essentials', 'ecohome@trustcart.ph', '09170000003', 'trust123', 'Sustainable home products', 'Low-Waste Packaging', 91, 96, 95, 94, 92, true, true, true, true, true, 'Verified business proof', 'Low-waste products and eco-packaging', 'Business, product, location, and eco claims checked.', 'TrustCart Seller Verification', 'EcoHome Laguna Sorting Hub, Calamba', 'Calamba', 'Laguna', 14.2117, 121.1653, 10, true, true, 'Verified map pin proof', 'APPROVED', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-
-INSERT INTO discount_code (code, description, minimum_spend, percent_off, amount_off, active, first_order_only, max_redemptions, seller_id, created_by_seller) VALUES
-('WELCOME10', '10% off first protected order for first-time buyers.', 0, 10, 0, true, true, 0, 2, 'Local Goods PH'),
-('GREEN5', '5% off for green checkout buyers.', 500, 5, 0, true, false, 0, 3, 'EcoHome Essentials'),
-('LOCAL50', '₱50 off selected local Filipino products.', 300, 0, 50, true, false, 0, 2, 'Local Goods PH');
-
-INSERT INTO product (name, description, category, price, stock, eco_friendly, sustainability_tag, trust_cart_shield, authentic_item_checked, verified_reviews_only, suspicious_review_flag, plastic_free_packaging, locally_sourced, low_waste_delivery, trust_score, green_score, seller_verification_score, product_authenticity_score, review_quality_score, delivery_reliability_score, sustainability_score, return_risk_score, review_summary, red_flag_summary, image_url, product_origin, warranty_policy, subscription_eligible, subscription_discount_percent, photo_alt_text, status, seller_id) VALUES
-('Wireless Earbuds', 'Clear audio earbuds from an approved seller. Includes authenticity and warranty check.', 'ELECTRONICS', 899, 100, true, 'Plastic-Free Packaging', true, true, true, false, true, false, true, 94, 95, 25, 24, 23, 18, 10, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', false, 0, 'Wireless Earbuds product photo', 'APPROVED', 1),
-('Power Bank 20000mAh', 'High-capacity power bank with safety-tested battery cells.', 'ELECTRONICS', 1299, 80, true, 'Verified Tech Item', true, true, true, false, true, false, true, 92, 93, 25, 24, 23, 18, 10, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', false, 0, 'Power Bank 20000mAh product photo', 'APPROVED', 1),
-('Bluetooth Speaker', 'Portable speaker with clear bass and verified buyer feedback.', 'ELECTRONICS', 749, 120, false, 'Verified Seller', true, true, true, false, false, false, false, 90, 70, 25, 23, 23, 18, 6, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', false, 0, 'Bluetooth Speaker product photo', 'APPROVED', 1),
-('Fast Charger Type-C', 'Fast charging adapter with Type-C compatibility.', 'MOBILE_ACCESSORIES', 399, 150, true, 'Minimal Packaging', true, true, true, false, true, false, true, 91, 92, 25, 24, 23, 18, 10, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', false, 0, 'Fast Charger Type-C product photo', 'APPROVED', 1),
-('Shockproof Phone Case', 'Durable phone case with anti-scratch protection.', 'MOBILE_ACCESSORIES', 199, 200, true, 'Recyclable Packaging', true, true, true, false, true, false, true, 89, 90, 25, 24, 23, 18, 10, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1601593346740-925612772716?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', false, 0, 'Shockproof Phone Case product photo', 'APPROVED', 1),
-('Tempered Glass', 'Clear tempered glass screen protector.', 'MOBILE_ACCESSORIES', 149, 250, false, 'Verified Accessory', true, true, true, false, false, false, false, 88, 70, 25, 23, 23, 18, 6, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', false, 0, 'Tempered Glass product photo', 'APPROVED', 1),
-('Organic Cotton Shirt', 'Soft cotton shirt from a local approved seller.', 'FASHION', 349, 95, true, 'Organic Cotton', true, true, true, false, true, false, true, 93, 94, 25, 24, 23, 18, 10, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', false, 0, 'Organic Cotton Shirt product photo', 'APPROVED', 2),
-('Denim Pants', 'Comfort fit denim pants with verified sizing guide.', 'FASHION', 799, 60, false, 'Trusted Local Seller', true, true, true, false, false, true, false, 89, 70, 25, 23, 23, 18, 6, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', false, 0, 'Denim Pants product photo', 'APPROVED', 2),
-('Eco Canvas Tote Bag', 'Reusable tote bag for sustainable shopping.', 'FASHION', 299, 130, true, 'Reusable Product', true, true, true, false, true, false, true, 96, 97, 25, 24, 23, 18, 10, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1597484662317-9bd7bdda2907?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', false, 0, 'Eco Canvas Tote Bag product photo', 'APPROVED', 2),
-('Bamboo Toothbrush Set', 'Eco-friendly toothbrush set for daily use.', 'BEAUTY_PERSONAL_CARE', 129, 180, true, 'Bamboo Material', true, true, true, false, true, false, true, 95, 96, 25, 24, 23, 18, 10, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', true, 5, 'Bamboo Toothbrush Set product photo', 'APPROVED', 2),
-('Organic Facial Wash', 'Gentle facial wash from verified local supplier.', 'BEAUTY_PERSONAL_CARE', 249, 90, true, 'Natural Ingredients', true, true, true, false, true, false, true, 90, 91, 25, 24, 23, 18, 10, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', true, 5, 'Organic Facial Wash product photo', 'APPROVED', 2),
-('Sunscreen SPF50', 'Daily sunscreen with SPF50 protection.', 'BEAUTY_PERSONAL_CARE', 399, 85, false, 'Verified Product', true, true, true, false, false, false, false, 88, 70, 25, 23, 23, 18, 6, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1620916297397-a4a5402a3c6c?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', true, 5, 'Sunscreen SPF50 product photo', 'APPROVED', 2),
-('Reusable Food Container', 'Food container for reducing single-use plastic waste.', 'HOME_LIVING', 299, 140, true, 'Reusable Product', true, true, true, false, true, false, true, 96, 97, 25, 24, 23, 18, 10, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1584346133934-a3afd2a33c4c?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', true, 5, 'Reusable Food Container product photo', 'APPROVED', 3),
-('LED Desk Lamp', 'Energy-saving LED desk lamp for study or work.', 'HOME_LIVING', 599, 70, true, 'Energy Efficient', true, true, true, false, true, false, true, 90, 91, 25, 24, 23, 18, 10, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', true, 5, 'LED Desk Lamp product photo', 'APPROVED', 1),
-('Bamboo Organizer', 'Bamboo desk organizer for home and office.', 'HOME_LIVING', 459, 75, true, 'Bamboo Material', true, true, true, false, true, false, true, 94, 95, 25, 24, 23, 18, 10, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1618220179428-22790b461013?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', true, 5, 'Bamboo Organizer product photo', 'APPROVED', 3),
-('Brown Rice 5kg', 'Locally sourced brown rice pack.', 'GROCERIES', 420, 55, true, 'Locally Sourced', true, true, true, false, true, true, true, 92, 93, 25, 24, 23, 18, 10, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', true, 5, 'Brown Rice 5kg product photo', 'APPROVED', 2),
-('Organic Coffee Beans', 'Locally roasted organic coffee beans.', 'GROCERIES', 350, 65, true, 'Local Farmer Support', true, true, true, false, true, true, true, 95, 96, 25, 24, 23, 18, 10, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', true, 5, 'Organic Coffee Beans product photo', 'APPROVED', 2),
-('Muscovado Sugar 1kg', 'Unrefined muscovado sugar from local suppliers.', 'GROCERIES', 180, 100, true, 'Locally Sourced', true, true, true, false, true, true, true, 91, 92, 25, 24, 23, 18, 10, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1587486937303-32eaa2134b78?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', true, 5, 'Muscovado Sugar 1kg product photo', 'APPROVED', 2),
-('Digital Thermometer', 'Basic digital thermometer for home use.', 'HEALTH_WELLNESS', 299, 110, false, 'Verified Seller', true, true, true, false, false, false, false, 89, 70, 25, 23, 23, 18, 6, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', true, 5, 'Digital Thermometer product photo', 'APPROVED', 1),
-('Resistance Band Set', 'Exercise resistance bands for home fitness.', 'HEALTH_WELLNESS', 399, 90, true, 'Minimal Packaging', true, true, true, false, true, false, true, 90, 91, 25, 24, 23, 18, 10, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1599058917212-d750089bc07e?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', true, 5, 'Resistance Band Set product photo', 'APPROVED', 3),
-('Reusable Water Bottle 1L', 'BPA-free water bottle for daily hydration.', 'HEALTH_WELLNESS', 249, 140, true, 'Reusable Product', true, true, true, false, true, false, true, 96, 97, 25, 24, 23, 18, 10, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', true, 5, 'Reusable Water Bottle 1L product photo', 'APPROVED', 3),
-('Baby Wipes Eco Pack', 'Baby wipes in eco-conscious packaging.', 'BABY_KIDS', 189, 85, true, 'Eco Pack', true, true, true, false, true, false, true, 90, 91, 25, 24, 23, 18, 10, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', false, 0, 'Baby Wipes Eco Pack product photo', 'APPROVED', 3),
-('Educational Puzzle Toy', 'Learning puzzle toy for kids.', 'BABY_KIDS', 299, 60, false, 'Verified Toy', true, true, true, false, false, false, false, 88, 70, 25, 23, 23, 18, 6, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1587654780291-39c9404d746b?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', false, 0, 'Educational Puzzle Toy product photo', 'APPROVED', 2),
-('Kids Cotton Shirt', 'Comfortable cotton shirt for children.', 'BABY_KIDS', 249, 70, true, 'Cotton Fabric', true, true, true, false, true, false, true, 90, 91, 25, 24, 23, 18, 10, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', false, 0, 'Kids Cotton Shirt product photo', 'APPROVED', 2),
-('Yoga Mat', 'Comfortable yoga mat for workout sessions.', 'SPORTS_OUTDOORS', 499, 60, true, 'Durable Product', true, true, true, false, true, false, true, 89, 90, 25, 24, 23, 18, 10, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', false, 0, 'Yoga Mat product photo', 'APPROVED', 3),
-('Jump Rope', 'Basic jump rope for cardio training.', 'SPORTS_OUTDOORS', 149, 150, false, 'Verified Product', true, true, true, false, false, false, false, 87, 70, 25, 23, 23, 18, 6, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1605296867304-46d5465a13f1?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', false, 0, 'Jump Rope product photo', 'APPROVED', 3),
-('Sports Towel', 'Quick-dry sports towel.', 'SPORTS_OUTDOORS', 199, 100, true, 'Reusable Product', true, true, true, false, true, false, true, 90, 91, 25, 24, 23, 18, 10, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1556197408-904afb6a4666?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', false, 0, 'Sports Towel product photo', 'APPROVED', 2),
-('Recycled Notebook', 'Notebook made with recycled paper.', 'SCHOOL_OFFICE', 89, 250, true, 'Recycled Paper', true, true, true, false, true, false, true, 97, 98, 25, 24, 23, 18, 10, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', false, 0, 'Recycled Notebook product photo', 'APPROVED', 2),
-('Ballpen Set', 'Affordable ballpen set for school and office.', 'SCHOOL_OFFICE', 99, 300, false, 'Verified Seller', true, true, true, false, false, false, false, 88, 70, 25, 23, 23, 18, 6, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', false, 0, 'Ballpen Set product photo', 'APPROVED', 2),
-('Desk Calculator', 'Basic calculator for school and office use.', 'SCHOOL_OFFICE', 249, 100, false, 'Verified Tech Item', true, true, true, false, false, false, false, 89, 70, 25, 23, 23, 18, 6, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1587145820266-a5951ee6f620?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', false, 0, 'Desk Calculator product photo', 'APPROVED', 1),
-('Helmet Cleaner', 'Cleaning spray for motorcycle helmets.', 'AUTOMOTIVE_MOTORCYCLE', 199, 90, false, 'Verified Product', true, true, true, false, false, false, false, 88, 70, 25, 23, 23, 18, 6, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', false, 0, 'Helmet Cleaner product photo', 'APPROVED', 1),
-('Motorcycle Phone Holder', 'Sturdy holder for motorcycle navigation.', 'AUTOMOTIVE_MOTORCYCLE', 349, 70, false, 'Verified Accessory', true, true, true, false, false, false, false, 89, 70, 25, 23, 23, 18, 6, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1605514449459-5a9cfa0b9955?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', false, 0, 'Motorcycle Phone Holder product photo', 'APPROVED', 1),
-('Tire Pressure Gauge', 'Compact tire pressure gauge.', 'AUTOMOTIVE_MOTORCYCLE', 299, 80, false, 'Verified Tool', true, true, true, false, false, false, false, 90, 70, 25, 23, 23, 18, 6, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1607860108855-64acf2078ed9?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', false, 0, 'Tire Pressure Gauge product photo', 'APPROVED', 1),
-('Organic Pet Shampoo', 'Gentle shampoo for pets.', 'PET_SUPPLIES', 299, 75, true, 'Natural Ingredients', true, true, true, false, true, false, true, 91, 92, 25, 24, 23, 18, 10, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', true, 5, 'Organic Pet Shampoo product photo', 'APPROVED', 3),
-('Cat Litter 5L', 'Absorbent cat litter pack.', 'PET_SUPPLIES', 249, 90, false, 'Verified Supplier', true, true, true, false, false, false, false, 88, 70, 25, 23, 23, 18, 6, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1574144611937-0df059b5ef3e?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', true, 5, 'Cat Litter 5L product photo', 'APPROVED', 2),
-('Dog Chew Toy', 'Durable dog chew toy.', 'PET_SUPPLIES', 199, 120, false, 'Verified Product', true, true, true, false, false, false, false, 87, 70, 25, 23, 23, 18, 6, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', true, 5, 'Dog Chew Toy product photo', 'APPROVED', 2),
-('Metal Straw Set', 'Reusable metal straw set with pouch.', 'SUSTAINABLE_PRODUCTS', 99, 200, true, 'Reusable Product', true, true, true, false, true, false, true, 98, 99, 25, 24, 23, 18, 10, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', true, 5, 'Metal Straw Set product photo', 'APPROVED', 3),
-('Reusable Shopping Bag', 'Foldable shopping bag for groceries.', 'SUSTAINABLE_PRODUCTS', 149, 180, true, 'Reusable Product', true, true, true, false, true, false, true, 97, 98, 25, 24, 23, 18, 10, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', true, 5, 'Reusable Shopping Bag product photo', 'APPROVED', 3),
-('Compostable Trash Bags', 'Compostable trash bags for home use.', 'SUSTAINABLE_PRODUCTS', 189, 130, true, 'Compostable Material', true, true, true, false, true, false, true, 95, 96, 25, 24, 23, 18, 10, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?auto=format&fit=crop&w=900&q=80', 'Verified approved source', '7-day buyer protection with digital refund request tracking.', true, 5, 'Compostable Trash Bags product photo', 'APPROVED', 3),
-('Handwoven Pouch', 'Locally handwoven pouch by Filipino makers.', 'LOCAL_FILIPINO_PRODUCTS', 250, 80, true, 'Locally Sourced', true, true, true, false, true, true, true, 96, 97, 25, 24, 23, 18, 10, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1516762689617-e1cffcef479d?auto=format&fit=crop&w=900&q=80', 'Philippines / Local MSME source', '7-day buyer protection with digital refund request tracking.', false, 0, 'Handwoven Pouch product photo', 'APPROVED', 2),
-('Local Tablea Chocolate', 'Traditional Filipino tablea chocolate.', 'LOCAL_FILIPINO_PRODUCTS', 180, 100, true, 'Local Farmer Support', true, true, true, false, true, true, true, 94, 95, 25, 24, 23, 18, 10, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1606312619070-d48b4c652a52?auto=format&fit=crop&w=900&q=80', 'Philippines / Local MSME source', '7-day buyer protection with digital refund request tracking.', false, 0, 'Local Tablea Chocolate product photo', 'APPROVED', 2),
-('Abaca Storage Basket', 'Abaca basket made by local artisans.', 'LOCAL_FILIPINO_PRODUCTS', 499, 55, true, 'Abaca Material', true, true, true, false, true, true, true, 97, 98, 25, 24, 23, 18, 10, 94, 'Verified purchase reviews only. Product quality, seller reliability, and return risk are summarized for buyers.', 'No fake-review pattern detected. Checkout is protected inside TrustCart.', 'https://images.unsplash.com/photo-1603204077779-bed963ea7d0e?auto=format&fit=crop&w=900&q=80', 'Philippines / Local MSME source', '7-day buyer protection with digital refund request tracking.', false, 0, 'Abaca Storage Basket product photo', 'APPROVED', 2);
+INSERT INTO buyer_account(full_name,email,password,phone,default_address,preferred_city,preferred_latitude,preferred_longitude,loyalty_points_balance,lifetime_loyalty_points) VALUES ('Juan Trust','buyer@trustcart.ph','trust123','09179990000','San Pablo City, Laguna','San Pablo City',14.0683,121.3256,350,350);
+INSERT INTO seller(store_name,email,password,business_type,sustainability_badge,store_exact_address,store_city,store_province,latitude,longitude,eco_commitment,verification_note,approved_by) VALUES
+('GreenTech Manila','greentech@trustcart.ph','trust123','Verified electronics reseller','Plastic-Free Packaging','GreenTech Manila Fulfillment Hub','Manila','Metro Manila',14.5995,120.9842,'Plastic-reduced electronics packaging','Business, product, and location verified.','TrustCart Verification'),
+('Local Goods PH','localgoods@trustcart.ph','trust123','Local Filipino MSME','Locally Sourced','Local Goods Hub','San Pablo City','Laguna',14.0683,121.3256,'Local sourcing and recyclable packaging','Business, product, and location verified.','TrustCart Verification'),
+('EcoHome Essentials','ecohome@trustcart.ph','trust123','Sustainable home products','Low-Waste Packaging','EcoHome Laguna Sorting Hub','Calamba','Laguna',14.2117,121.1653,'Low-waste products and eco-packaging','Business, product, and location verified.','TrustCart Verification');
+INSERT INTO discount_code(code,description,minimum_spend,percent_off,amount_off,first_order_only,seller_id,created_by_seller) VALUES ('WELCOME10','10% off first protected order for first-time buyers.',0,10,0,true,2,'Local Goods PH'),('GREEN5','5% off for green checkout buyers.',500,5,0,false,3,'EcoHome Essentials'),('LOCAL50','₱50 off selected local Filipino products.',300,0,50,false,2,'Local Goods PH');
+-- Product catalog is automatically completed by the Spring Boot DataSeeder if product table is empty.

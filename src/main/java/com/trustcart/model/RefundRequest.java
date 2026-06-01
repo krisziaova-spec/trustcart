@@ -5,24 +5,15 @@ import java.time.LocalDateTime;
 
 @Entity
 public class RefundRequest {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String orderCode;
     private String email;
-
     @Column(length = 1500)
     private String reason;
-
     private String evidenceUrl;
-
-    @Enumerated(EnumType.STRING)
-    private RefundStatus status = RefundStatus.SUBMITTED;
-
+    private String status = "SUBMITTED";
     private LocalDateTime createdAt = LocalDateTime.now();
-
     @ManyToOne
     private CustomerOrder order;
 
@@ -36,8 +27,8 @@ public class RefundRequest {
     public void setReason(String reason) { this.reason = reason; }
     public String getEvidenceUrl() { return evidenceUrl; }
     public void setEvidenceUrl(String evidenceUrl) { this.evidenceUrl = evidenceUrl; }
-    public RefundStatus getStatus() { return status; }
-    public void setStatus(RefundStatus status) { this.status = status; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public CustomerOrder getOrder() { return order; }

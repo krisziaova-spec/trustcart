@@ -5,34 +5,17 @@ import java.math.BigDecimal;
 
 @Entity
 public class OrderItem {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @ManyToOne(optional = false)
     private CustomerOrder order;
-
     @ManyToOne(optional = false)
     private Product product;
-
     private String productName;
     private String sellerName;
     private int quantity;
     private BigDecimal unitPrice;
     private BigDecimal lineTotal;
-
-    public OrderItem() {
-    }
-
-    public OrderItem(Product product, int quantity) {
-        this.product = product;
-        this.productName = product.getName();
-        this.sellerName = product.getSeller().getStoreName();
-        this.quantity = quantity;
-        this.unitPrice = product.getPrice();
-        this.lineTotal = product.getPrice().multiply(BigDecimal.valueOf(quantity));
-    }
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

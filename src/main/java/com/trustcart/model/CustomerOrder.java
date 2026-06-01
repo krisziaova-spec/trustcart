@@ -7,43 +7,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "customer_orders")
 public class CustomerOrder {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @Column(unique = true)
     private String orderCode;
-
     private String fullName;
     private String email;
     private String phone;
-
     @Column(length = 1000)
     private String shippingAddress;
-
-    @Enumerated(EnumType.STRING)
-    private PaymentMethod paymentMethod;
-
+    private String paymentMethod;
     private String paymentStatus;
-
-    @Enumerated(EnumType.STRING)
-    private OrderStatus orderStatus = OrderStatus.PLACED;
-
+    private String orderStatus = "PLACED";
     private boolean ecoPackaging;
     private boolean noExtraPlastic;
     private boolean consolidatedDelivery;
-
-    @Enumerated(EnumType.STRING)
-    private DeliveryOption deliveryOption = DeliveryOption.STANDARD_DELIVERY;
-
+    private String deliveryOption = "STANDARD_DELIVERY";
     private String buyerMarketLocation;
-
     @Column(length = 1000)
-    private String platformProtectionNote = "For buyer protection, seller exact address and direct contact are hidden. Complete payment, pickup, delivery, refund, and dispute handling inside TrustCart only.";
-
+    private String platformProtectionNote;
     private BigDecimal subtotal = BigDecimal.ZERO;
     private BigDecimal shippingFee = BigDecimal.ZERO;
     private BigDecimal ecoPackagingFee = BigDecimal.ZERO;
@@ -57,21 +40,13 @@ public class CustomerOrder {
     private Integer loyaltyPointsRedeemed = 0;
     private String loyaltyTierAfterOrder;
     private BigDecimal total = BigDecimal.ZERO;
-
     private LocalDateTime createdAt = LocalDateTime.now();
-
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy="order", cascade=CascadeType.ALL, orphanRemoval=true)
     private List<OrderItem> items = new ArrayList<>();
 
     public void addItem(OrderItem item) {
-        item.setOrder(this);
         items.add(item);
-    }
-
-    public String getGreenDeliveryLabel() {
-        if (ecoPackaging && noExtraPlastic && consolidatedDelivery) return "Maximum Green Checkout";
-        if (ecoPackaging || noExtraPlastic || consolidatedDelivery) return "Green Checkout Enabled";
-        return "Standard Checkout";
+        item.setOrder(this);
     }
 
     public Long getId() { return id; }
@@ -86,20 +61,20 @@ public class CustomerOrder {
     public void setPhone(String phone) { this.phone = phone; }
     public String getShippingAddress() { return shippingAddress; }
     public void setShippingAddress(String shippingAddress) { this.shippingAddress = shippingAddress; }
-    public PaymentMethod getPaymentMethod() { return paymentMethod; }
-    public void setPaymentMethod(PaymentMethod paymentMethod) { this.paymentMethod = paymentMethod; }
+    public String getPaymentMethod() { return paymentMethod; }
+    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
     public String getPaymentStatus() { return paymentStatus; }
     public void setPaymentStatus(String paymentStatus) { this.paymentStatus = paymentStatus; }
-    public OrderStatus getOrderStatus() { return orderStatus; }
-    public void setOrderStatus(OrderStatus orderStatus) { this.orderStatus = orderStatus; }
+    public String getOrderStatus() { return orderStatus; }
+    public void setOrderStatus(String orderStatus) { this.orderStatus = orderStatus; }
     public boolean isEcoPackaging() { return ecoPackaging; }
     public void setEcoPackaging(boolean ecoPackaging) { this.ecoPackaging = ecoPackaging; }
     public boolean isNoExtraPlastic() { return noExtraPlastic; }
     public void setNoExtraPlastic(boolean noExtraPlastic) { this.noExtraPlastic = noExtraPlastic; }
     public boolean isConsolidatedDelivery() { return consolidatedDelivery; }
     public void setConsolidatedDelivery(boolean consolidatedDelivery) { this.consolidatedDelivery = consolidatedDelivery; }
-    public DeliveryOption getDeliveryOption() { return deliveryOption; }
-    public void setDeliveryOption(DeliveryOption deliveryOption) { this.deliveryOption = deliveryOption; }
+    public String getDeliveryOption() { return deliveryOption; }
+    public void setDeliveryOption(String deliveryOption) { this.deliveryOption = deliveryOption; }
     public String getBuyerMarketLocation() { return buyerMarketLocation; }
     public void setBuyerMarketLocation(String buyerMarketLocation) { this.buyerMarketLocation = buyerMarketLocation; }
     public String getPlatformProtectionNote() { return platformProtectionNote; }
@@ -115,17 +90,17 @@ public class CustomerOrder {
     public BigDecimal getDiscount() { return discount; }
     public void setDiscount(BigDecimal discount) { this.discount = discount; }
     public BigDecimal getPromoDiscount() { return promoDiscount; }
-    public void setPromoDiscount(BigDecimal promoDiscount) { this.promoDiscount = promoDiscount == null ? BigDecimal.ZERO : promoDiscount; }
+    public void setPromoDiscount(BigDecimal promoDiscount) { this.promoDiscount = promoDiscount; }
     public BigDecimal getLoyaltyPointsDiscount() { return loyaltyPointsDiscount; }
-    public void setLoyaltyPointsDiscount(BigDecimal loyaltyPointsDiscount) { this.loyaltyPointsDiscount = loyaltyPointsDiscount == null ? BigDecimal.ZERO : loyaltyPointsDiscount; }
+    public void setLoyaltyPointsDiscount(BigDecimal loyaltyPointsDiscount) { this.loyaltyPointsDiscount = loyaltyPointsDiscount; }
     public String getDiscountCode() { return discountCode; }
     public void setDiscountCode(String discountCode) { this.discountCode = discountCode; }
     public String getDiscountCodeDescription() { return discountCodeDescription; }
     public void setDiscountCodeDescription(String discountCodeDescription) { this.discountCodeDescription = discountCodeDescription; }
-    public Integer getLoyaltyPointsEarned() { return loyaltyPointsEarned == null ? 0 : loyaltyPointsEarned; }
-    public void setLoyaltyPointsEarned(Integer loyaltyPointsEarned) { this.loyaltyPointsEarned = loyaltyPointsEarned == null ? 0 : loyaltyPointsEarned; }
-    public Integer getLoyaltyPointsRedeemed() { return loyaltyPointsRedeemed == null ? 0 : loyaltyPointsRedeemed; }
-    public void setLoyaltyPointsRedeemed(Integer loyaltyPointsRedeemed) { this.loyaltyPointsRedeemed = loyaltyPointsRedeemed == null ? 0 : loyaltyPointsRedeemed; }
+    public Integer getLoyaltyPointsEarned() { return loyaltyPointsEarned; }
+    public void setLoyaltyPointsEarned(Integer loyaltyPointsEarned) { this.loyaltyPointsEarned = loyaltyPointsEarned; }
+    public Integer getLoyaltyPointsRedeemed() { return loyaltyPointsRedeemed; }
+    public void setLoyaltyPointsRedeemed(Integer loyaltyPointsRedeemed) { this.loyaltyPointsRedeemed = loyaltyPointsRedeemed; }
     public String getLoyaltyTierAfterOrder() { return loyaltyTierAfterOrder; }
     public void setLoyaltyTierAfterOrder(String loyaltyTierAfterOrder) { this.loyaltyTierAfterOrder = loyaltyTierAfterOrder; }
     public BigDecimal getTotal() { return total; }

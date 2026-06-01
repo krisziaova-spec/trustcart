@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="92" viewBox="0 0 360 92">
+  <defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#087a3f"/><stop offset="1" stop-color="#0f766e"/></linearGradient></defs>
+  <rect width="360" height="92" fill="none"/>
+  <g transform="translate(6,10)">
+    <path d="M18 16h13l8 39h89l10-31H44" fill="none" stroke="url(#g)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="54" cy="66" r="8" fill="#e8b86d"/><circle cx="113" cy="66" r="8" fill="#e8b86d"/>
+    <path d="M77 0l45 14v21c0 20-17 34-45 43-28-9-45-23-45-43V14L77 0z" fill="#10b981" opacity=".92"/>
+    <path d="M57 35l14 14 30-33" fill="none" stroke="#062c24" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="150" y="58" font-size="42" font-family="Inter, Arial, sans-serif" font-weight="800" fill="#0b7a3b">Trust<tspan fill="#0f3b74">Cart</tspan></text>
+</svg>

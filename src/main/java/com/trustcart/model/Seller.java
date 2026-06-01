@@ -1,54 +1,36 @@
 package com.trustcart.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 public class Seller {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @NotBlank
     private String storeName;
-
-    @Email
     @Column(unique = true)
     private String email;
-
     private String phone;
     private String password;
     private String businessType;
     private String sustainabilityBadge;
-
-    private int reliabilityScore;
-    private int responseRateScore;
-    private int complaintRateScore;
-    private int returnRateScore;
-    private int greenComplianceScore;
-
-    private boolean businessVerified = false;
-    private boolean identityVerified = false;
-    private boolean documentVerified = false;
-    private boolean productComplianceChecked = false;
+    private int reliabilityScore = 90;
+    private int responseRateScore = 95;
+    private int complaintRateScore = 95;
+    private int returnRateScore = 94;
+    private int greenComplianceScore = 90;
+    private boolean businessVerified = true;
+    private boolean identityVerified = true;
+    private boolean documentVerified = true;
+    private boolean productComplianceChecked = true;
     private boolean invitedOrApprovedOnly = true;
-
     @Column(length = 1000)
     private String documentProofUrl;
-
     @Column(length = 1000)
     private String ecoCommitment;
-
     @Column(length = 1000)
     private String verificationNote;
-
     private String approvedBy;
-
     @Column(length = 1000)
     private String storeExactAddress;
     private String storeCity;
@@ -57,84 +39,21 @@ public class Seller {
     private Double longitude;
     private Integer serviceRadiusKm = 5;
     private boolean pickupAvailable = true;
-    private boolean storeLocationVerified = false;
-
+    private boolean storeLocationVerified = true;
     @Column(length = 1000)
     private String locationProofUrl;
-
-    @Enumerated(EnumType.STRING)
-    private SellerStatus status = SellerStatus.PENDING;
-
+    private String status = "APPROVED";
     private LocalDateTime createdAt = LocalDateTime.now();
-    private LocalDateTime approvedAt;
-
-    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL)
-    private List<Product> products = new ArrayList<>();
-
-    public Seller() {
-    }
-
-    public Seller(String storeName, String email, String phone, String businessType, String sustainabilityBadge, int reliabilityScore, SellerStatus status) {
-        this.storeName = storeName;
-        this.email = email;
-        this.phone = phone;
-        this.businessType = businessType;
-        this.sustainabilityBadge = sustainabilityBadge;
-        this.reliabilityScore = reliabilityScore;
-        this.status = status;
-        if (status == SellerStatus.APPROVED) {
-            markVerifiedDefaults();
-        }
-    }
-
-    public void markVerifiedDefaults() {
-        this.businessVerified = true;
-        this.identityVerified = true;
-        this.documentVerified = true;
-        this.productComplianceChecked = true;
-        this.storeLocationVerified = true;
-        this.reliabilityScore = Math.max(this.reliabilityScore, 92);
-        this.responseRateScore = Math.max(this.responseRateScore, 96);
-        this.complaintRateScore = Math.max(this.complaintRateScore, 95);
-        this.returnRateScore = Math.max(this.returnRateScore, 94);
-        this.greenComplianceScore = Math.max(this.greenComplianceScore, 88);
-        if (this.verificationNote == null || this.verificationNote.isBlank()) {
-            this.verificationNote = "Business identity, product compliance, location proof, and sustainability claims checked for platform approval.";
-        }
-        if (this.approvedBy == null || this.approvedBy.isBlank()) {
-            this.approvedBy = "TrustCart Seller Verification";
-        }
-        if (this.approvedAt == null) {
-            this.approvedAt = LocalDateTime.now();
-        }
-    }
-
-    public String getPassportStatus() {
-        return businessVerified && identityVerified && documentVerified && productComplianceChecked && storeLocationVerified ? "Complete" : "Needs Verification Review";
-    }
+    private LocalDateTime approvedAt = LocalDateTime.now();
 
     public String getPublicLocationLabel() {
-        if (storeCity == null || storeCity.isBlank()) return "Verified area hidden";
-        String provincePart = storeProvince == null || storeProvince.isBlank() ? "" : ", " + storeProvince;
-        return storeCity + provincePart + " area";
+        String city = storeCity == null || storeCity.isBlank() ? "Verified seller area" : storeCity;
+        String province = storeProvince == null || storeProvince.isBlank() ? "" : ", " + storeProvince;
+        return city + province + " area";
     }
 
     public String getProtectedPickupLabel() {
-        if (!pickupAvailable) return "Pickup not available";
-        return "Pickup via TrustCart partner hub only - exact store address is hidden until platform-approved pickup confirmation.";
-    }
-
-    public String getDeliveryPromise() {
-        if (serviceRadiusKm != null && serviceRadiusKm <= 5) return "Nearby delivery eligible";
-        return "Delivery coverage subject to seller radius";
-    }
-
-    public String getLocationIntegrityNote() {
-        return storeLocationVerified ? "Store location verified by TrustCart; exact address hidden from buyers to prevent off-platform transactions." : "Store location pending TrustCart verification.";
-    }
-
-    public boolean hasCoordinates() {
-        return latitude != null && longitude != null;
+        return pickupAvailable ? "Pickup via TrustCart partner hub only" : "Delivery only";
     }
 
     public Long getId() { return id; }
@@ -197,12 +116,10 @@ public class Seller {
     public void setStoreLocationVerified(boolean storeLocationVerified) { this.storeLocationVerified = storeLocationVerified; }
     public String getLocationProofUrl() { return locationProofUrl; }
     public void setLocationProofUrl(String locationProofUrl) { this.locationProofUrl = locationProofUrl; }
-    public SellerStatus getStatus() { return status; }
-    public void setStatus(SellerStatus status) { this.status = status; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public LocalDateTime getApprovedAt() { return approvedAt; }
     public void setApprovedAt(LocalDateTime approvedAt) { this.approvedAt = approvedAt; }
-    public List<Product> getProducts() { return products; }
-    public void setProducts(List<Product> products) { this.products = products; }
 }

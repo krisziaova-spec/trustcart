@@ -67,12 +67,12 @@ public class DataSeeder {
                 base(products,"Handwoven Pouch",ProductCategory.LOCAL_FILIPINO_PRODUCTS,250,local,"https://images.unsplash.com/photo-1516762689617-e1cffcef479d?auto=format&fit=crop&w=900&q=80",false,false);
                 base(products,"Local Tablea Chocolate",ProductCategory.LOCAL_FILIPINO_PRODUCTS,180,local,"https://images.unsplash.com/photo-1606312619070-d48b4c652a52?auto=format&fit=crop&w=900&q=80",false,false);
                 base(products,"Abaca Storage Basket",ProductCategory.LOCAL_FILIPINO_PRODUCTS,499,local,"https://images.unsplash.com/photo-1603204077779-bed963ea7d0e?auto=format&fit=crop&w=900&q=80",false,false);
-                String[] men={"Classic White Polo Shirt","Green Casual T-Shirt","Black Hoodie","Denim Jacket","Office Long Sleeve Shirt","Casual Bomber Jacket","Chino Pants","Slim Fit Denim Pants","Running Jacket","Eco Cotton Shirt"};
-                String[] ma={"/img/tryon/men-polo.svg","/img/tryon/men-tshirt.svg","/img/tryon/men-hoodie.svg","/img/tryon/men-denim-jacket.svg","/img/tryon/men-long-sleeve.svg","/img/tryon/men-bomber.svg","/img/tryon/men-chino-pants.svg","/img/tryon/men-denim-pants.svg","/img/tryon/men-running-jacket.svg","/img/tryon/men-eco-shirt.svg"};
-                for(int i=0;i<men.length;i++) tryon(products,men[i],"MEN",ma[i],local,349+i*40);
-                String[] women={"Casual Green Dress","White Blouse","Floral Dress","Soft Cardigan","Women Denim Jacket","Office Blazer","Eco Cotton Top","Casual Hoodie","Long Skirt","Tote Bag Preview"};
-                String[] wa={"/img/tryon/women-green-dress.svg","/img/tryon/women-white-blouse.svg","/img/tryon/women-floral-dress.svg","/img/tryon/women-cardigan.svg","/img/tryon/women-denim-jacket.svg","/img/tryon/women-office-blazer.svg","/img/tryon/women-eco-top.svg","/img/tryon/women-hoodie.svg","/img/tryon/women-long-skirt.svg","/img/tryon/women-tote-bag.svg"};
-                for(int i=0;i<women.length;i++) tryon(products,women[i],"WOMEN",wa[i],local,399+i*45);
+                String[] men={"Men Basic T-Shirt - Green","Men Basic T-Shirt - Navy","Men Basic T-Shirt - White","Men Basic T-Shirt - Black"};
+                String[] ma={"/img/tryon/men-tshirt-green.png","/img/tryon/men-tshirt-navy.png","/img/tryon/men-tshirt-white.png","/img/tryon/men-tshirt-black.png"};
+                for(int i=0;i<men.length;i++) tryon(products,men[i],"MEN",ma[i],local,389+i*20);
+                String[] women={"Women Simple Dress - Sage","Women Simple Dress - Rose","Women Simple Dress - Navy","Women Simple Dress - Cream"};
+                String[] wa={"/img/tryon/women-dress-sage.png","/img/tryon/women-dress-rose.png","/img/tryon/women-dress-navy.png","/img/tryon/women-dress-cream.png"};
+                for(int i=0;i<women.length;i++) tryon(products,women[i],"WOMEN",wa[i],local,459+i*25);
             }
             if (registries.count() == 0) {
                 BuyerAccount owner = buyers.findByEmailIgnoreCase("buyer@trustcart.ph").orElse(null);

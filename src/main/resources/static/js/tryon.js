@@ -37,14 +37,15 @@ function selectGarment(btn) {
     scaleRange.value = 175;
     pos.y = 180;
   } else if (asset.includes('dress')) {
-    scaleRange.value = 190;
-    pos.y = 95;
+    scaleRange.value = 215;
+    pos.y = 90;
   } else if (asset.includes('bag')) {
     scaleRange.value = 150;
     pos.x = 62;
     pos.y = 170;
   } else {
-    scaleRange.value = 165;
+    scaleRange.value = 205;
+    pos.y = 92;
   }
   rotateRange.value = 0;
   updateOverlay();
@@ -65,7 +66,7 @@ scaleRange?.addEventListener('input', updateOverlay);
 rotateRange?.addEventListener('input', updateOverlay);
 resetBtn?.addEventListener('click', () => {
   pos = { x: 50, y: 110 };
-  scaleRange.value = 165;
+  scaleRange.value = 205;
   rotateRange.value = 0;
   updateOverlay();
 });

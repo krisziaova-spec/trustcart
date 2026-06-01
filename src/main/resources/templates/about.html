@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TrustCart - About Us</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<nav class="nav"><div class="nav-inner"><a class="logo" th:href="@{/}"><span class="logo-badge">TC</span> TrustCart</a><div class="nav-links"><a th:href="@{/}">Shop</a><a th:href="@{/help-center}">Help Center</a><a th:href="@{/buyer-protection-policy}">Buyer Protection</a><a th:href="@{/seller}">Seller Center</a><a th:href="@{/site-map}">Site Map</a><a class="btn-light" th:href="@{/cart}">Cart</a></div></div></nav>
+<main class="container narrow-wide">
+    <section class="hero hero-premium">
+        <div>
+            <span class="eyebrow">About TrustCart</span>
+            <h1>A marketplace built around trust, sustainability, and buyer confidence.</h1>
+            <p>TrustCart is designed as a verified green marketplace where approved sellers, safer checkout, nearby seller filtering, and buyer protection work together to improve the online shopping experience.</p>
+        </div>
+        <div class="hero-card shield-card">
+            <h3 style="margin-top:0">TrustCart Standard</h3>
+            <div class="shield-list"><span>✓ Verified sellers and products</span><span>✓ Transparent checkout and protection reminders</span><span>✓ Sustainability and location integrity features</span></div>
+        </div>
+    </section>
+    <section class="info-grid policy-grid"><div class="info-card"><h2>What TrustCart Offers</h2><p class="policy-line"><strong>Verified marketplace</strong><br>Only approved sellers can offer products on the platform.</p><p class="policy-line"><strong>Green commerce</strong><br>Product Green Score, eco-packaging, consolidated delivery, and local seller visibility support sustainability.</p><p class="policy-line"><strong>Buyer-first design</strong><br>True price display, order tracking, refund center, and clear seller indicators help buyers make safer decisions.</p></div>
+<div class="info-card"><h2>Why It Is Different</h2><p class="policy-line"><strong>Trust before volume</strong><br>TrustCart prioritizes seller legitimacy and product reliability over simply increasing listings.</p><p class="policy-line"><strong>Protected location system</strong><br>Seller exact addresses are verified internally but not exposed to buyers to reduce off-platform transactions.</p><p class="policy-line"><strong>Retention features</strong><br>TrustPoints, discount codes, and autoship subscriptions encourage repeat use within the platform.</p></div></section>
+    <section class="card cta-panel"><h2>Continue shopping safely</h2><p class="muted">All purchases, payments, refunds, TrustPoints, and support should stay inside TrustCart for protection.</p><div class="footer-actions"><a class="btn btn-primary" th:href="@{/}">Back to Shop</a><a class="btn btn-outline" th:href="@{/help-center}">Open Help Center</a></div></section>
+</main>
+
+<footer class="site-footer">
+    <div class="container footer-grid">
+        <div><strong>TrustCart</strong><p>Verified green marketplace with buyer protection, seller verification, and sustainable checkout.</p></div>
+        <div><h4>Customer Care</h4><a th:href="@{/help-center}">Help Center</a><a th:href="@{/faq}">FAQ</a><a th:href="@{/track}">Track Order</a><a th:href="@{/refund}">Protection Center</a></div>
+        <div><h4>Policies</h4><a th:href="@{/privacy-policy}">Privacy Policy</a><a th:href="@{/terms-and-conditions}">Terms and Conditions</a><a th:href="@{/return-refund-policy}">Returns and Refunds</a><a th:href="@{/shipping-delivery-policy}">Shipping and Delivery</a></div>
+        <div><h4>Marketplace</h4><a th:href="@{/buyer-protection-policy}">Buyer Protection</a><a th:href="@{/seller-policy}">Seller Policy</a><a th:href="@{/sustainability-policy}">Sustainability</a><a th:href="@{/site-map}">Site Map</a></div>
+    </div>
+</footer>
+</body>
+</html>

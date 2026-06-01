@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TrustCart - Prohibited Items Policy</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<nav class="nav"><div class="nav-inner"><a class="logo" th:href="@{/}"><span class="logo-badge">TC</span> TrustCart</a><div class="nav-links"><a th:href="@{/}">Shop</a><a th:href="@{/help-center}">Help Center</a><a th:href="@{/buyer-protection-policy}">Buyer Protection</a><a th:href="@{/seller}">Seller Center</a><a th:href="@{/site-map}">Site Map</a><a class="btn-light" th:href="@{/cart}">Cart</a></div></div></nav>
+<main class="container narrow-wide">
+    <section class="hero hero-premium">
+        <div>
+            <span class="eyebrow">Prohibited Items</span>
+            <h1>Items not allowed on TrustCart.</h1>
+            <p>This policy helps protect buyers, sellers, and the platform from unsafe, illegal, counterfeit, or misleading products.</p>
+        </div>
+        <div class="hero-card shield-card">
+            <h3 style="margin-top:0">TrustCart Standard</h3>
+            <div class="shield-list"><span>✓ Verified sellers and products</span><span>✓ Transparent checkout and protection reminders</span><span>✓ Sustainability and location integrity features</span></div>
+        </div>
+    </section>
+    <section class="info-grid policy-grid"><div class="info-card"><h2>Not Allowed</h2><p class="policy-line"><strong>Counterfeit goods</strong><br>Fake branded items and misleading replicas are not allowed.</p><p class="policy-line"><strong>Unsafe items</strong><br>Products that may harm buyers or violate safety standards are not allowed.</p><p class="policy-line"><strong>Illegal products</strong><br>Products prohibited by applicable law or platform rules are not allowed.</p><p class="policy-line"><strong>Deceptive listings</strong><br>Listings with fake photos, false claims, or hidden conditions are not allowed.</p></div>
+<div class="info-card"><h2>Restricted Review</h2><p class="policy-line"><strong>High-risk categories</strong><br>Certain items such as electronics, beauty products, supplements, and baby products may require closer review.</p><p class="policy-line"><strong>Sustainability claims</strong><br>Eco claims must be clear and not misleading.</p><p class="policy-line"><strong>Location claims</strong><br>Virtual or fake store locations are not allowed.</p></div>
+<div class="info-card"><h2>Enforcement</h2><p class="policy-line"><strong>Product rejection</strong><br>Admin may reject listings.</p><p class="policy-line"><strong>Listing removal</strong><br>Approved products may be removed after reports or review.</p><p class="policy-line"><strong>Seller restriction</strong><br>Seller accounts may be suspended for repeated violations.</p></div></section>
+    <section class="card cta-panel"><h2>Continue shopping safely</h2><p class="muted">All purchases, payments, refunds, TrustPoints, and support should stay inside TrustCart for protection.</p><div class="footer-actions"><a class="btn btn-primary" th:href="@{/}">Back to Shop</a><a class="btn btn-outline" th:href="@{/help-center}">Open Help Center</a></div></section>
+</main>
+
+<footer class="site-footer">
+    <div class="container footer-grid">
+        <div><strong>TrustCart</strong><p>Verified green marketplace with buyer protection, seller verification, and sustainable checkout.</p></div>
+        <div><h4>Customer Care</h4><a th:href="@{/help-center}">Help Center</a><a th:href="@{/faq}">FAQ</a><a th:href="@{/track}">Track Order</a><a th:href="@{/refund}">Protection Center</a></div>
+        <div><h4>Policies</h4><a th:href="@{/privacy-policy}">Privacy Policy</a><a th:href="@{/terms-and-conditions}">Terms and Conditions</a><a th:href="@{/return-refund-policy}">Returns and Refunds</a><a th:href="@{/shipping-delivery-policy}">Shipping and Delivery</a></div>
+        <div><h4>Marketplace</h4><a th:href="@{/buyer-protection-policy}">Buyer Protection</a><a th:href="@{/seller-policy}">Seller Policy</a><a th:href="@{/sustainability-policy}">Sustainability</a><a th:href="@{/site-map}">Site Map</a></div>
+    </div>
+</footer>
+</body>
+</html>

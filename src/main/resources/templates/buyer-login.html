@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Buyer Login - TrustCart</title><link rel="stylesheet" th:href="@{/css/styles.css}"></head>
 <body>
-<nav class="nav"><div class="nav-inner"><a class="logo" th:href="@{/}"><span class="logo-badge">TC</span> TrustCart</a><div class="nav-links"><a th:href="@{/}">Shop</a><a th:href="@{/buyer/register}">Create Buyer Account</a><a th:href="@{/seller/login}">Seller Login</a></div></div></nav>
+<nav class="nav"><div class="nav-inner"><a class="logo" th:href="@{/}"><span class="logo-badge">TC</span> TrustCart</a><div class="nav-links"><a th:href="@{/}">Shop</a><a th:href="@{/buyer/register}">Create Buyer Account</a><a th:href="@{/seller/login}">Seller Login</a><a th:href="@{/faq}">FAQ</a><a th:href="@{/site-map}">Site Map</a></div></div></nav>
 <main class="container narrow">
     <section class="card auth-card">
         <span class="eyebrow green">Buyer Access</span>
@@ -21,5 +21,14 @@
         <a class="btn btn-outline" style="width:100%;margin-top:8px" th:href="@{/buyer/register}">Create New Buyer Account</a>
     </section>
 </main>
+
+<footer class="site-footer">
+    <div class="container footer-grid">
+        <div><strong>TrustCart</strong><p>Verified green marketplace with buyer protection, seller verification, and sustainable checkout.</p></div>
+        <div><h4>Customer Care</h4><a th:href="@{/help-center}">Help Center</a><a th:href="@{/faq}">FAQ</a><a th:href="@{/track}">Track Order</a><a th:href="@{/refund}">Protection Center</a></div>
+        <div><h4>Policies</h4><a th:href="@{/privacy-policy}">Privacy Policy</a><a th:href="@{/terms-and-conditions}">Terms and Conditions</a><a th:href="@{/return-refund-policy}">Returns and Refunds</a><a th:href="@{/shipping-delivery-policy}">Shipping and Delivery</a></div>
+        <div><h4>Marketplace</h4><a th:href="@{/buyer-protection-policy}">Buyer Protection</a><a th:href="@{/seller-policy}">Seller Policy</a><a th:href="@{/sustainability-policy}">Sustainability</a><a th:href="@{/site-map}">Site Map</a></div>
+    </div>
+</footer>
 </body>
 </html>

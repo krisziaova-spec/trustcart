@@ -218,3 +218,38 @@ Redeem: 10 TrustPoints = ₱1 checkout discount
 ```
 
 Autoshipment is available for selected essentials such as groceries, home living, pet supplies, wellness, beauty care, and sustainable products.
+
+## Added Information Pages
+
+TrustCart now includes customer-facing information pages that make the website feel more complete and easier to present:
+
+- `/faq` - Frequently Asked Questions for buyers, sellers, sustainability, rewards, subscriptions, pickup, and buyer protection.
+- `/site-map` - Human-readable site map for buyer, seller, admin, checkout, tracking, refund, and autoship pages.
+- `/sitemap.xml` - XML sitemap endpoint for deployment and search-engine style structure.
+
+
+## Full Online Shop Pages Added
+
+TrustCart now includes standard online store support and policy pages:
+
+- `/about`
+- `/help-center`
+- `/contact-us`
+- `/faq`
+- `/site-map`
+- `/sitemap.xml`
+- `/privacy-policy`
+- `/terms-and-conditions`
+- `/return-refund-policy`
+- `/shipping-delivery-policy`
+- `/payment-policy`
+- `/buyer-protection-policy`
+- `/seller-policy`
+- `/authenticity-policy`
+- `/sustainability-policy`
+- `/prohibited-items-policy`
+- `/off-platform-policy`
+
+## Render Fix
+
+This package includes a safer Dockerfile and server binding settings for Render. Use `/health` as the health check path.

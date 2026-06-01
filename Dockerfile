@@ -11,7 +11,8 @@ RUN mvn -B -DskipTests clean package
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 ENV PORT=8080
-ENV JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=75.0 -Dserver.address=0.0.0.0"
+ENV SERVER_ADDRESS=0.0.0.0
+ENV JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=75.0"
 COPY --from=build /app/target/trustcart-0.0.1-SNAPSHOT.jar app.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["sh", "-c", "java -Dserver.port=${PORT:-8080} -Dserver.address=0.0.0.0 -jar app.jar"]

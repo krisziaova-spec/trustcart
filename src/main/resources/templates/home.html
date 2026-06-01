@@ -17,7 +17,7 @@
             <a th:href="@{/autoship}" th:if="${buyerLoggedIn}">Subscriptions</a>
             <a th:href="@{/seller}">Seller Center</a>
             <a th:href="@{/admin}">Admin</a>
-            <a class="btn-light" th:href="@{/cart}">Cart (<span th:text="${cartCount}">0</span>)</a>
+            <a th:href="@{/faq}">FAQ</a><a th:href="@{/site-map}">Site Map</a><a class="btn-light" th:href="@{/cart}">Cart (<span th:text="${cartCount}">0</span>)</a>
             <a th:if="${!buyerLoggedIn}" th:href="@{/buyer/login}">Buyer Login</a>
             <form th:if="${buyerLoggedIn}" th:action="@{/buyer/logout}" method="post" class="nav-form"><button type="submit">Logout</button></form>
         </div>
@@ -172,5 +172,14 @@ function applyPreset(){
   document.getElementById('longitude').value = parts[2];
 }
 </script>
+
+<footer class="site-footer">
+    <div class="container footer-grid">
+        <div><strong>TrustCart</strong><p>Verified green marketplace with buyer protection, seller verification, and sustainable checkout.</p></div>
+        <div><h4>Customer Care</h4><a th:href="@{/help-center}">Help Center</a><a th:href="@{/faq}">FAQ</a><a th:href="@{/track}">Track Order</a><a th:href="@{/refund}">Protection Center</a></div>
+        <div><h4>Policies</h4><a th:href="@{/privacy-policy}">Privacy Policy</a><a th:href="@{/terms-and-conditions}">Terms and Conditions</a><a th:href="@{/return-refund-policy}">Returns and Refunds</a><a th:href="@{/shipping-delivery-policy}">Shipping and Delivery</a></div>
+        <div><h4>Marketplace</h4><a th:href="@{/buyer-protection-policy}">Buyer Protection</a><a th:href="@{/seller-policy}">Seller Policy</a><a th:href="@{/sustainability-policy}">Sustainability</a><a th:href="@{/site-map}">Site Map</a></div>
+    </div>
+</footer>
 </body>
 </html>

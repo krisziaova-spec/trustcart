@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TrustCart - Seller Policy</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<nav class="nav"><div class="nav-inner"><a class="logo" th:href="@{/}"><span class="logo-badge">TC</span> TrustCart</a><div class="nav-links"><a th:href="@{/}">Shop</a><a th:href="@{/help-center}">Help Center</a><a th:href="@{/buyer-protection-policy}">Buyer Protection</a><a th:href="@{/seller}">Seller Center</a><a th:href="@{/site-map}">Site Map</a><a class="btn-light" th:href="@{/cart}">Cart</a></div></div></nav>
+<main class="container narrow-wide">
+    <section class="hero hero-premium">
+        <div>
+            <span class="eyebrow">Seller Policy</span>
+            <h1>Requirements for becoming and remaining a TrustCart seller.</h1>
+            <p>TrustCart is an approved-seller marketplace. Sellers must meet verification and listing standards before products are offered to buyers.</p>
+        </div>
+        <div class="hero-card shield-card">
+            <h3 style="margin-top:0">TrustCart Standard</h3>
+            <div class="shield-list"><span>✓ Verified sellers and products</span><span>✓ Transparent checkout and protection reminders</span><span>✓ Sustainability and location integrity features</span></div>
+        </div>
+    </section>
+    <section class="info-grid policy-grid"><div class="info-card"><h2>Seller Approval</h2><p class="policy-line"><strong>Application required</strong><br>Applicants submit store details, contact details, and exact location for review.</p><p class="policy-line"><strong>Admin approval</strong><br>Admin approval is required before selling.</p><p class="policy-line"><strong>Seller Passport</strong><br>Approved sellers display a public trust profile with verification indicators.</p></div>
+<div class="info-card"><h2>Listing Rules</h2><p class="policy-line"><strong>Truthful details</strong><br>Product titles, descriptions, stock, price, photos, and sustainability claims must be accurate.</p><p class="policy-line"><strong>No fake items</strong><br>Counterfeit, misleading, unsafe, or prohibited items are not allowed.</p><p class="policy-line"><strong>Product photos</strong><br>Photos should represent the actual product and should not deceive buyers.</p></div>
+<div class="info-card"><h2>Fulfillment Rules</h2><p class="policy-line"><strong>Delivery readiness</strong><br>Sellers must keep stock and fulfillment details updated.</p><p class="policy-line"><strong>Pickup protection</strong><br>Pickup must follow TrustCart hub or protected pickup flow.</p><p class="policy-line"><strong>No buyer circumvention</strong><br>Sellers must not invite buyers to complete transactions outside TrustCart.</p></div></section>
+    <section class="card cta-panel"><h2>Continue shopping safely</h2><p class="muted">All purchases, payments, refunds, TrustPoints, and support should stay inside TrustCart for protection.</p><div class="footer-actions"><a class="btn btn-primary" th:href="@{/}">Back to Shop</a><a class="btn btn-outline" th:href="@{/help-center}">Open Help Center</a></div></section>
+</main>
+
+<footer class="site-footer">
+    <div class="container footer-grid">
+        <div><strong>TrustCart</strong><p>Verified green marketplace with buyer protection, seller verification, and sustainable checkout.</p></div>
+        <div><h4>Customer Care</h4><a th:href="@{/help-center}">Help Center</a><a th:href="@{/faq}">FAQ</a><a th:href="@{/track}">Track Order</a><a th:href="@{/refund}">Protection Center</a></div>
+        <div><h4>Policies</h4><a th:href="@{/privacy-policy}">Privacy Policy</a><a th:href="@{/terms-and-conditions}">Terms and Conditions</a><a th:href="@{/return-refund-policy}">Returns and Refunds</a><a th:href="@{/shipping-delivery-policy}">Shipping and Delivery</a></div>
+        <div><h4>Marketplace</h4><a th:href="@{/buyer-protection-policy}">Buyer Protection</a><a th:href="@{/seller-policy}">Seller Policy</a><a th:href="@{/sustainability-policy}">Sustainability</a><a th:href="@{/site-map}">Site Map</a></div>
+    </div>
+</footer>
+</body>
+</html>

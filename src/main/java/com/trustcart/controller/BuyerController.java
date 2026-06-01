@@ -295,7 +295,7 @@ public class BuyerController {
         orderRepository.findByOrderCodeIgnoreCaseAndEmailIgnoreCase(orderCode.trim(), email.trim())
                 .ifPresent(refund::setOrder);
         refundRepository.save(refund);
-        redirectAttributes.addFlashAttribute("message", "Refund request submitted. The seller will review it inside the platform under buyer protection rules.");
+        redirectAttributes.addFlashAttribute("message", "Refund request submitted. Admin will review it inside the platform.");
         return "redirect:/refund";
     }
 

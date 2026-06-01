@@ -110,7 +110,7 @@ public class Seller {
     }
 
     public String getPassportStatus() {
-        return businessVerified && identityVerified && documentVerified && productComplianceChecked && storeLocationVerified ? "Complete" : "Verification Needed";
+        return businessVerified && identityVerified && documentVerified && productComplianceChecked && storeLocationVerified ? "Complete" : "Needs Verification Review";
     }
 
     public String getPublicLocationLabel() {
@@ -130,7 +130,7 @@ public class Seller {
     }
 
     public String getLocationIntegrityNote() {
-        return storeLocationVerified ? "Store location verified for platform use; exact address hidden from buyers to prevent off-platform transactions." : "Store location needs verification before pickup can be enabled.";
+        return storeLocationVerified ? "Store location verified by TrustCart; exact address hidden from buyers to prevent off-platform transactions." : "Store location pending TrustCart verification.";
     }
 
     public boolean hasCoordinates() {

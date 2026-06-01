@@ -205,7 +205,7 @@ TrustCart now includes additional customer-retention features:
 Active sample discount codes:
 
 ```text
-WELCOME100
+WELCOME10
 GREEN5
 LOCAL50
 ```

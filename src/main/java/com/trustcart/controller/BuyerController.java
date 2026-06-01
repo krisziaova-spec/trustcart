@@ -15,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -189,7 +190,8 @@ public class BuyerController {
         }
         BuyerAccount buyer = currentBuyer(session).orElse(null);
         int safePoints = buyer == null ? 0 : Math.min(Math.max(0, pointsToRedeem), buyer.getLoyaltyPointsBalance());
-        CartSummary summary = cartService.summarize(session, ecoPackaging, noExtraPlastic, consolidatedDelivery, deliveryOption, discountCode, safePoints);
+        String effectiveDiscountCode = eligibleDiscountForBuyer(discountCode, buyer);
+        CartSummary summary = cartService.summarize(session, ecoPackaging, noExtraPlastic, consolidatedDelivery, deliveryOption, effectiveDiscountCode, safePoints);
         if (summary.getLines().isEmpty()) {
             return "redirect:/cart";
         }
@@ -226,7 +228,9 @@ public class BuyerController {
             return "redirect:/buyer/login";
         }
         String marketLabel = getStringSession(session, MARKET_CITY, "No target market selected");
-        CustomerOrder order = orderService.createOrder(session, fullName, email, phone, shippingAddress, paymentMethod, ecoPackaging, noExtraPlastic, consolidatedDelivery, deliveryOption, marketLabel, discountCode, pointsToRedeem);
+        BuyerAccount buyer = currentBuyer(session).orElse(null);
+        String effectiveDiscountCode = eligibleDiscountForBuyer(discountCode, buyer);
+        CustomerOrder order = orderService.createOrder(session, fullName, email, phone, shippingAddress, paymentMethod, ecoPackaging, noExtraPlastic, consolidatedDelivery, deliveryOption, marketLabel, effectiveDiscountCode, pointsToRedeem);
         redirectAttributes.addFlashAttribute("message", "Order placed successfully.");
         return "redirect:/orders/" + order.getOrderCode() + "/success";
     }
@@ -332,6 +336,21 @@ public class BuyerController {
         autoshipRepository.save(subscription);
         redirectAttributes.addFlashAttribute("message", "Autoshipment created for " + product.getName() + ".");
         return "redirect:/autoship";
+    }
+
+
+    private String eligibleDiscountForBuyer(String discountCode, BuyerAccount buyer) {
+        if (discountCode == null || discountCode.isBlank()) {
+            return discountCode;
+        }
+        return discountCodeRepository.findByCodeIgnoreCase(DiscountCode.normalizeCode(discountCode))
+                .map(code -> {
+                    if (code.isFirstOrderOnly() && buyer != null && buyer.getLifetimeSpend().compareTo(BigDecimal.ZERO) > 0) {
+                        return "";
+                    }
+                    return discountCode;
+                })
+                .orElse(discountCode);
     }
 
     @ModelAttribute("allCategories")

@@ -39,7 +39,7 @@
                 <div class="option-card-grid two-options">
                     <label class="option-card">
                         <strong>Discount Code</strong>
-                        <input name="discountCode" th:value="${discountCode}" placeholder="WELCOME100 / GREEN5 / LOCAL50">
+                        <input name="discountCode" th:value="${discountCode}" placeholder="WELCOME10 / GREEN5 / LOCAL50">
                         <span th:text="${summary.discountMessage}">Enter an active code.</span>
                     </label>
                     <label class="option-card">
@@ -108,7 +108,7 @@
             </div>
             <div class="discount-list" th:if="${!activeDiscountCodes.isEmpty()}">
                 <strong>Active Codes</strong>
-                <span th:each="code : ${activeDiscountCodes}" th:text="${code.displayLabel}">WELCOME100</span>
+                <span th:each="code : ${activeDiscountCodes}" th:text="${code.displayLabel}">WELCOME10</span>
             </div>
             <div class="protection-box">
                 <strong>Buyer Protection Active</strong>

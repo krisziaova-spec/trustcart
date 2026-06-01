@@ -56,7 +56,7 @@ public class DataSeeder {
                 return sellerRepository.save(seller);
             });
 
-            saveDiscountIfMissing(discountCodeRepository, "WELCOME100", "₱100 off for orders with ₱800 minimum spend.", BigDecimal.valueOf(800), 0, BigDecimal.valueOf(100), localGoods);
+            saveDiscountIfMissing(discountCodeRepository, "WELCOME10", "10% off first protected order for first-time buyers.", BigDecimal.valueOf(0), 10, BigDecimal.ZERO, localGoods);
             saveDiscountIfMissing(discountCodeRepository, "GREEN5", "5% off for green checkout buyers.", BigDecimal.valueOf(500), 5, BigDecimal.ZERO, ecoHome);
             saveDiscountIfMissing(discountCodeRepository, "LOCAL50", "₱50 off selected local Filipino products.", BigDecimal.valueOf(300), 0, BigDecimal.valueOf(50), localGoods);
 
@@ -115,6 +115,9 @@ public class DataSeeder {
     private void saveDiscountIfMissing(DiscountCodeRepository repository, String code, String description, BigDecimal minimum, int percent, BigDecimal amount, Seller seller) {
         repository.findByCodeIgnoreCase(code).orElseGet(() -> {
             DiscountCode discount = new DiscountCode(code, description, minimum, percent, amount, true);
+            if ("WELCOME10".equalsIgnoreCase(code)) {
+                discount.setFirstOrderOnly(true);
+            }
             discount.setSellerId(seller.getId());
             discount.setCreatedBySeller(seller.getStoreName());
             return repository.save(discount);

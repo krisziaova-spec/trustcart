@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -63,7 +64,8 @@ public class OrderService {
                                      String discountCode, int pointsToRedeem) {
         BuyerAccount buyer = currentBuyer(session);
         int redeemablePoints = buyer == null ? 0 : Math.min(Math.max(0, pointsToRedeem), buyer.getLoyaltyPointsBalance());
-        CartSummary summary = cartService.summarize(session, ecoPackaging, noExtraPlastic, consolidatedDelivery, deliveryOption, discountCode, redeemablePoints);
+        String effectiveDiscountCode = eligibleDiscountForBuyer(discountCode, buyer);
+        CartSummary summary = cartService.summarize(session, ecoPackaging, noExtraPlastic, consolidatedDelivery, deliveryOption, effectiveDiscountCode, redeemablePoints);
         if (summary.getLines().isEmpty()) {
             throw new IllegalArgumentException("Cart is empty.");
         }
@@ -120,6 +122,21 @@ public class OrderService {
         CustomerOrder saved = orderRepository.save(order);
         cartService.clear(session);
         return saved;
+    }
+
+
+    private String eligibleDiscountForBuyer(String discountCode, BuyerAccount buyer) {
+        if (discountCode == null || discountCode.isBlank()) {
+            return discountCode;
+        }
+        return discountCodeRepository.findByCodeIgnoreCase(DiscountCode.normalizeCode(discountCode))
+                .map(code -> {
+                    if (code.isFirstOrderOnly() && buyer != null && buyer.getLifetimeSpend().compareTo(BigDecimal.ZERO) > 0) {
+                        return "";
+                    }
+                    return discountCode;
+                })
+                .orElse(discountCode);
     }
 
     private BuyerAccount currentBuyer(HttpSession session) {

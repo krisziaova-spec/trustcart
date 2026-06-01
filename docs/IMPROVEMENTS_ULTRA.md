@@ -29,7 +29,7 @@ This version adds a practical marketplace advantage: buyers can focus on sellers
 
 - Product photo URLs added to seeded products for a more polished buyer interface.
 - Discount Code Management added in Admin Control Center.
-- Active checkout codes: WELCOME100, GREEN5, LOCAL50.
+- Active checkout codes: WELCOME10, GREEN5, LOCAL50.
 - TrustPoints rewards added for buyer retention.
 - Buyers earn 1 TrustPoint for every ₱20 spent.
 - Buyers can redeem 10 TrustPoints for ₱1 discount at checkout.

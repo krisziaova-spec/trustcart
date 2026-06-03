@@ -7,7 +7,7 @@
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
-<nav class="nav"><div class="nav-inner"><a class="logo" th:href="@{/}"><img th:src="@{/img/trustcart-logo.svg}" alt="TrustCart"></a><div class="nav-links"><a th:href="@{/}">Shop</a><a th:href="@{/autoship}">Autoship</a><a th:href="@{/cart}">Cart (<span th:text="${cartCount}">0</span>)</a></div></div></nav>
+<nav class="nav"><div class="nav-inner"><a class="logo" th:href="@{/}"><img th:src="@{/img/logo-uploaded.png}" alt="TrustCart"></a><div class="nav-links"><a th:href="@{/}">Shop</a><a th:href="@{/autoship}">Autoship</a><a th:href="@{/cart}">Cart (<span th:text="${cartCount}">0</span>)</a></div></div></nav>
 <main class="container">
     <section class="storefront-hero">
         <img class="storefront-banner" th:src="${#strings.isEmpty(seller.storeBannerImageUrl) ? 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1600&q=80' : seller.storeBannerImageUrl}" alt="Store banner">

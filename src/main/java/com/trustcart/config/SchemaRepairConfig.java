@@ -1,0 +1,29 @@
+package com.trustcart.config;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.jdbc.core.JdbcTemplate;
+
+@Configuration
+public class SchemaRepairConfig {
+    @Bean
+    @Order(1)
+    CommandLineRunner repairSchema(JdbcTemplate jdbc) {
+        return args -> {
+            // Safe no-op for fresh databases and a hotfix for existing Render/Supabase databases.
+            jdbc.execute("ALTER TABLE IF EXISTS seller ADD COLUMN IF NOT EXISTS can_use_fbt BOOLEAN DEFAULT FALSE");
+            jdbc.execute("ALTER TABLE IF EXISTS seller ADD COLUMN IF NOT EXISTS fulfillment_preference VARCHAR(255) DEFAULT 'SELLER'");
+            jdbc.execute("ALTER TABLE IF EXISTS seller ADD COLUMN IF NOT EXISTS requirements_status VARCHAR(255) DEFAULT 'COMPLETED'");
+            jdbc.execute("ALTER TABLE IF EXISTS seller ADD COLUMN IF NOT EXISTS requirements_note VARCHAR(1200) DEFAULT 'Requirements completed and approved by TrustCart.'");
+            jdbc.execute("ALTER TABLE IF EXISTS seller ADD COLUMN IF NOT EXISTS store_profile_image_url VARCHAR(1200)");
+            jdbc.execute("ALTER TABLE IF EXISTS seller ADD COLUMN IF NOT EXISTS store_banner_image_url VARCHAR(1200)");
+            jdbc.execute("ALTER TABLE IF EXISTS seller ADD COLUMN IF NOT EXISTS store_description VARCHAR(1200)");
+            jdbc.execute("ALTER TABLE IF EXISTS product ADD COLUMN IF NOT EXISTS fulfilled_by VARCHAR(255) DEFAULT 'SELLER'");
+            jdbc.execute("ALTER TABLE IF EXISTS product ADD COLUMN IF NOT EXISTS fulfillment_status VARCHAR(255) DEFAULT 'SELLER_MANAGED'");
+            jdbc.execute("ALTER TABLE IF EXISTS product ADD COLUMN IF NOT EXISTS trust_cart_stock INTEGER DEFAULT 0");
+            jdbc.execute("ALTER TABLE IF EXISTS product ADD COLUMN IF NOT EXISTS fulfillment_note VARCHAR(1200) DEFAULT 'Seller stores, packs, and ships this product.'");
+        };
+    }
+}

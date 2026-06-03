@@ -5,6 +5,7 @@ import com.trustcart.repository.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
@@ -12,6 +13,7 @@ import java.util.*;
 @Configuration
 public class DataSeeder {
     @Bean
+    @Order(2)
     CommandLineRunner seed(BuyerAccountRepository buyers, SellerRepository sellers, ProductRepository products, DiscountCodeRepository discounts, GiftRegistryRepository registries, GiftRegistryItemRepository registryItems) {
         return args -> {
             if (buyers.findByEmailIgnoreCase("buyer@trustcart.ph").isEmpty()) {

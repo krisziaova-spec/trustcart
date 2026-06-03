@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title th:text="${registry.registryName}">Gift Registry</title><link rel="stylesheet" th:href="@{/css/styles.css}"></head>
-<body><nav class="nav"><div class="nav-inner"><a class="logo" th:href="@{/}"><img th:src="@{/img/trustcart-logo.svg}" alt="TrustCart"></a><div class="nav-links"><a th:href="@{/}">Shop</a><a th:href="@{/registry}">Gift Registry</a><a th:href="@{/cart}">Cart (<span th:text="${cartCount}">0</span>)</a><a th:href="@{/buyer/login}" th:if="${!buyerLoggedIn}">Buyer Login</a></div></div></nav>
+<body><nav class="nav"><div class="nav-inner"><a class="logo" th:href="@{/}"><img th:src="@{/img/logo-uploaded.png}" alt="TrustCart"></a><div class="nav-links"><a th:href="@{/}">Shop</a><a th:href="@{/registry}">Gift Registry</a><a th:href="@{/cart}">Cart (<span th:text="${cartCount}">0</span>)</a><a th:href="@{/buyer/login}" th:if="${!buyerLoggedIn}">Buyer Login</a></div></div></nav>
 <main class="container">
   <section class="registry-detail-hero">
     <div><span class="eyebrow green" th:text="${registry.registryType}">Baby Shower</span><h1 th:text="${registry.registryName}">Gift Registry</h1><p class="muted">For <strong th:text="${registry.recipientName}">Recipient</strong> · Event date: <span th:text="${registry.eventDate != null ? registry.eventDate : 'To be announced'}">Date</span></p><p th:text="${registry.registryNote}">Registry note</p><div class="platform-warning"><strong>Protected gifting:</strong> <span th:text="${registry.protectedDeliveryNote}">Address hidden.</span></div></div>

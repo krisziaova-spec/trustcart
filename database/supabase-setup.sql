@@ -67,7 +67,14 @@ CREATE TABLE seller (
     service_radius_km INTEGER DEFAULT 5,
     pickup_available BOOLEAN DEFAULT TRUE,
     store_location_verified BOOLEAN DEFAULT TRUE,
+    can_use_fbt BOOLEAN DEFAULT FALSE,
+    fulfillment_preference VARCHAR(255) DEFAULT 'SELLER',
+    requirements_status VARCHAR(255) DEFAULT 'COMPLETED',
+    requirements_note VARCHAR(1200) DEFAULT 'Requirements completed and approved by TrustCart.',
     location_proof_url VARCHAR(1000),
+    store_profile_image_url VARCHAR(1200),
+    store_banner_image_url VARCHAR(1200),
+    store_description VARCHAR(1200),
     status VARCHAR(50) DEFAULT 'APPROVED',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     approved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -111,6 +118,10 @@ CREATE TABLE product (
     try_on_asset_url VARCHAR(1000),
     stock_status VARCHAR(80) DEFAULT 'In Stock',
     estimated_delivery VARCHAR(80) DEFAULT 'ETA: 1-2 days',
+    fulfilled_by VARCHAR(255) DEFAULT 'SELLER',
+    fulfillment_status VARCHAR(255) DEFAULT 'SELLER_MANAGED',
+    trust_cart_stock INTEGER DEFAULT 0,
+    fulfillment_note VARCHAR(1200) DEFAULT 'Seller stores, packs, and ships this product.',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     seller_id BIGINT REFERENCES seller(id)
 );

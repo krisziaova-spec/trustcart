@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller
-@RequestMapping("/admin")
+@RequestMapping("/trustcart-admin-portal-2026")
 public class AdminController {
     private final SellerRepository sellerRepository;
     private final ProductRepository productRepository;
@@ -25,7 +25,7 @@ public class AdminController {
 
     @GetMapping
     public String adminHome() {
-        return "redirect:/admin/sellers";
+        return "redirect:/trustcart-admin-portal-2026/sellers";
     }
 
     @GetMapping("/sellers")
@@ -55,7 +55,7 @@ public class AdminController {
         seller.setApprovedAt(LocalDateTime.now());
         sellerRepository.save(seller);
         ra.addFlashAttribute("success", "Seller approved. Seller can now log in." + (canUseFbt ? " FBT access enabled." : ""));
-        return "redirect:/admin/sellers";
+        return "redirect:/trustcart-admin-portal-2026/sellers";
     }
 
     @PostMapping("/sellers/{id}/reject")
@@ -69,7 +69,7 @@ public class AdminController {
         seller.setRequirementsNote(note == null || note.isBlank() ? "Application rejected by TrustCart admin." : note);
         sellerRepository.save(seller);
         ra.addFlashAttribute("success", "Seller application rejected.");
-        return "redirect:/admin/sellers";
+        return "redirect:/trustcart-admin-portal-2026/sellers";
     }
 
     @GetMapping("/fulfillment")
@@ -98,7 +98,7 @@ public class AdminController {
         seller.setCanUseFbt(true);
         sellerRepository.save(seller);
         ra.addFlashAttribute("success", "Product marked as Fulfilled by TrustCart.");
-        return "redirect:/admin/fulfillment";
+        return "redirect:/trustcart-admin-portal-2026/fulfillment";
     }
 
     @PostMapping("/fulfillment/{id}/seller")
@@ -110,6 +110,6 @@ public class AdminController {
         product.setFulfillmentNote("Seller stores, packs, and ships this product.");
         productRepository.save(product);
         ra.addFlashAttribute("success", "Product marked as Fulfilled by Seller.");
-        return "redirect:/admin/fulfillment";
+        return "redirect:/trustcart-admin-portal-2026/fulfillment";
     }
 }

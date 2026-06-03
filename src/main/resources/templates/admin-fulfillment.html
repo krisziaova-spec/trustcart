@@ -11,7 +11,7 @@
 <main class="container admin-page">
     <div class="section-title">
         <div><span class="section-pill">TrustCart Admin</span><h1>Fulfillment Requests</h1><p class="muted">Only admin can mark a product as Fulfilled by TrustCart after inventory is received/verified.</p></div>
-        <a class="btn btn-outline" th:href="@{/admin/sellers}">Seller Applications</a>
+        <a class="btn btn-outline" th:href="@{/trustcart-admin-portal-2026/sellers}">Seller Applications</a>
     </div>
     <p class="success" th:text="${success}"></p>
 
@@ -25,12 +25,12 @@
                 <td th:text="${p.stock}">0</td>
                 <td th:text="${p.fulfillmentNote}">Note</td>
                 <td>
-                    <form th:action="@{/admin/fulfillment/{id}/approve(id=${p.id})}" method="post" class="inline-admin-form">
+                    <form th:action="@{/trustcart-admin-portal-2026/fulfillment/{id}/approve(id=${p.id})}" method="post" class="inline-admin-form">
                         <input type="number" name="receivedStock" min="0" th:value="${p.stock}" placeholder="Received stock">
                         <input name="note" placeholder="Inventory verification note">
                         <button class="btn btn-primary">Approve FBT</button>
                     </form>
-                    <form th:action="@{/admin/fulfillment/{id}/seller(id=${p.id})}" method="post"><button class="btn btn-outline">Keep as FBS</button></form>
+                    <form th:action="@{/trustcart-admin-portal-2026/fulfillment/{id}/seller(id=${p.id})}" method="post"><button class="btn btn-outline">Keep as FBS</button></form>
                 </td>
             </tr>
             <tr th:if="${pendingProducts.isEmpty()}"><td colspan="5">No pending FBT requests.</td></tr>

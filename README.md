@@ -51,3 +51,20 @@ For a fresh database, use:
 - Seller dashboard: `/seller/dashboard`
 - Admin seller approval: `/admin/sellers`
 - Admin fulfillment approval: `/admin/fulfillment`
+
+
+## Admin URL
+
+The admin dashboard is intentionally hidden from buyer and seller navigation. Open it directly at:
+
+`/trustcart-admin-portal-2026/sellers`
+
+Admin sections:
+- `/trustcart-admin-portal-2026/sellers` - approve or reject seller applications
+- `/trustcart-admin-portal-2026/fulfillment` - approve Fulfilled by TrustCart product requests
+
+Do not add this link to buyer or seller pages.
+
+## Deployment Reminder
+
+Replace the whole project with this package. Do not copy only selected files, because the build requires the included model, repository, service, template, and static files.

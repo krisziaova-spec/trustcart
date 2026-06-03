@@ -11,7 +11,7 @@
 <main class="container admin-page">
     <div class="section-title">
         <div><span class="section-pill">TrustCart Admin</span><h1>Seller Applications</h1><p class="muted">Approve sellers only after requirements are completed.</p></div>
-        <a class="btn btn-outline" th:href="@{/admin/fulfillment}">Fulfillment Requests</a>
+        <a class="btn btn-outline" th:href="@{/trustcart-admin-portal-2026/fulfillment}">Fulfillment Requests</a>
     </div>
     <p class="success" th:text="${success}"></p>
 
@@ -26,12 +26,12 @@
                 <td><span class="badge" th:text="${s.fulfillmentPreference == 'TRUSTCART' ? 'Interested in FBT' : 'Fulfilled by Seller'}">Preference</span></td>
                 <td><span th:text="${s.requirementsStatus}">Status</span><br><small th:text="${s.requirementsNote}">Note</small></td>
                 <td>
-                    <form th:action="@{/admin/sellers/{id}/approve(id=${s.id})}" method="post" class="inline-admin-form">
+                    <form th:action="@{/trustcart-admin-portal-2026/sellers/{id}/approve(id=${s.id})}" method="post" class="inline-admin-form">
                         <label><input type="checkbox" name="canUseFbt" value="true"> Enable FBT</label>
                         <input name="note" placeholder="Approval note">
                         <button class="btn btn-primary">Approve</button>
                     </form>
-                    <form th:action="@{/admin/sellers/{id}/reject(id=${s.id})}" method="post" class="inline-admin-form">
+                    <form th:action="@{/trustcart-admin-portal-2026/sellers/{id}/reject(id=${s.id})}" method="post" class="inline-admin-form">
                         <input name="note" placeholder="Reason if rejected">
                         <button class="btn btn-outline">Reject</button>
                     </form>

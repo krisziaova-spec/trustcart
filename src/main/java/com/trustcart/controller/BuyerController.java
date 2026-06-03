@@ -94,6 +94,72 @@ public class BuyerController {
         return "home";
     }
 
+
+    private List<Product> applyMarketFilters(List<Product> products, HttpSession session) {
+        boolean nearbyOnly = Boolean.TRUE.equals(session.getAttribute("nearbyOnly"));
+        boolean pickupOnly = Boolean.TRUE.equals(session.getAttribute("pickupOnly"));
+
+        if (!nearbyOnly && !pickupOnly) {
+            return products;
+        }
+
+        double targetLatitude = sessionNumber(session, "marketLatitude", 14.0683);
+        double targetLongitude = sessionNumber(session, "marketLongitude", 121.3256);
+        double radiusKm = sessionNumber(session, "marketRadius", 5.0);
+
+        return products.stream()
+                .filter(product -> {
+                    Seller seller = product.getSeller();
+                    if (seller == null) return false;
+
+                    if (pickupOnly && !seller.isPickupAvailable()) {
+                        return false;
+                    }
+
+                    if (nearbyOnly) {
+                        if (seller.getLatitude() == null || seller.getLongitude() == null) {
+                            return false;
+                        }
+                        double distanceKm = distanceInKilometers(
+                                targetLatitude,
+                                targetLongitude,
+                                seller.getLatitude(),
+                                seller.getLongitude()
+                        );
+                        return distanceKm <= radiusKm;
+                    }
+
+                    return true;
+                })
+                .collect(Collectors.toList());
+    }
+
+    private double sessionNumber(HttpSession session, String key, double defaultValue) {
+        Object value = session.getAttribute(key);
+        if (value instanceof Number number) {
+            return number.doubleValue();
+        }
+        if (value instanceof String text) {
+            try {
+                return Double.parseDouble(text);
+            } catch (NumberFormatException ignored) {
+                return defaultValue;
+            }
+        }
+        return defaultValue;
+    }
+
+    private double distanceInKilometers(double lat1, double lon1, double lat2, double lon2) {
+        final double earthRadiusKm = 6371.0;
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return earthRadiusKm * c;
+    }
+
     private String normalizeSearchTerm(String raw) {
         if (raw == null || raw.isBlank()) return null;
         String cleaned = raw.trim().replaceAll("\\s+", " ");

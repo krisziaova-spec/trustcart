@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin - Seller Applications</title>
+    <link rel="icon" th:href="@{/favicon.png}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<main class="container admin-page">
+    <div class="section-title">
+        <div><span class="section-pill">TrustCart Admin</span><h1>Seller Applications</h1><p class="muted">Approve sellers only after requirements are completed.</p></div>
+        <a class="btn btn-outline" th:href="@{/admin/fulfillment}">Fulfillment Requests</a>
+    </div>
+    <p class="success" th:text="${success}"></p>
+
+    <section class="table-card">
+        <h2>Pending Applications</h2>
+        <table>
+            <tr><th>Store</th><th>Contact</th><th>Address</th><th>Preference</th><th>Requirements</th><th>Action</th></tr>
+            <tr th:each="s:${pendingSellers}">
+                <td><strong th:text="${s.storeName}">Store</strong><br><small th:text="${s.businessType}">Type</small></td>
+                <td><span th:text="${s.email}">email</span><br><small th:text="${s.phone}">phone</small></td>
+                <td><span th:text="${s.storeExactAddress}">address</span><br><small th:text="${s.storeCity + ', ' + s.storeProvince}">city</small></td>
+                <td><span class="badge" th:text="${s.fulfillmentPreference == 'TRUSTCART' ? 'Interested in FBT' : 'Fulfilled by Seller'}">Preference</span></td>
+                <td><span th:text="${s.requirementsStatus}">Status</span><br><small th:text="${s.requirementsNote}">Note</small></td>
+                <td>
+                    <form th:action="@{/admin/sellers/{id}/approve(id=${s.id})}" method="post" class="inline-admin-form">
+                        <label><input type="checkbox" name="canUseFbt" value="true"> Enable FBT</label>
+                        <input name="note" placeholder="Approval note">
+                        <button class="btn btn-primary">Approve</button>
+                    </form>
+                    <form th:action="@{/admin/sellers/{id}/reject(id=${s.id})}" method="post" class="inline-admin-form">
+                        <input name="note" placeholder="Reason if rejected">
+                        <button class="btn btn-outline">Reject</button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${pendingSellers.isEmpty()}"><td colspan="6">No pending applications.</td></tr>
+        </table>
+    </section>
+
+    <section class="table-card">
+        <h2>Approved Sellers</h2>
+        <table>
+            <tr><th>Store</th><th>Status</th><th>Fulfillment Access</th><th>Approved</th></tr>
+            <tr th:each="s:${approvedSellers}">
+                <td th:text="${s.storeName}">Store</td>
+                <td><span class="badge shield">Verified Seller</span></td>
+                <td><span class="badge" th:text="${s.canUseFbt ? 'Can use Fulfilled by TrustCart' : 'Fulfilled by Seller only'}">Access</span></td>
+                <td th:text="${s.approvedBy}">Admin</td>
+            </tr>
+        </table>
+    </section>
+</main>
+</body>
+</html>

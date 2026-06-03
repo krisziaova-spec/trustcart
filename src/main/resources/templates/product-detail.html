@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${product.name}">Product</title>
+    <link rel="icon" th:href="@{/favicon.png}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<nav class="nav"><div class="nav-inner"><a class="logo" th:href="@{/}"><img th:src="@{/img/logo-uploaded.png}" alt="TrustCart"></a><div class="nav-links"><a th:href="@{/}">Shop</a><a th:href="@{/autoship}">Autoship</a><a th:href="@{/try-on}">Virtual Try-On</a><a th:href="@{/cart}">Cart (<span th:text="${cartCount}">0</span>)</a></div></div></nav>
+<main class="container">
+    <p class="success" th:text="${success}"></p><p class="error" th:text="${error}"></p>
+    <section class="detail-layout">
+        <img class="detail-photo" th:src="${product.imageUrl}" th:alt="${product.name}">
+        <div>
+            <div class="badges"><span class="badge shield">TrustCart Shield</span><span class="badge" th:if="${product.ecoFriendly}">Eco</span><a class="badge" th:if="${product.subscriptionEligible}" th:href="@{/autoship}">Autoship Eligible</a><a class="badge" th:if="${product.tryOnEligible}" th:href="@{/try-on}">Virtual Try-On Available</a></div>
+            <h1 th:text="${product.name}">Product</h1>
+            <div class="price big">₱<span th:text="${product.price}">0</span></div>
+            <p th:text="${product.description}">Description</p>
+            <p class="muted">Seller: <a th:href="@{/store/{id}(id=${product.seller.id})}" th:text="${product.seller.storeName}">Seller</a> · <span th:text="${product.seller.publicLocationLabel}">Area</span></p>
+            <div class="score-pair wide"><div><span>Trust Score</span><strong th:text="${product.trustScore} + '/100'"></strong></div><div><span>Green Score</span><strong th:text="${product.greenScore} + '/100'"></strong></div></div>
+            <p class="platform-warning"><strong>Protected checkout:</strong> Seller exact address is hidden. Orders outside TrustCart are not covered.</p>
+            <form th:action="@{/cart/add/{id}(id=${product.id})}" method="post" class="footer-actions"><input type="number" name="quantity" value="1" min="1"><a class="btn btn-outline" th:href="@{/store/{id}(id=${product.seller.id})}">View Store</a><a class="btn btn-outline" th:href="@{/chat/seller/{id}(id=${product.seller.id}, productId=${product.id})}">Contact Seller</a><a class="btn btn-outline" th:if="${product.tryOnEligible}" th:href="@{/try-on}">Virtual Try-On</a><a class="btn btn-outline" th:href="@{/registry}">Add to Gift Registry</a><a class="btn btn-outline" th:href="@{/report/product/{id}(id=${product.id})}">Report Product</a><a class="btn btn-outline" th:href="@{/report/seller/{id}(id=${product.seller.id})}">Report Seller</a><button class="btn btn-primary" type="submit">Add to Cart</button></form>
+        </div>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TrustCart Virtual Try-On</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<nav class="nav marketplace-nav">
+    <div class="nav-inner">
+        <a class="logo" th:href="@{/}"><img th:src="@{/img/logo-uploaded.png}" alt="TrustCart"></a>
+        <div class="nav-links">
+            <a th:href="@{/}">Shop</a>
+            <a th:href="@{/registry}">Gift Registry</a>
+            <a th:href="@{/cart}" class="cart-pill">Cart (<span th:text="${cartCount}">0</span>)</a>
+            <a th:href="@{/buyer/login}">Buyer Login</a>
+        </div>
+    </div>
+</nav>
+
+<main class="container">
+    <section class="tryon-hero tryon-hero-clean">
+        <div>
+            <span class="eyebrow green">AR / VR Retail Preview</span>
+            <h1>Virtual Try-On Preview</h1>
+            <p>
+                Upload or take a photo, then choose a realistic Men’s T-Shirt or Women’s Dress color. Drag, resize, and rotate the clothing overlay to preview the look before checkout.
+            </p>
+        </div>
+        <div class="tryon-privacy-card">
+            <strong>Private browser preview</strong>
+            <span>Your uploaded photo is used only on this page.</span>
+            <span>It is not saved to the database.</span>
+            <span>Use the controls to resize, rotate, and position the clothing layer.</span>
+        </div>
+    </section>
+
+    <section class="tryon-layout">
+        <div class="tryon-panel">
+            <h2>Your Preview</h2>
+            <p class="muted">Take a front-facing photo with good lighting for the best preview.</p>
+            <input id="photoInput" type="file" accept="image/*" capture="user">
+            <div class="tryon-stage" id="stage">
+                <div class="photo-placeholder" id="placeholder">Upload or take a photo</div>
+                <img id="userPhoto" class="user-photo" alt="Uploaded photo">
+                <img id="garmentOverlay" class="garment-overlay" alt="Selected garment">
+            </div>
+            <div class="controls">
+                <label>Size <input id="scaleRange" type="range" min="70" max="260" value="155"></label>
+                <label>Rotate <input id="rotateRange" type="range" min="-45" max="45" value="0"></label>
+                <button class="btn btn-outline" id="resetBtn" type="button">Reset</button>
+            </div>
+            <p class="tiny">Drag the clothing image to position it. This is a working prototype preview, not full AI body-fitting.</p>
+        </div>
+
+        <div class="tryon-products">
+            <div class="section-title compact-title">
+                <div>
+                    <h2>Choose a Try-On Demo Item</h2>
+                    <p class="muted">Clean, realistic garment previews with simple color options for the demo items.</p>
+                </div>
+                <a class="btn btn-outline" th:href="@{/(category=${T(com.trustcart.model.ProductCategory).FASHION})}">Shop Fashion</a>
+            </div>
+            <div class="tabs">
+                <button class="tab active" type="button" onclick="showGender('MEN')">Men</button>
+                <button class="tab" type="button" onclick="showGender('WOMEN')">Women</button>
+            </div>
+            <div class="tryon-grid realistic-garment-grid">
+                <article class="tryon-item" th:each="product : ${tryOnItems}" th:data-gender="${product.tryOnGender}" th:data-asset="${product.tryOnAssetUrl}" th:data-id="${product.id}">
+                    <img th:src="${product.tryOnAssetUrl}" th:alt="${product.name}">
+                    <strong th:text="${product.name}">Item</strong>
+                    <span>₱<b th:text="${product.price}">0</b></span>
+                    <div class="tryon-actions">
+                        <button class="btn btn-primary" type="button" onclick="selectGarment(this)">Try This</button>
+                        <a class="btn btn-outline" th:href="@{/product/{id}(id=${product.id})}">View Product</a>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script th:src="@{/js/tryon.js}"></script>
+</body>
+</html>

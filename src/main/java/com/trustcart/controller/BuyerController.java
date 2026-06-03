@@ -1,6 +1,14 @@
 package com.trustcart.controller;
 
-import com.trustcart.model.*;
+import com.trustcart.model.AutoshipSubscription;
+import com.trustcart.model.BuyerAccount;
+import com.trustcart.model.CustomerOrder;
+import com.trustcart.model.DiscountCode;
+import com.trustcart.model.OrderItem;
+import com.trustcart.model.Product;
+import com.trustcart.model.ProductCategory;
+import com.trustcart.model.RefundRequest;
+import com.trustcart.model.Seller;
 import com.trustcart.repository.*;
 import com.trustcart.service.CartService;
 import jakarta.servlet.http.HttpSession;
@@ -95,7 +103,14 @@ public class BuyerController {
     }
 
 
+    private boolean isSellerPubliclyActive(Seller seller) {
+        if (seller == null) return false;
+        String status = seller.getStatus();
+        return "ACTIVE".equalsIgnoreCase(status) || "APPROVED".equalsIgnoreCase(status);
+    }
+
     private List<Product> applyMarketFilters(List<Product> products, HttpSession session) {
+        products = products.stream().filter(p -> isSellerPubliclyActive(p.getSeller())).collect(Collectors.toList());
         boolean nearbyOnly = Boolean.TRUE.equals(session.getAttribute("nearbyOnly"));
         boolean pickupOnly = Boolean.TRUE.equals(session.getAttribute("pickupOnly"));
 
@@ -184,11 +199,15 @@ public class BuyerController {
     }
 
     @GetMapping("/product/{id}")
-    public String product(@PathVariable Long id, Model model, HttpSession session) {
+    public String product(@PathVariable Long id, Model model, HttpSession session, RedirectAttributes ra) {
         Product product = productRepository.findById(id).orElseThrow();
+        if (!isSellerPubliclyActive(product.getSeller())) {
+            ra.addFlashAttribute("error", "This product is currently unavailable because the store is not active.");
+            return "redirect:/";
+        }
         addCommon(model, session);
         model.addAttribute("product", product);
-        model.addAttribute("related", productRepository.findByCategoryAndStatusOrderByCreatedAtDesc(product.getCategory(), "APPROVED").stream().filter(p -> !Objects.equals(p.getId(), id)).limit(4).toList());
+        model.addAttribute("related", productRepository.findByCategoryAndStatusOrderByCreatedAtDesc(product.getCategory(), "APPROVED").stream().filter(p -> !Objects.equals(p.getId(), id)).filter(p -> isSellerPubliclyActive(p.getSeller())).limit(4).toList());
         return "product-detail";
     }
 
@@ -202,7 +221,12 @@ public class BuyerController {
     public String doBuyerLogin(@RequestParam String email, @RequestParam String password, HttpSession session, RedirectAttributes ra) {
         Optional<BuyerAccount> buyer = buyerRepository.findByEmailIgnoreCase(email);
         if (buyer.isPresent() && Objects.equals(buyer.get().getPassword(), password)) {
-            session.setAttribute("buyerId", buyer.get().getId());
+            BuyerAccount account = buyer.get();
+            if (!account.isActive()) {
+                ra.addFlashAttribute("error", "Your buyer account is currently " + account.getStatus() + ". Please contact TrustCart support if you believe this is a mistake.");
+                return "redirect:/buyer/login";
+            }
+            session.setAttribute("buyerId", account.getId());
             return "redirect:/";
         }
         ra.addFlashAttribute("error", "Invalid buyer email or password.");

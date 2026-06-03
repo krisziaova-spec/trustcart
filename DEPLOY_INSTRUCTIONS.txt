@@ -1,0 +1,35 @@
+TRUSTCART DEPLOYMENT INSTRUCTIONS
+
+1. Replace the full project with this ZIP content.
+2. Push all files to GitHub.
+3. In Render, use Manual Deploy > Clear build cache & deploy.
+4. Wait for the Java build to succeed.
+5. After successful deployment, run this SQL once on your existing database:
+   database/migration-admin-security-hotfix.sql
+
+MAIN URLS
+Store: /
+Buyer Login: /buyer/login
+Buyer Messages: /buyer/messages
+Buyer Support: /support/contact
+Seller Login: /seller/login
+Seller Dashboard: /seller/dashboard
+Seller Fulfillment: /seller/fulfillment
+Seller Analytics: /seller/analytics
+Seller Messages: /seller/messages
+Seller Support: /seller/support/contact
+Admin Login: /command-center/login
+Admin Dashboard: /command-center
+Admin Stores: /command-center/sellers
+Admin Fulfillment: /command-center/fulfillment
+Admin Incoming Stocks: /command-center/incoming-stocks
+Admin Tickets: /command-center/tickets
+Admin Buyers: /command-center/buyers
+Admin Analytics: /command-center/analytics
+
+ADMIN LOGIN
+Email: admin@trustcart.ph
+Password: trustadmin2026
+
+IMPORTANT
+Do not run database/supabase-setup.sql unless you want to reset the database.

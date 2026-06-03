@@ -84,13 +84,15 @@
     recognition.start();
   }
 
-  function openImagePanel() {
+  function openImagePanel(openFilePicker) {
     if (!smartSearch) return;
     const panel = smartSearch.querySelector('[data-image-search-panel]');
     if (panel) panel.hidden = false;
     smartSearch.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    const prompt = smartSearch.querySelector('.image-search-prompt');
-    if (prompt) setTimeout(() => prompt.focus(), 350);
+    const fileInput = smartSearch.querySelector('.image-search-file');
+    if (openFilePicker && fileInput) {
+      setTimeout(function () { fileInput.click(); }, 120);
+    }
   }
 
   function inferImageTerm(fileName, promptText) {
@@ -119,14 +121,12 @@
   });
 
   document.querySelectorAll('.open-image-search').forEach(function (button) {
-    button.addEventListener('click', openImagePanel);
+    button.addEventListener('click', function () { openImagePanel(true); });
   });
 
   document.querySelectorAll('.image-search-toggle').forEach(function (button) {
     button.addEventListener('click', function () {
-      const form = button.closest('[data-search-form]');
-      const panel = form.querySelector('[data-image-search-panel]');
-      if (panel) panel.hidden = !panel.hidden;
+      openImagePanel(true);
     });
   });
 
@@ -142,11 +142,16 @@
       const form = input.closest('[data-search-form]');
       const file = input.files && input.files[0];
       const preview = form.querySelector('.image-search-preview');
+      const fileName = form.querySelector('[data-image-file-name]');
       if (file && preview) {
         preview.src = URL.createObjectURL(file);
         preview.hidden = false;
+      } else if (preview) {
+        preview.hidden = true;
+        preview.removeAttribute('src');
       }
-      setStatus(form, file ? 'Selected image: ' + file.name + '. Add a short prompt or click Find Similar Products.' : 'No image selected.');
+      if (fileName) fileName.textContent = file ? file.name : 'No file selected';
+      setStatus(form, file ? 'Selected image: ' + file.name : 'No image selected.');
     });
   });
 })();

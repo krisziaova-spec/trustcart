@@ -7,6 +7,14 @@ public enum ProductCategory {
     BEAUTY_PERSONAL_CARE("Beauty & Personal Care", "💄"),
     HOME_LIVING("Home & Living", "🏠"),
     GROCERIES("Groceries", "🛒"),
+
+    FMCG("Fast-Moving Consumer Goods", "🛍️"),
+    CONVENIENCE_GOODS("Convenience Goods", "🏪"),
+    CONSUMER_STAPLES("Consumer Staples", "📦"),
+    EVERYDAY_ESSENTIALS("Everyday Essentials", "🧺"),
+    DAILY_NECESSITIES("Daily Necessities", "🧻"),
+    PACKAGED_GOODS("Packaged Goods", "🥫"),
+
     HEALTH_WELLNESS("Health & Wellness", "💚"),
     BABY_KIDS("Baby & Kids", "🧸"),
     SPORTS_OUTDOORS("Sports & Outdoors", "🏀"),

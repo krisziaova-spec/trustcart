@@ -24,6 +24,13 @@ public class SchemaRepairConfig {
             jdbc.execute("ALTER TABLE IF EXISTS product ADD COLUMN IF NOT EXISTS fulfillment_status VARCHAR(255) DEFAULT 'SELLER_MANAGED'");
             jdbc.execute("ALTER TABLE IF EXISTS product ADD COLUMN IF NOT EXISTS trust_cart_stock INTEGER DEFAULT 0");
             jdbc.execute("ALTER TABLE IF EXISTS product ADD COLUMN IF NOT EXISTS fulfillment_note VARCHAR(1200) DEFAULT 'Seller stores, packs, and ships this product.'");
+            jdbc.execute("ALTER TABLE IF EXISTS buyer_account ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'ACTIVE'");
+            jdbc.execute("ALTER TABLE IF EXISTS buyer_account ADD COLUMN IF NOT EXISTS report_count INTEGER DEFAULT 0");
+            jdbc.execute("ALTER TABLE IF EXISTS buyer_account ADD COLUMN IF NOT EXISTS admin_safety_note VARCHAR(1500)");
+            jdbc.execute("ALTER TABLE IF EXISTS buyer_account ADD COLUMN IF NOT EXISTS deactivated_at TIMESTAMP");
+            jdbc.execute("ALTER TABLE IF EXISTS buyer_account ADD COLUMN IF NOT EXISTS blocked_at TIMESTAMP");
+            jdbc.execute("ALTER TABLE IF EXISTS support_ticket ADD COLUMN IF NOT EXISTS buyer_id BIGINT");
+            jdbc.execute("ALTER TABLE IF EXISTS support_ticket ADD COLUMN IF NOT EXISTS reported_buyer_email VARCHAR(255)");
         };
     }
 }

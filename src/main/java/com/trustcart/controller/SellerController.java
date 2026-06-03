@@ -1,6 +1,12 @@
 package com.trustcart.controller;
 
-import com.trustcart.model.*;
+import com.trustcart.model.CustomerOrder;
+import com.trustcart.model.OrderItem;
+import com.trustcart.model.Product;
+import com.trustcart.model.ProductCategory;
+import com.trustcart.model.Seller;
+import com.trustcart.model.SupportTicket;
+import com.trustcart.model.BuyerAccount;
 import com.trustcart.repository.*;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -27,13 +33,18 @@ public class SellerController {
     private final ProductRepository productRepository;
     private final DiscountCodeRepository discountCodeRepository;
     private final CustomerOrderRepository orderRepository;
+    private final SupportTicketRepository ticketRepository;
+    private final BuyerAccountRepository buyerRepository;
 
     public SellerController(SellerRepository sellerRepository, ProductRepository productRepository,
-                            DiscountCodeRepository discountCodeRepository, CustomerOrderRepository orderRepository) {
+                            DiscountCodeRepository discountCodeRepository, CustomerOrderRepository orderRepository,
+                            SupportTicketRepository ticketRepository, BuyerAccountRepository buyerRepository) {
         this.sellerRepository = sellerRepository;
         this.productRepository = productRepository;
         this.discountCodeRepository = discountCodeRepository;
         this.orderRepository = orderRepository;
+        this.ticketRepository = ticketRepository;
+        this.buyerRepository = buyerRepository;
     }
 
 
@@ -87,8 +98,8 @@ public class SellerController {
         Optional<Seller> seller = sellerRepository.findByEmailIgnoreCase(email);
         if (seller.isPresent() && Objects.equals(seller.get().getPassword(), password)) {
             Seller account = seller.get();
-            if (!"APPROVED".equalsIgnoreCase(account.getStatus())) {
-                ra.addFlashAttribute("error", "Your seller application is still pending. Please submit the required documents sent by TrustCart before approval.");
+            if (!("APPROVED".equalsIgnoreCase(account.getStatus()) || "ACTIVE".equalsIgnoreCase(account.getStatus()))) {
+                ra.addFlashAttribute("error", "Your seller account is currently " + account.getStatus() + ". Please wait for admin approval or contact TrustCart support.");
                 return "redirect:/seller/login";
             }
             session.setAttribute("sellerId", account.getId());
@@ -321,4 +332,46 @@ public class SellerController {
         discountCodeRepository.save(dc);
         return "redirect:/seller/dashboard";
     }
+
+
+    @GetMapping("/report-buyer")
+    public String reportBuyerForm(Model model, HttpSession session, RedirectAttributes ra) {
+        Seller seller = currentSeller(session);
+        if (seller == null) {
+            ra.addFlashAttribute("error", "Please log in as seller first.");
+            return "redirect:/seller/login";
+        }
+        sellerCommon(model, session);
+        return "seller-report-buyer";
+    }
+
+    @PostMapping("/report-buyer")
+    public String reportBuyer(@RequestParam String buyerEmail,
+                              @RequestParam String reason,
+                              @RequestParam(required = false) String orderCode,
+                              HttpSession session, RedirectAttributes ra) {
+        Seller seller = currentSeller(session);
+        if (seller == null) return "redirect:/seller/login";
+
+        SupportTicket ticket = new SupportTicket();
+        ticket.setTicketCode("TC-TICKET-" + System.currentTimeMillis());
+        ticket.setType("BUYER_REPORT");
+        ticket.setStatus("OPEN");
+        ticket.setPriority("HIGH");
+        ticket.setReporterName(seller.getStoreName());
+        ticket.setReporterEmail(seller.getEmail());
+        ticket.setSeller(seller);
+        ticket.setReportedBuyerEmail(buyerEmail);
+        ticket.setSubject("Seller reported buyer account" + (orderCode == null || orderCode.isBlank() ? "" : " - Order " + orderCode));
+        ticket.setMessage(reason);
+        buyerRepository.findByEmailIgnoreCase(buyerEmail).ifPresent(buyer -> {
+            ticket.setBuyer(buyer);
+            buyer.setReportCount((buyer.getReportCount() == null ? 0 : buyer.getReportCount()) + 1);
+            buyerRepository.save(buyer);
+        });
+        ticketRepository.save(ticket);
+        ra.addFlashAttribute("success", "Buyer report submitted to TrustCart Admin for review.");
+        return "redirect:/seller/dashboard";
+    }
+
 }

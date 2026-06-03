@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${seller.storeName} + ' | TrustCart Store'">TrustCart Store</title>
+    <link rel="icon" th:href="@{/favicon.png}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<nav class="nav"><div class="nav-inner"><a class="logo" th:href="@{/}"><img th:src="@{/img/logo-uploaded.png}" alt="TrustCart"></a><div class="nav-links"><a th:href="@{/}">Shop</a><a th:href="@{/autoship}">Autoship</a><a th:href="@{/cart}">Cart (<span th:text="${cartCount}">0</span>)</a></div></div></nav>
+<main class="container">
+    <section class="storefront-hero">
+        <img class="storefront-banner" th:src="${#strings.isEmpty(seller.storeBannerImageUrl) ? 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1600&q=80' : seller.storeBannerImageUrl}" alt="Store banner">
+        <div class="storefront-profile">
+            <img class="store-avatar large" th:src="${#strings.isEmpty(seller.storeProfileImageUrl) ? 'https://images.unsplash.com/photo-1556745753-b2904692b3cd?auto=format&fit=crop&w=700&q=80' : seller.storeProfileImageUrl}" alt="Store profile photo">
+            <div>
+                <div class="badges"><span class="badge shield">Verified Seller</span><span class="badge" th:text="${#strings.isEmpty(seller.sustainabilityBadge) ? 'TrustCart Seller' : seller.sustainabilityBadge}">Badge</span><span class="badge" th:text="${seller.protectedPickupLabel}">Pickup</span></div>
+                <h1 th:text="${seller.storeName}">Store Name</h1>
+                <p th:text="${#strings.isEmpty(seller.storeDescription) ? 'Verified TrustCart seller with protected checkout and seller-area visibility only.' : seller.storeDescription}">Store description</p>
+                <p class="muted"><span th:text="${seller.publicLocationLabel}">Seller area</span> · Trust score <strong th:text="${seller.reliabilityScore}">90</strong>/100</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="storefront-summary-grid">
+        <article class="stat-card"><span>Products</span><strong th:text="${products.size()}">0</strong><small>Approved goods listed</small></article>
+        <article class="stat-card"><span>Autoship Goods</span><strong th:text="${subscriptionProducts.size()}">0</strong><small>Repeat purchase eligible</small></article>
+        <article class="stat-card"><span>Promos</span><strong th:text="${discounts.size()}">0</strong><small>Active seller discounts</small></article>
+        <article class="stat-card"><span>Store Area</span><strong th:text="${seller.storeCity}">City</strong><small>Exact address hidden</small></article>
+    </section>
+
+    <section th:if="${!discounts.isEmpty()}">
+        <div class="section-title"><h2>Seller Promos</h2><span class="muted">Use during protected checkout</span></div>
+        <div class="promo-grid">
+            <article class="promo-card" th:each="d:${discounts}"><strong th:text="${d.code}">CODE</strong><span th:text="${d.description}">Description</span><small><span th:text="${d.percentOff}">0</span>% off / ₱<span th:text="${d.amountOff}">0</span> off</small></article>
+        </div>
+    </section>
+
+    <section th:if="${!subscriptionProducts.isEmpty()}">
+        <div class="section-title"><h2>Autoship from this Store</h2><a class="btn btn-outline" th:href="@{/autoship}">View Autoship</a></div>
+        <div class="grid">
+            <article class="product-card" th:each="product : ${subscriptionProducts}">
+                <a class="product-photo-wrap" th:href="@{/product/{id}(id=${product.id})}"><img class="product-photo" th:src="${product.imageUrl}" th:alt="${product.photoAltText}"></a>
+                <div class="product-body"><div class="badges"><span class="badge">Autoship</span><span class="badge" th:text="${product.category.displayName}">Category</span></div><a class="product-name" th:href="@{/product/{id}(id=${product.id})}" th:text="${product.name}">Product</a><div class="price">₱<span th:text="${product.price}">0</span></div></div>
+            </article>
+        </div>
+    </section>
+
+    <section>
+        <div class="section-title"><h2>All Store Products</h2><span class="muted" th:text="${products.size()} + ' visible listings'">0 visible listings</span></div>
+        <div class="grid">
+            <article class="product-card premium-card" th:each="product : ${products}">
+                <a class="product-photo-wrap" th:href="@{/product/{id}(id=${product.id})}"><img class="product-photo" th:src="${product.imageUrl}" th:alt="${product.photoAltText}"></a>
+                <div class="product-body">
+                    <div class="badges"><span class="badge shield">Shield</span><span class="badge" th:text="${product.category.displayName}">Category</span><span class="badge" th:if="${product.subscriptionEligible}">Autoship</span></div>
+                    <a class="product-name" th:href="@{/product/{id}(id=${product.id})}" th:text="${product.name}">Product Name</a>
+                    <div class="price">₱<span th:text="${product.price}">0</span></div>
+                    <p class="tiny"><span th:text="${product.stockStatus}">In Stock</span> · <span th:text="${product.redFlagSummary}">No red flags.</span></p>
+                    <form th:action="@{/cart/add/{id}(id=${product.id})}" method="post" class="footer-actions"><input type="hidden" name="quantity" value="1"><a class="btn btn-outline" th:href="@{/product/{id}(id=${product.id})}">Details</a><button class="btn btn-primary" type="submit" th:text="${buyerLoggedIn ? 'Add' : 'Login to Add'}">Add</button></form>
+                </div>
+            </article>
+        </div>
+    </section>
+</main>
+</body>
+</html>

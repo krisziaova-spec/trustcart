@@ -3,27 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Buyer Login</title>
+    <title>Buyer Login | TrustCart</title>
     <link rel="icon" th:href="@{/favicon.png}">
     <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/auth-premium.css}">
 </head>
-<body>
-<main class="auth-card">
-    <img th:src="@{/img/logo-uploaded.png}" class="auth-logo" alt="TrustCart logo">
-    <p class="muted">Secure Shopping Starts Here</p>
-    <h1>Buyer Login</h1>
-    <p class="error" th:text="${error}"></p>
-    <p class="success" th:text="${success}"></p>
-    <form method="post">
-        <input name="email" type="email" placeholder="buyer@trustcart.ph" required>
-        <input name="password" type="password" placeholder="trust123" required>
-        <button class="btn btn-primary">Login</button>
-    </form>
-    <div class="auth-links">
-        <a th:href="@{/buyer/register}">Create buyer account</a>
-        <a th:href="@{/forgot-password(type='buyer')}">Forgot password?</a>
+<body class="auth-premium-page buyer-auth-page">
+<header class="auth-topbar">
+    <a class="auth-brand" th:href="@{/}">
+        <img th:src="@{/img/logo-uploaded.png}" alt="TrustCart logo">
+        <span>Buyer Access</span>
+    </a>
+    <nav class="auth-help-links" aria-label="Login help links">
         <a th:href="@{/}">Back to shop</a>
-    </div>
+        <a th:href="@{/forgot-password(type='buyer')}">Need help?</a>
+    </nav>
+</header>
+
+<main class="auth-premium-shell">
+    <section class="auth-hero-panel" aria-label="TrustCart buyer benefits">
+        <div class="auth-hero-content">
+            <span class="auth-pill">Protected Local Shopping</span>
+            <h1>Shop nearby essentials from verified TrustCart stores.</h1>
+            <p>Find everyday goods faster, buy from approved sellers, and choose safer fulfillment options built for local commerce.</p>
+            <div class="auth-feature-grid">
+                <div><strong>Verified Sellers</strong><span>Approved stores only</span></div>
+                <div><strong>Buyer Protection</strong><span>Reports and support center</span></div>
+                <div><strong>Nearby Search</strong><span>Shop by area and radius</span></div>
+                <div><strong>FBT Ready</strong><span>Fulfilled by TrustCart badge</span></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="auth-login-panel" aria-label="Buyer login form">
+        <div class="auth-card-premium">
+            <img th:src="@{/img/logo-uploaded.png}" class="auth-card-logo" alt="TrustCart logo">
+            <p class="auth-kicker">Secure Shopping Starts Here</p>
+            <h2>Buyer Login</h2>
+            <p class="auth-subtitle">Access your orders, cart, reports, and saved local stores.</p>
+
+            <div class="auth-alert error" th:if="${error}" th:text="${error}"></div>
+            <div class="auth-alert success" th:if="${success}" th:text="${success}"></div>
+
+            <form method="post" class="auth-form-premium">
+                <label for="buyer-email">Email address</label>
+                <div class="auth-input-wrap">
+                    <span aria-hidden="true">✉</span>
+                    <input id="buyer-email" name="email" type="email" placeholder="buyer@trustcart.ph" autocomplete="email" required>
+                </div>
+
+                <label for="buyer-password">Password</label>
+                <div class="auth-input-wrap">
+                    <span aria-hidden="true">🔒</span>
+                    <input id="buyer-password" name="password" type="password" placeholder="Enter your password" autocomplete="current-password" required>
+                </div>
+
+                <button class="auth-submit" type="submit">Login</button>
+            </form>
+
+            <div class="auth-secondary-row">
+                <a th:href="@{/forgot-password(type='buyer')}">Forgot password?</a>
+            </div>
+
+            <div class="auth-divider"><span>or</span></div>
+
+            <div class="auth-action-row">
+                <a class="auth-outline-action" th:href="@{/buyer/register}">Create buyer account</a>
+                <a class="auth-outline-action" th:href="@{/}">Continue shopping</a>
+            </div>
+        </div>
+    </section>
 </main>
+
+<footer class="auth-footer">© 2026 TrustCart. Secure local commerce for buyers and sellers.</footer>
 </body>
 </html>

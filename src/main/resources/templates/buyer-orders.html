@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My Purchases | TrustCart</title>
+    <link rel="icon" th:href="@{/favicon.png}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<nav class="nav">
+    <div class="nav-inner">
+        <a class="logo" th:href="@{/}"><img th:src="@{/img/logo-uploaded.png}" alt="TrustCart"></a>
+        <div class="nav-links"><a th:href="@{/}">Shop</a><a th:href="@{/buyer/messages}">Messages</a><a th:href="@{/support/contact}">Support</a><a th:href="@{/buyer/logout}">Logout</a></div>
+    </div>
+</nav>
+<main class="container">
+    <section class="table-card">
+        <div class="section-title">
+            <div>
+                <span class="section-pill">Buyer Dashboard</span>
+                <h1>My Purchases</h1>
+                <p class="muted">Track orders, confirm received delivery, open tickets, and rate completed purchases only.</p>
+            </div>
+            <a class="btn btn-outline" th:href="@{/}">Back to Shop</a>
+        </div>
+        <p class="success" th:text="${success}"></p><p class="error" th:text="${error}"></p>
+        <div class="purchase-tabs">
+            <a href="#all">All <span th:text="${orders.size()}">0</span></a>
+            <a href="#to-pay">To Pay <span th:text="${toPayOrders.size()}">0</span></a>
+            <a href="#to-ship">To Ship <span th:text="${toShipOrders.size()}">0</span></a>
+            <a href="#to-receive">To Receive <span th:text="${toReceiveOrders.size()}">0</span></a>
+            <a href="#completed">Completed <span th:text="${completedOrders.size()}">0</span></a>
+            <a href="#cancelled">Cancelled/Refunded <span th:text="${cancelledOrders.size()}">0</span></a>
+        </div>
+    </section>
+
+    <section class="table-card" id="all">
+        <div class="section-title"><div><span class="section-pill">All Orders</span><h2>Purchase History</h2><p class="muted">Reviews are unlocked only after Confirm Received.</p></div></div>
+        <div class="purchase-list">
+            <article class="purchase-card" th:each="o:${orders}">
+                <div class="purchase-head">
+                    <div><strong th:text="${o.orderCode}">TC</strong><br><small th:text="${#temporals.format(o.createdAt, 'MMM dd, yyyy HH:mm')}">Date</small></div>
+                    <span class="badge" th:text="${o.orderStatus}">Status</span>
+                </div>
+                <div class="purchase-item" th:each="item:${o.items}">
+                    <img th:if="${item.product != null}" th:src="${item.product.imageUrl}" alt="Product">
+                    <div class="purchase-info">
+                        <strong th:text="${item.productName}">Product</strong>
+                        <small th:text="${item.sellerName}">Seller</small>
+                        <small>Qty: <span th:text="${item.quantity}">1</span> · ₱<span th:text="${item.lineTotal}">0</span></small>
+                    </div>
+                    <div class="purchase-actions">
+                        <a class="btn btn-outline" th:if="${item.product != null}" th:href="@{/chat/seller/{id}(id=${item.product.seller.id}, productId=${item.product.id})}">Contact Seller</a>
+                        <a class="btn btn-outline" th:if="${item.product != null and (#strings.equalsIgnoreCase(o.orderStatus,'COMPLETED') or #strings.equalsIgnoreCase(o.orderStatus,'BUYER_CONFIRMED_RECEIVED') or #strings.equalsIgnoreCase(o.orderStatus,'ORDER_RECEIVED') or #strings.equalsIgnoreCase(o.orderStatus,'RECEIVED') or #strings.equalsIgnoreCase(o.orderStatus,'DELIVERED'))}" th:href="@{|/product/${item.product.id}?reviewOrderCode=${o.orderCode}#reviews|}">Rate</a>
+                    </div>
+                </div>
+                <div class="purchase-foot">
+                    <div><strong>Total:</strong> ₱<span th:text="${o.total}">0</span><br><small th:text="${o.escrowStatus}">Escrow</small></div>
+                    <div class="footer-actions">
+                        <a class="btn btn-outline" th:href="@{/track(code=${o.orderCode})}">Track Order</a>
+                        <a class="btn btn-outline" th:href="@{/support/contact}">Open Ticket</a>
+                        <form th:if="${!(#strings.equalsIgnoreCase(o.orderStatus,'COMPLETED') or #strings.equalsIgnoreCase(o.orderStatus,'BUYER_CONFIRMED_RECEIVED') or #strings.equalsIgnoreCase(o.orderStatus,'ORDER_RECEIVED') or #strings.equalsIgnoreCase(o.orderStatus,'RECEIVED') or #strings.equalsIgnoreCase(o.orderStatus,'DELIVERED') or #strings.equalsIgnoreCase(o.orderStatus,'CANCELLED') or #strings.equalsIgnoreCase(o.orderStatus,'CANCELED') or #strings.equalsIgnoreCase(o.orderStatus,'REFUNDED'))}" th:action="@{/buyer/orders/{id}/confirm-received(id=${o.id})}" method="post">
+                            <button class="btn btn-primary" type="submit">Confirm Received</button>
+                        </form>
+                    </div>
+                </div>
+            </article>
+            <p class="muted" th:if="${orders.isEmpty()}">No orders yet.</p>
+        </div>
+    </section>
+
+    <section class="table-card" id="completed">
+        <div class="section-title"><div><span class="section-pill">Completed</span><h2>Ready to Rate</h2><p class="muted">Only completed/confirmed received orders show Rate buttons.</p></div></div>
+        <div class="purchase-list">
+            <article class="purchase-card" th:each="o:${completedOrders}">
+                <div class="purchase-head"><strong th:text="${o.orderCode}">TC</strong><span class="badge shield">Completed</span></div>
+                <div class="purchase-item" th:each="item:${o.items}">
+                    <img th:if="${item.product != null}" th:src="${item.product.imageUrl}" alt="Product">
+                    <div class="purchase-info"><strong th:text="${item.productName}">Product</strong><small th:text="${item.sellerName}">Seller</small><small>Qty: <span th:text="${item.quantity}">1</span></small></div>
+                    <a class="btn btn-primary" th:if="${item.product != null}" th:href="@{|/product/${item.product.id}?reviewOrderCode=${o.orderCode}#reviews|}">Rate</a>
+                </div>
+            </article>
+            <p class="muted" th:if="${completedOrders.isEmpty()}">No completed purchases ready for review yet.</p>
+        </div>
+    </section>
+</main>
+</body>
+</html>

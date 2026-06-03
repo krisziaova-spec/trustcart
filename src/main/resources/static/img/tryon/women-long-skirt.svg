@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 430">
+<defs><linearGradient id="fabric" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#be123c"/><stop offset="1" stop-color="#7f1d1d"/></linearGradient><filter id="shadow"><feDropShadow dx="0" dy="10" stdDeviation="8" flood-color="#000" flood-opacity=".22"/></filter></defs>
+<g filter="url(#shadow)" opacity=".96">
+<path d="M128 55h84l37 88-34 19 61 220H64l61-220-34-19 37-88z" fill="url(#fabric)"/>
+<path d="M142 70h56l-16 54h-24z" fill="rgba(255,255,255,.32)"/>
+<path d="M127 165c28 18 60 18 88 0" fill="none" stroke="rgba(255,255,255,.24)" stroke-width="5"/>
+<path d="M111 210h118M99 275h142" stroke="rgba(0,0,0,.10)" stroke-width="5"/>
+
+</g></svg>

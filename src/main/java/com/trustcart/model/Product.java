@@ -50,6 +50,11 @@ public class Product {
     private String tryOnAssetUrl;
     private String stockStatus = "In Stock";
     private String estimatedDelivery = "ETA: 1-2 days";
+    private String fulfilledBy = "SELLER";
+    private String fulfillmentStatus = "SELLER_MANAGED";
+    private int trustCartStock = 0;
+    @Column(length = 1200)
+    private String fulfillmentNote = "Seller stores, packs, and ships this product.";
     private LocalDateTime createdAt = LocalDateTime.now();
     @ManyToOne(optional = false)
     private Seller seller;
@@ -128,6 +133,16 @@ public class Product {
     public void setStockStatus(String stockStatus) { this.stockStatus = stockStatus; }
     public String getEstimatedDelivery() { return estimatedDelivery; }
     public void setEstimatedDelivery(String estimatedDelivery) { this.estimatedDelivery = estimatedDelivery; }
+    public String getFulfilledBy() { return fulfilledBy; }
+    public void setFulfilledBy(String fulfilledBy) { this.fulfilledBy = fulfilledBy; }
+    public String getFulfillmentStatus() { return fulfillmentStatus; }
+    public void setFulfillmentStatus(String fulfillmentStatus) { this.fulfillmentStatus = fulfillmentStatus; }
+    public int getTrustCartStock() { return trustCartStock; }
+    public void setTrustCartStock(int trustCartStock) { this.trustCartStock = trustCartStock; }
+    public String getFulfillmentNote() { return fulfillmentNote; }
+    public void setFulfillmentNote(String fulfillmentNote) { this.fulfillmentNote = fulfillmentNote; }
+    public boolean isFulfilledByTrustCart() { return "TRUSTCART".equalsIgnoreCase(fulfilledBy); }
+    public String getFulfillmentLabel() { return isFulfilledByTrustCart() ? "Fulfilled by TrustCart" : "Fulfilled by Seller"; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public Seller getSeller() { return seller; }

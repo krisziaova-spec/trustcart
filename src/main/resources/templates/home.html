@@ -58,6 +58,10 @@
                     <option value="">Select a saved city / area</option>
                     <option value="San Pablo City|14.0683|121.3256">San Pablo City, Laguna</option>
                     <option value="Calamba|14.2117|121.1653">Calamba, Laguna</option>
+                    <option value="Brgy. Chrysanthemum, San Pedro|14.3440|121.0576">Brgy. Chrysanthemum, San Pedro, Laguna</option>
+                    <option value="Brgy. Malagasang 2-C, Imus|14.3860|120.9368">Brgy. Malagasang 2-C, Imus, Cavite</option>
+                    <option value="Biñan|14.3036|121.0781">Biñan, Laguna</option>
+                    <option value="Dasmariñas|14.3294|120.9367">Dasmariñas, Cavite</option>
                     <option value="Lipa City|13.9411|121.1631">Lipa City, Batangas</option>
                     <option value="Manila|14.5995|120.9842">Manila</option>
                     <option value="Quezon City|14.6760|121.0437">Quezon City</option>
@@ -180,7 +184,7 @@
             <article class="product-card premium-card" th:each="product : ${products}">
                 <a class="product-photo-wrap" th:href="@{/product/{id}(id=${product.id})}"><img class="product-photo" th:src="${product.imageUrl}" th:alt="${product.photoAltText}"></a>
                 <div class="product-body">
-                    <div class="badges"><span class="badge shield">Shield</span><a class="badge" th:href="@{/(category=${product.category})}" th:text="${product.category.displayName}">Category</a><span class="badge" th:if="${product.ecoFriendly}">Eco</span><a class="badge" th:if="${product.tryOnEligible}" th:href="@{/try-on}">Try-On</a><a class="badge" th:if="${product.subscriptionEligible}" th:href="@{/autoship}">Autoship</a></div>
+                    <div class="badges"><span class="badge shield">Verified Seller</span><span class="badge shield" th:if="${product.fulfilledByTrustCart}">Fulfilled by TrustCart</span><span class="badge" th:unless="${product.fulfilledByTrustCart}">Fulfilled by Seller</span><a class="badge" th:href="@{/(category=${product.category})}" th:text="${product.category.displayName}">Category</a><span class="badge" th:if="${product.ecoFriendly}">Eco</span><a class="badge" th:if="${product.tryOnEligible}" th:href="@{/try-on}">Try-On</a><a class="badge" th:if="${product.subscriptionEligible}" th:href="@{/autoship}">Autoship</a></div>
                     <a class="product-name" th:href="@{/product/{id}(id=${product.id})}" th:text="${product.name}">Product Name</a>
                     <div class="price">₱<span th:text="${product.price}">0</span></div>
                     <div class="muted">Seller: <a th:href="@{/store/{id}(id=${product.seller.id})}" th:text="${product.seller.storeName}">Seller</a></div>

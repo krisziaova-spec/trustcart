@@ -23,10 +23,25 @@ public class DataSeeder {
             Seller eco = seller(sellers,"EcoHome Essentials","ecohome@trustcart.ph","Sustainable home products","Low-Waste Packaging","Calamba","Laguna",14.2117,121.1653);
             Seller daily = seller(sellers,"Daily Essentials Co.","daily@trustcart.ph","FMCG and household essentials","Autoship Essentials","San Pablo City","Laguna",14.0740,121.3250);
             Seller pantry = seller(sellers,"FreshPack Staples","freshpack@trustcart.ph","Packaged goods and consumer staples","Sealed Packaged Goods","Calamba","Laguna",14.2104,121.1650);
+            Seller chrys = seller(sellers,"Chrysanthemum Rice Depot","chrysanthemumrice@trustcart.ph","Local rice and grocery store","Verified Local Seller","San Pedro","Laguna",14.3440,121.0576);
+            Seller lagunaFarm = seller(sellers,"Laguna Farmers Hub","lagunafarmers@trustcart.ph","Farm staples and rice supplier","Fulfilled by TrustCart Partner","San Pedro","Laguna",14.3475,121.0558); lagunaFarm.setCanUseFbt(true); sellers.save(lagunaFarm);
+            Seller southGrain = seller(sellers,"South Grain Trading","southgrain@trustcart.ph","Rice trading store","Verified Local Seller","San Pedro","Laguna",14.3412,121.0610);
+            Seller greenBasket = seller(sellers,"Green Basket San Pedro","greenbasketsp@trustcart.ph","Vegetables and pantry goods","Locally Sourced","San Pedro","Laguna",14.3501,121.0585);
+            Seller caviteRice = seller(sellers,"Cavite Rice Center","caviterice@trustcart.ph","Rice and consumer staples","Fulfilled by TrustCart Partner","Imus","Cavite",14.3860,120.9368); caviteRice.setCanUseFbt(true); sellers.save(caviteRice);
+            Seller malagasang = seller(sellers,"Malagasang Grocery Mart","malagasangmart@trustcart.ph","Community grocery store","Verified Local Seller","Imus","Cavite",14.3884,120.9345);
+            Seller goldenHarvest = seller(sellers,"Golden Harvest Store","goldenharvest@trustcart.ph","Rice and dry goods","Verified Local Seller","Imus","Cavite",14.3833,120.9399);
+            Seller caviteFresh = seller(sellers,"Cavite Fresh Goods","cavitefresh@trustcart.ph","Fresh vegetables and household goods","Locally Sourced","Imus","Cavite",14.3901,120.9405);
+            Seller binanRice = seller(sellers,"Biñan Rice Depot","binanrice@trustcart.ph","Rice depot","Verified Local Seller","Biñan","Laguna",14.3036,121.0781);
+            Seller southLuzon = seller(sellers,"South Luzon Grocery","southluzon@trustcart.ph","Mixed grocery and daily needs","Verified Seller","Biñan","Laguna",14.3064,121.0758);
+            Seller dasmaFarm = seller(sellers,"Dasma Farmers Market","dasmafarmers@trustcart.ph","Farm goods and staples","Verified Local Seller","Dasmariñas","Cavite",14.3294,120.9367);
+            Seller kadiwaDasma = seller(sellers,"Kadiwa Express Dasma","kadiwadasma@trustcart.ph","Rice, eggs, and vegetables","Verified Local Seller","Dasmariñas","Cavite",14.3310,120.9388);
+            Seller rosaFresh = seller(sellers,"Santa Rosa Fresh Market","santarosafresh@trustcart.ph","Fresh market and pantry goods","Verified Local Seller","Santa Rosa","Laguna",14.3122,121.1114);
+            Seller valleyRice = seller(sellers,"Green Valley Rice Store","greenvalleyrice@trustcart.ph","Rice and grains store","Verified Local Seller","Santa Rosa","Laguna",14.3147,121.1098);
             code(discounts,"WELCOME10","10% off first protected order for first-time buyers.",BigDecimal.ZERO,10,BigDecimal.ZERO,true,local);
             code(discounts,"GREEN5","5% off for green checkout buyers.",BigDecimal.valueOf(500),5,BigDecimal.ZERO,false,eco);
             code(discounts,"LOCAL50","₱50 off selected local Filipino products.",BigDecimal.valueOf(300),0,BigDecimal.valueOf(50),false,local);
-            if (products.count() == 0) {
+            boolean freshProductSeed = products.count() == 0;
+            if (freshProductSeed) {
                 base(products,"Wireless Earbuds",ProductCategory.ELECTRONICS,899,tech,"https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?auto=format&fit=crop&w=900&q=80",false,false);
                 base(products,"Power Bank 20000mAh",ProductCategory.ELECTRONICS,1299,tech,"https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?auto=format&fit=crop&w=900&q=80",false,false);
                 base(products,"Bluetooth Speaker",ProductCategory.ELECTRONICS,749,tech,"https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?auto=format&fit=crop&w=900&q=80",false,false);
@@ -78,6 +93,8 @@ public class DataSeeder {
             }
             seedEverydaySubscriptionGoods(products, daily, pantry, eco);
 
+            seedDemoRiceAndLocalStores(products, chrys, lagunaFarm, southGrain, greenBasket, caviteRice, malagasang, goldenHarvest, caviteFresh, binanRice, southLuzon, dasmaFarm, kadiwaDasma, rosaFresh, valleyRice);
+
             if (registries.count() == 0) {
                 BuyerAccount owner = buyers.findByEmailIgnoreCase("buyer@trustcart.ph").orElse(null);
                 if (owner != null) {
@@ -121,6 +138,30 @@ public class DataSeeder {
     }
     private void code(DiscountCodeRepository repo,String code,String desc,BigDecimal min,int pct,BigDecimal amt,boolean first,Seller seller){
         repo.findByCodeIgnoreCase(code).orElseGet(()->{DiscountCode d=new DiscountCode();d.setCode(code);d.setDescription(desc);d.setMinimumSpend(min);d.setPercentOff(pct);d.setAmountOff(amt);d.setFirstOrderOnly(first);d.setSeller(seller);d.setCreatedBySeller(seller.getStoreName());return repo.save(d);});
+    }
+
+    private void seedDemoRiceAndLocalStores(ProductRepository repo, Seller... sellers) {
+        String[] riceNames = {"Premium Dinorado Rice 25kg", "Jasmine Rice 10kg", "Well-Milled Rice 25kg", "Brown Rice 5kg", "Sinandomeng Rice 25kg", "Rice and Egg Bundle", "Local Vegetables Basket", "Canned Goods Bundle", "Cooking Oil 2L", "Household Grocery Pack", "Fresh Egg Tray", "Pancit Canton Grocery Pack", "Sugar 1kg Bundle", "TrustCart Pantry Starter"};
+        int[] prices = {1450, 720, 1280, 420, 1320, 520, 299, 399, 289, 699, 245, 180, 210, 999};
+        for (int i = 0; i < sellers.length; i++) {
+            Seller seller = sellers[i];
+            String productName = seller.getStoreName() + " - " + riceNames[i % riceNames.length];
+            baseIfMissing(repo, productName, ProductCategory.GROCERIES, prices[i % prices.length], seller,
+                    "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=900&q=80",
+                    true, false,
+                    "Demo fast-moving product for nearby seller search and presentation sample.",
+                    seller.isCanUseFbt() ? "TrustCart hub inventory sample" : "Seller-managed local fulfillment");
+            repo.findByNameIgnoreCase(productName).ifPresent(p -> {
+                if (seller.isCanUseFbt()) {
+                    p.setFulfilledBy("TRUSTCART");
+                    p.setFulfillmentStatus("TRUSTCART_APPROVED");
+                    p.setTrustCartStock(p.getStock());
+                    p.setFulfillmentNote("Sample inventory verified and stored at TrustCart partner hub for demo.");
+                    p.setEstimatedDelivery("ETA: TrustCart hub delivery");
+                    repo.save(p);
+                }
+            });
+        }
     }
 
     private void seedEverydaySubscriptionGoods(ProductRepository repo, Seller daily, Seller pantry, Seller eco) {

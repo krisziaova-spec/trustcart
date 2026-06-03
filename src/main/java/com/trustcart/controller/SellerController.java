@@ -86,7 +86,12 @@ public class SellerController {
     public String doLogin(@RequestParam String email, @RequestParam String password, HttpSession session, RedirectAttributes ra) {
         Optional<Seller> seller = sellerRepository.findByEmailIgnoreCase(email);
         if (seller.isPresent() && Objects.equals(seller.get().getPassword(), password)) {
-            session.setAttribute("sellerId", seller.get().getId());
+            Seller account = seller.get();
+            if (!"APPROVED".equalsIgnoreCase(account.getStatus())) {
+                ra.addFlashAttribute("error", "Your seller application is still pending. Please submit the required documents sent by TrustCart before approval.");
+                return "redirect:/seller/login";
+            }
+            session.setAttribute("sellerId", account.getId());
             return "redirect:/seller/dashboard";
         }
         ra.addFlashAttribute("error", "Invalid seller email or password.");
@@ -112,6 +117,7 @@ public class SellerController {
                           @RequestParam(required = false) String phone,
                           @RequestParam(required = false) Double latitude,
                           @RequestParam(required = false) Double longitude,
+                          @RequestParam(required = false, defaultValue = "SELLER") String fulfillmentPreference,
                           HttpSession session, RedirectAttributes ra) {
         if (sellerRepository.existsByEmailIgnoreCase(email)) {
             ra.addFlashAttribute("error", "Seller email already exists.");
@@ -128,16 +134,24 @@ public class SellerController {
         seller.setStoreProvince(storeProvince);
         seller.setLatitude(latitude == null ? 14.0683 : latitude);
         seller.setLongitude(longitude == null ? 121.3256 : longitude);
-        seller.setStatus("APPROVED");
-        seller.setStoreLocationVerified(true);
-        seller.setApprovedAt(LocalDateTime.now());
-        seller.setApprovedBy("TrustCart Verification");
+        seller.setStatus("PENDING");
+        seller.setStoreLocationVerified(false);
+        seller.setApprovedAt(null);
+        seller.setApprovedBy(null);
+        seller.setBusinessVerified(false);
+        seller.setIdentityVerified(false);
+        seller.setDocumentVerified(false);
+        seller.setProductComplianceChecked(false);
+        seller.setRequirementsStatus("REQUIREMENTS_SENT");
+        seller.setRequirementsNote("Email sent: please submit valid government ID, proof of address, business permit if applicable, and selfie with ID. Admin approval is required before login.");
+        seller.setFulfillmentPreference(fulfillmentPreference);
+        seller.setCanUseFbt(false);
         seller.setStoreDescription("Verified TrustCart seller with protected checkout and seller-area visibility only.");
         seller.setStoreProfileImageUrl("https://images.unsplash.com/photo-1556745753-b2904692b3cd?auto=format&fit=crop&w=700&q=80");
         seller.setStoreBannerImageUrl("https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1600&q=80");
         sellerRepository.save(seller);
-        session.setAttribute("sellerId", seller.getId());
-        return "redirect:/seller/dashboard";
+        ra.addFlashAttribute("success", "Seller application submitted. TrustCart has sent the requirements email. You can log in only after admin approval.");
+        return "redirect:/seller/login";
     }
 
     @GetMapping("/dashboard")
@@ -227,6 +241,7 @@ public class SellerController {
                                 @RequestParam(required = false, defaultValue = "false") boolean tryOnEligible,
                                 @RequestParam(required = false) String tryOnGender,
                                 @RequestParam(required = false) String tryOnAssetUrl,
+                                @RequestParam(required = false, defaultValue = "false") boolean requestFbt,
                                 HttpSession session) throws IOException {
         Seller seller = currentSeller(session);
         if (seller == null) return "redirect:/seller/login";
@@ -253,6 +268,21 @@ public class SellerController {
         p.setRedFlagSummary("New seller product. Transactions must remain inside TrustCart.");
         p.setSeller(seller);
         p.setStatus("APPROVED");
+        if (requestFbt && seller.isCanUseFbt()) {
+            p.setFulfilledBy("TRUSTCART");
+            p.setFulfillmentStatus("TRUSTCART_APPROVED");
+            p.setTrustCartStock(stock);
+            p.setFulfillmentNote("Inventory is recorded as received and managed by TrustCart for prototype fulfillment.");
+            p.setEstimatedDelivery("ETA: TrustCart hub delivery");
+        } else if (requestFbt) {
+            p.setFulfilledBy("SELLER");
+            p.setFulfillmentStatus("PENDING_TRUSTCART_REVIEW");
+            p.setFulfillmentNote("Seller requested Fulfilled by TrustCart. Admin must approve after inventory verification.");
+        } else {
+            p.setFulfilledBy("SELLER");
+            p.setFulfillmentStatus("SELLER_MANAGED");
+            p.setFulfillmentNote("Seller stores, packs, and ships this product.");
+        }
         productRepository.save(p);
         return "redirect:/seller/dashboard";
     }

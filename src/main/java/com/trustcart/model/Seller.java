@@ -40,6 +40,11 @@ public class Seller {
     private Integer serviceRadiusKm = 5;
     private boolean pickupAvailable = true;
     private boolean storeLocationVerified = true;
+    private boolean canUseFbt = false;
+    private String fulfillmentPreference = "SELLER";
+    private String requirementsStatus = "COMPLETED";
+    @Column(length = 1200)
+    private String requirementsNote = "Requirements completed and approved by TrustCart.";
     @Column(length = 1000)
     private String locationProofUrl;
     @Column(length = 1200)
@@ -128,6 +133,14 @@ public class Seller {
     public void setStoreBannerImageUrl(String storeBannerImageUrl) { this.storeBannerImageUrl = storeBannerImageUrl; }
     public String getStoreDescription() { return storeDescription; }
     public void setStoreDescription(String storeDescription) { this.storeDescription = storeDescription; }
+    public boolean isCanUseFbt() { return canUseFbt; }
+    public void setCanUseFbt(boolean canUseFbt) { this.canUseFbt = canUseFbt; }
+    public String getFulfillmentPreference() { return fulfillmentPreference; }
+    public void setFulfillmentPreference(String fulfillmentPreference) { this.fulfillmentPreference = fulfillmentPreference; }
+    public String getRequirementsStatus() { return requirementsStatus; }
+    public void setRequirementsStatus(String requirementsStatus) { this.requirementsStatus = requirementsStatus; }
+    public String getRequirementsNote() { return requirementsNote; }
+    public void setRequirementsNote(String requirementsNote) { this.requirementsNote = requirementsNote; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
     public LocalDateTime getCreatedAt() { return createdAt; }

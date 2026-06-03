@@ -277,6 +277,17 @@ public class BuyerController {
         return "cart";
     }
 
+    @PostMapping("/cart/update/{id}")
+    public String updateQuantity(@PathVariable Long id, @RequestParam(defaultValue = "1") int quantity, HttpSession session) {
+        Map<Long, Integer> cart = cartService.getCart(session);
+        if (quantity <= 0) {
+            cart.remove(id);
+        } else {
+            cart.put(id, quantity);
+        }
+        return "redirect:/cart";
+    }
+
     @PostMapping("/cart/remove/{id}")
     public String removeItem(@PathVariable Long id, HttpSession session) {
         cartService.getCart(session).remove(id);

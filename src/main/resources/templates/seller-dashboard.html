@@ -12,7 +12,7 @@
         <div>
             <span class="section-pill">Seller Side</span>
             <h1>Seller Dashboard</h1>
-            <p>Welcome, <strong th:text="${seller.storeName}">Seller</strong></p>
+            <p>Welcome, <strong th:text="${seller.storeName}">Seller</strong></p><div class="badges"><span class="badge shield">Verified Seller</span><span class="badge" th:text="${seller.canUseFbt ? 'FBT Enabled' : 'Fulfilled by Seller'}">Fulfillment</span></div>
             <p class="success" th:text="${success}"></p>
         </div>
         <form th:action="@{/seller/logout}" method="post"><button class="btn btn-outline">Logout</button></form>
@@ -45,7 +45,7 @@
         <div class="grid">
             <article class="product-card" th:each="p:${products}">
                 <img class="product-photo" th:src="${p.imageUrl}" th:alt="${p.photoAltText}">
-                <div class="product-body"><strong th:text="${p.name}">Product</strong><p>₱<span th:text="${p.price}">0</span></p><div class="badges"><span class="badge" th:text="${p.category.displayName}">Category</span><span class="badge" th:if="${p.subscriptionEligible}">Autoship</span></div></div>
+                <div class="product-body"><strong th:text="${p.name}">Product</strong><p>₱<span th:text="${p.price}">0</span></p><div class="badges"><span class="badge" th:text="${p.category.displayName}">Category</span><span class="badge shield" th:if="${p.fulfilledByTrustCart}">Fulfilled by TrustCart</span><span class="badge" th:unless="${p.fulfilledByTrustCart}">Fulfilled by Seller</span><span class="badge" th:if="${p.fulfillmentStatus == 'PENDING_TRUSTCART_REVIEW'}">FBT Pending Review</span><span class="badge" th:if="${p.subscriptionEligible}">Autoship</span></div></div>
             </article>
         </div>
     </section>

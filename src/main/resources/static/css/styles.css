@@ -27,3 +27,23 @@
 @media(max-width:1000px){.hero-shop{grid-template-columns:1fr}.seller-actions,.seller-stats-grid,.storefront-summary-grid,.promo-grid{grid-template-columns:repeat(2,1fr)}.location-tools{grid-template-columns:1fr}.subscription-form{grid-template-columns:1fr}}
 @media(max-width:560px){.hero-shop .main-banner h2,.autoship-hero h1,.storefront-profile h1{font-size:28px}.seller-dashboard-head,.store-preview-body,.storefront-profile{flex-direction:column;align-items:flex-start}.seller-actions,.seller-stats-grid,.storefront-summary-grid,.promo-grid{grid-template-columns:1fr}.store-preview-banner,.storefront-banner{height:160px}.store-avatar.large{width:92px;height:92px}}
 .live-section{background:#fff;border:1px solid var(--border);border-radius:24px;padding:24px;box-shadow:var(--shadow);margin:22px 0;overflow:hidden}
+
+/* TrustCart prototype update: seller approval, FBS/FBT, cart controls, admin pages */
+.admin-page .table-card { margin-bottom: 1.5rem; overflow-x: auto; }
+.inline-admin-form { display: grid; gap: .45rem; min-width: 220px; margin-bottom: .5rem; }
+.inline-admin-form input { padding: .65rem; border: 1px solid #dfe7df; border-radius: 10px; }
+.cart-product-cell { display: flex; align-items: center; gap: .75rem; min-width: 220px; }
+.cart-thumb { width: 64px; height: 64px; object-fit: cover; border-radius: 12px; border: 1px solid #e4eee4; }
+.qty-controls { display: inline-flex; align-items: center; gap: .6rem; background: #f6faf6; border: 1px solid #dfeade; border-radius: 999px; padding: .25rem .5rem; }
+.qty-controls form { margin: 0; }
+.qty-btn { width: 30px; height: 30px; border-radius: 50%; border: 1px solid #bfd5c0; background: #fff; font-weight: 800; cursor: pointer; }
+.delete-icon { border: none; background: #fff3f3; color: #b42318; border-radius: 10px; padding: .55rem .7rem; cursor: pointer; }
+.badge.shield { background: #e8f7ed; color: #087443; border-color: #bde5c8; }
+.platform-warning { background: #fff8e6; border: 1px solid #f1d28a; border-radius: 14px; padding: .85rem; margin: .75rem 0; }
+@media (max-width: 760px) {
+  table { min-width: 720px; }
+  .cart-card { overflow-x: auto; }
+  .seller-dashboard-head, .section-title { gap: 1rem; align-items: flex-start; }
+  .inline-admin-form { min-width: 180px; }
+  .cart-thumb { width: 52px; height: 52px; }
+}

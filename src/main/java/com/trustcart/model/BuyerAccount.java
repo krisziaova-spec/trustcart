@@ -25,7 +25,20 @@ public class BuyerAccount {
     private Integer lifetimeLoyaltyPoints = 0;
     private BigDecimal lifetimeSpend = BigDecimal.ZERO;
     private String loyaltyTier = "Starter Green Member";
+
+    // TrustCart safety controls. Admin can block or deactivate buyers after verified reports.
+    private String status = "ACTIVE"; // ACTIVE, DEACTIVATED, BLOCKED
+    private Integer reportCount = 0;
+    @Column(length = 1500)
+    private String adminSafetyNote;
+    private LocalDateTime deactivatedAt;
+    private LocalDateTime blockedAt;
+
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    public boolean isActive() {
+        return "ACTIVE".equalsIgnoreCase(status) || status == null || status.isBlank();
+    }
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -59,6 +72,16 @@ public class BuyerAccount {
     public void setLifetimeSpend(BigDecimal lifetimeSpend) { this.lifetimeSpend = lifetimeSpend; }
     public String getLoyaltyTier() { return loyaltyTier; }
     public void setLoyaltyTier(String loyaltyTier) { this.loyaltyTier = loyaltyTier; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+    public Integer getReportCount() { return reportCount; }
+    public void setReportCount(Integer reportCount) { this.reportCount = reportCount; }
+    public String getAdminSafetyNote() { return adminSafetyNote; }
+    public void setAdminSafetyNote(String adminSafetyNote) { this.adminSafetyNote = adminSafetyNote; }
+    public LocalDateTime getDeactivatedAt() { return deactivatedAt; }
+    public void setDeactivatedAt(LocalDateTime deactivatedAt) { this.deactivatedAt = deactivatedAt; }
+    public LocalDateTime getBlockedAt() { return blockedAt; }
+    public void setBlockedAt(LocalDateTime blockedAt) { this.blockedAt = blockedAt; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

@@ -1,38 +1,125 @@
 package com.trustcart.controller;
 
+import com.trustcart.model.BuyerAccount;
+import com.trustcart.model.CustomerOrder;
 import com.trustcart.model.Product;
 import com.trustcart.model.Seller;
+import com.trustcart.model.SupportTicket;
+import com.trustcart.repository.BuyerAccountRepository;
+import com.trustcart.repository.CustomerOrderRepository;
 import com.trustcart.repository.ProductRepository;
 import com.trustcart.repository.SellerRepository;
+import com.trustcart.repository.SupportTicketRepository;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/trustcart-admin-portal-2026")
+@RequestMapping("/command-center")
 public class AdminController {
+    private static final String ADMIN_EMAIL = "admin@trustcart.ph";
+    private static final String ADMIN_PASSWORD = "trustadmin2026";
+
     private final SellerRepository sellerRepository;
     private final ProductRepository productRepository;
+    private final CustomerOrderRepository orderRepository;
+    private final SupportTicketRepository ticketRepository;
+    private final BuyerAccountRepository buyerRepository;
 
-    public AdminController(SellerRepository sellerRepository, ProductRepository productRepository) {
+    public AdminController(SellerRepository sellerRepository, ProductRepository productRepository,
+                           CustomerOrderRepository orderRepository, SupportTicketRepository ticketRepository,
+                           BuyerAccountRepository buyerRepository) {
         this.sellerRepository = sellerRepository;
         this.productRepository = productRepository;
+        this.orderRepository = orderRepository;
+        this.ticketRepository = ticketRepository;
+        this.buyerRepository = buyerRepository;
+    }
+
+    private boolean isAdmin(HttpSession session) {
+        return Boolean.TRUE.equals(session.getAttribute("adminLoggedIn"));
+    }
+
+    private String guard(HttpSession session) {
+        return isAdmin(session) ? null : "redirect:/command-center/login";
+    }
+
+    private void adminCommon(Model model, String activeTab) {
+        model.addAttribute("activeTab", activeTab);
+        model.addAttribute("openTicketCount", ticketRepository.countByStatus("OPEN"));
+        model.addAttribute("pendingSellerCount", sellerRepository.findByStatusOrderByCreatedAtDesc("PENDING").size()
+                + sellerRepository.findByStatusOrderByCreatedAtDesc("PENDING_REVIEW").size());
+        model.addAttribute("buyerReportCount", ticketRepository.findAllByOrderByCreatedAtDesc().stream()
+                .filter(t -> "BUYER_REPORT".equalsIgnoreCase(t.getType()))
+                .filter(t -> !"RESOLVED".equalsIgnoreCase(t.getStatus()) && !"CLOSED".equalsIgnoreCase(t.getStatus()))
+                .count());
+        model.addAttribute("adminBase", "/command-center");
+    }
+
+    @GetMapping("/login")
+    public String login(HttpSession session) {
+        if (isAdmin(session)) return "redirect:/command-center";
+        return "admin-login";
+    }
+
+    @PostMapping("/login")
+    public String doLogin(@RequestParam String email, @RequestParam String password, HttpSession session, RedirectAttributes ra) {
+        if (ADMIN_EMAIL.equalsIgnoreCase(email.trim()) && ADMIN_PASSWORD.equals(password)) {
+            session.setAttribute("adminLoggedIn", true);
+            return "redirect:/command-center";
+        }
+        ra.addFlashAttribute("error", "Invalid admin email or password.");
+        return "redirect:/command-center/login";
+    }
+
+    @PostMapping("/logout")
+    public String logout(HttpSession session) {
+        session.removeAttribute("adminLoggedIn");
+        return "redirect:/command-center/login";
     }
 
     @GetMapping
-    public String adminHome() {
-        return "redirect:/trustcart-admin-portal-2026/sellers";
+    public String dashboard(Model model, HttpSession session) {
+        String redirect = guard(session); if (redirect != null) return redirect;
+        adminCommon(model, "overview");
+        List<Seller> sellers = sellerRepository.findAll();
+        List<Product> products = productRepository.findAll();
+        List<CustomerOrder> orders = orderRepository.findAll();
+        BigDecimal totalSales = orders.stream().map(CustomerOrder::getTotal).filter(v -> v != null).reduce(BigDecimal.ZERO, BigDecimal::add);
+        long fbtProducts = products.stream().filter(Product::isFulfilledByTrustCart).count();
+        long fbsProducts = products.size() - fbtProducts;
+        model.addAttribute("totalSales", totalSales);
+        model.addAttribute("totalOrders", orders.size());
+        model.addAttribute("totalStores", sellers.size());
+        model.addAttribute("activeStores", sellers.stream().filter(s -> "ACTIVE".equalsIgnoreCase(s.getStatus()) || "APPROVED".equalsIgnoreCase(s.getStatus())).count());
+        model.addAttribute("totalProducts", products.size());
+        model.addAttribute("totalBuyers", buyerRepository.count());
+        model.addAttribute("deactivatedBuyers", buyerRepository.findAll().stream().filter(b -> !b.isActive()).count());
+        model.addAttribute("fbtProducts", fbtProducts);
+        model.addAttribute("fbsProducts", fbsProducts);
+        model.addAttribute("recentTickets", ticketRepository.findAllByOrderByCreatedAtDesc().stream().limit(5).toList());
+        model.addAttribute("recentOrders", orders.stream().sorted(Comparator.comparing(CustomerOrder::getCreatedAt).reversed()).limit(5).toList());
+        return "admin-dashboard";
     }
 
     @GetMapping("/sellers")
-    public String sellers(Model model) {
-        model.addAttribute("pendingSellers", sellerRepository.findByStatusOrderByCreatedAtDesc("PENDING"));
-        model.addAttribute("approvedSellers", sellerRepository.findByStatusOrderByCreatedAtDesc("APPROVED"));
-        model.addAttribute("rejectedSellers", sellerRepository.findByStatusOrderByCreatedAtDesc("REJECTED"));
+    public String sellers(Model model, HttpSession session) {
+        String redirect = guard(session); if (redirect != null) return redirect;
+        adminCommon(model, "sellers");
+        List<Seller> all = sellerRepository.findAll().stream().sorted(Comparator.comparing(Seller::getCreatedAt, Comparator.nullsLast(Comparator.reverseOrder()))).toList();
+        model.addAttribute("allSellers", all);
+        model.addAttribute("pendingSellers", all.stream().filter(s -> "PENDING".equalsIgnoreCase(s.getStatus()) || "PENDING_REVIEW".equalsIgnoreCase(s.getStatus())).toList());
+        model.addAttribute("activeSellers", all.stream().filter(s -> "ACTIVE".equalsIgnoreCase(s.getStatus()) || "APPROVED".equalsIgnoreCase(s.getStatus())).toList());
+        model.addAttribute("inactiveSellers", all.stream().filter(s -> "DEACTIVATED".equalsIgnoreCase(s.getStatus()) || "SUSPENDED".equalsIgnoreCase(s.getStatus()) || "REJECTED".equalsIgnoreCase(s.getStatus())).toList());
         return "admin-sellers";
     }
 
@@ -40,9 +127,10 @@ public class AdminController {
     public String approveSeller(@PathVariable Long id,
                                 @RequestParam(required = false, defaultValue = "false") boolean canUseFbt,
                                 @RequestParam(required = false) String note,
-                                RedirectAttributes ra) {
+                                RedirectAttributes ra, HttpSession session) {
+        String redirect = guard(session); if (redirect != null) return redirect;
         Seller seller = sellerRepository.findById(id).orElseThrow();
-        seller.setStatus("APPROVED");
+        seller.setStatus("ACTIVE");
         seller.setBusinessVerified(true);
         seller.setIdentityVerified(true);
         seller.setDocumentVerified(true);
@@ -54,14 +142,14 @@ public class AdminController {
         seller.setApprovedBy("TrustCart Admin");
         seller.setApprovedAt(LocalDateTime.now());
         sellerRepository.save(seller);
-        ra.addFlashAttribute("success", "Seller approved. Seller can now log in." + (canUseFbt ? " FBT access enabled." : ""));
-        return "redirect:/trustcart-admin-portal-2026/sellers";
+        ra.addFlashAttribute("success", "Store activated. Seller can now log in." + (canUseFbt ? " FBT access enabled." : ""));
+        return "redirect:/command-center/sellers";
     }
 
     @PostMapping("/sellers/{id}/reject")
-    public String rejectSeller(@PathVariable Long id,
-                               @RequestParam(required = false) String note,
-                               RedirectAttributes ra) {
+    public String rejectSeller(@PathVariable Long id, @RequestParam(required = false) String note,
+                               RedirectAttributes ra, HttpSession session) {
+        String redirect = guard(session); if (redirect != null) return redirect;
         Seller seller = sellerRepository.findById(id).orElseThrow();
         seller.setStatus("REJECTED");
         seller.setCanUseFbt(false);
@@ -69,11 +157,99 @@ public class AdminController {
         seller.setRequirementsNote(note == null || note.isBlank() ? "Application rejected by TrustCart admin." : note);
         sellerRepository.save(seller);
         ra.addFlashAttribute("success", "Seller application rejected.");
-        return "redirect:/trustcart-admin-portal-2026/sellers";
+        return "redirect:/command-center/sellers";
+    }
+
+    @PostMapping("/sellers/{id}/activate")
+    public String activateStore(@PathVariable Long id, RedirectAttributes ra, HttpSession session) {
+        String redirect = guard(session); if (redirect != null) return redirect;
+        Seller seller = sellerRepository.findById(id).orElseThrow();
+        seller.setStatus("ACTIVE");
+        seller.setRequirementsStatus("COMPLETED");
+        seller.setApprovedAt(seller.getApprovedAt() == null ? LocalDateTime.now() : seller.getApprovedAt());
+        sellerRepository.save(seller);
+        ra.addFlashAttribute("success", "Store activated and visible to buyers.");
+        return "redirect:/command-center/sellers";
+    }
+
+    @PostMapping("/sellers/{id}/deactivate")
+    public String deactivateStore(@PathVariable Long id, RedirectAttributes ra, HttpSession session) {
+        String redirect = guard(session); if (redirect != null) return redirect;
+        Seller seller = sellerRepository.findById(id).orElseThrow();
+        seller.setStatus("DEACTIVATED");
+        sellerRepository.save(seller);
+        ra.addFlashAttribute("success", "Store deactivated and hidden from marketplace.");
+        return "redirect:/command-center/sellers";
+    }
+
+    @PostMapping("/sellers/{id}/suspend")
+    public String suspendStore(@PathVariable Long id, RedirectAttributes ra, HttpSession session) {
+        String redirect = guard(session); if (redirect != null) return redirect;
+        Seller seller = sellerRepository.findById(id).orElseThrow();
+        seller.setStatus("SUSPENDED");
+        sellerRepository.save(seller);
+        ra.addFlashAttribute("success", "Store suspended due to admin review or buyer protection concern.");
+        return "redirect:/command-center/sellers";
+    }
+
+
+
+    @GetMapping("/buyers")
+    public String buyers(Model model, HttpSession session) {
+        String redirect = guard(session); if (redirect != null) return redirect;
+        adminCommon(model, "buyers");
+        List<BuyerAccount> buyers = buyerRepository.findAll().stream()
+                .sorted(Comparator.comparing(BuyerAccount::getCreatedAt, Comparator.nullsLast(Comparator.reverseOrder())))
+                .toList();
+        model.addAttribute("buyers", buyers);
+        model.addAttribute("activeBuyers", buyers.stream().filter(BuyerAccount::isActive).count());
+        model.addAttribute("restrictedBuyers", buyers.stream().filter(b -> !b.isActive()).count());
+        model.addAttribute("buyerReports", ticketRepository.findAllByOrderByCreatedAtDesc().stream()
+                .filter(t -> "BUYER_REPORT".equalsIgnoreCase(t.getType())).toList());
+        return "admin-buyers";
+    }
+
+    @PostMapping("/buyers/{id}/activate")
+    public String activateBuyer(@PathVariable Long id, RedirectAttributes ra, HttpSession session) {
+        String redirect = guard(session); if (redirect != null) return redirect;
+        BuyerAccount buyer = buyerRepository.findById(id).orElseThrow();
+        buyer.setStatus("ACTIVE");
+        buyer.setAdminSafetyNote("Buyer account reactivated by TrustCart Admin.");
+        buyer.setDeactivatedAt(null);
+        buyer.setBlockedAt(null);
+        buyerRepository.save(buyer);
+        ra.addFlashAttribute("success", "Buyer account activated.");
+        return "redirect:/command-center/buyers";
+    }
+
+    @PostMapping("/buyers/{id}/deactivate")
+    public String deactivateBuyer(@PathVariable Long id, @RequestParam(required = false) String note, RedirectAttributes ra, HttpSession session) {
+        String redirect = guard(session); if (redirect != null) return redirect;
+        BuyerAccount buyer = buyerRepository.findById(id).orElseThrow();
+        buyer.setStatus("DEACTIVATED");
+        buyer.setAdminSafetyNote(note == null || note.isBlank() ? "Deactivated after TrustCart safety review." : note);
+        buyer.setDeactivatedAt(LocalDateTime.now());
+        buyerRepository.save(buyer);
+        ra.addFlashAttribute("success", "Buyer account deactivated.");
+        return "redirect:/command-center/buyers";
+    }
+
+    @PostMapping("/buyers/{id}/block")
+    public String blockBuyer(@PathVariable Long id, @RequestParam(required = false) String note, RedirectAttributes ra, HttpSession session) {
+        String redirect = guard(session); if (redirect != null) return redirect;
+        BuyerAccount buyer = buyerRepository.findById(id).orElseThrow();
+        buyer.setStatus("BLOCKED");
+        buyer.setAdminSafetyNote(note == null || note.isBlank() ? "Blocked after repeated reports or serious safety concern." : note);
+        buyer.setBlockedAt(LocalDateTime.now());
+        buyerRepository.save(buyer);
+        ra.addFlashAttribute("success", "Buyer account blocked.");
+        return "redirect:/command-center/buyers";
     }
 
     @GetMapping("/fulfillment")
-    public String fulfillment(Model model) {
+    public String fulfillment(Model model, HttpSession session) {
+        String redirect = guard(session); if (redirect != null) return redirect;
+        adminCommon(model, "fulfillment");
         List<Product> products = productRepository.findByStatusOrderByCreatedAtDesc("APPROVED");
         model.addAttribute("pendingProducts", products.stream().filter(p -> "PENDING_TRUSTCART_REVIEW".equalsIgnoreCase(p.getFulfillmentStatus())).toList());
         model.addAttribute("trustCartProducts", products.stream().filter(Product::isFulfilledByTrustCart).toList());
@@ -82,10 +258,9 @@ public class AdminController {
     }
 
     @PostMapping("/fulfillment/{id}/approve")
-    public String approveFbt(@PathVariable Long id,
-                             @RequestParam(defaultValue = "0") int receivedStock,
-                             @RequestParam(required = false) String note,
-                             RedirectAttributes ra) {
+    public String approveFbt(@PathVariable Long id, @RequestParam(defaultValue = "0") int receivedStock,
+                             @RequestParam(required = false) String note, RedirectAttributes ra, HttpSession session) {
+        String redirect = guard(session); if (redirect != null) return redirect;
         Product product = productRepository.findById(id).orElseThrow();
         product.setFulfilledBy("TRUSTCART");
         product.setFulfillmentStatus("TRUSTCART_APPROVED");
@@ -98,11 +273,12 @@ public class AdminController {
         seller.setCanUseFbt(true);
         sellerRepository.save(seller);
         ra.addFlashAttribute("success", "Product marked as Fulfilled by TrustCart.");
-        return "redirect:/trustcart-admin-portal-2026/fulfillment";
+        return "redirect:/command-center/fulfillment";
     }
 
     @PostMapping("/fulfillment/{id}/seller")
-    public String setSellerFulfilled(@PathVariable Long id, RedirectAttributes ra) {
+    public String setSellerFulfilled(@PathVariable Long id, RedirectAttributes ra, HttpSession session) {
+        String redirect = guard(session); if (redirect != null) return redirect;
         Product product = productRepository.findById(id).orElseThrow();
         product.setFulfilledBy("SELLER");
         product.setFulfillmentStatus("SELLER_MANAGED");
@@ -110,6 +286,51 @@ public class AdminController {
         product.setFulfillmentNote("Seller stores, packs, and ships this product.");
         productRepository.save(product);
         ra.addFlashAttribute("success", "Product marked as Fulfilled by Seller.");
-        return "redirect:/trustcart-admin-portal-2026/fulfillment";
+        return "redirect:/command-center/fulfillment";
     }
+
+    @GetMapping("/tickets")
+    public String tickets(Model model, HttpSession session) {
+        String redirect = guard(session); if (redirect != null) return redirect;
+        adminCommon(model, "tickets");
+        model.addAttribute("tickets", ticketRepository.findAllByOrderByCreatedAtDesc());
+        return "admin-tickets";
+    }
+
+    @PostMapping("/tickets/{id}/update")
+    public String updateTicket(@PathVariable Long id, @RequestParam String status,
+                               @RequestParam(required = false) String adminNote,
+                               RedirectAttributes ra, HttpSession session) {
+        String redirect = guard(session); if (redirect != null) return redirect;
+        SupportTicket ticket = ticketRepository.findById(id).orElseThrow();
+        ticket.setStatus(status);
+        ticket.setAdminNote(adminNote);
+        ticket.setUpdatedAt(LocalDateTime.now());
+        ticketRepository.save(ticket);
+        ra.addFlashAttribute("success", "Ticket updated.");
+        return "redirect:/command-center/tickets";
+    }
+
+    @GetMapping("/analytics")
+    public String analytics(Model model, HttpSession session) {
+        String redirect = guard(session); if (redirect != null) return redirect;
+        adminCommon(model, "analytics");
+        List<CustomerOrder> orders = orderRepository.findAll();
+        List<Product> products = productRepository.findAll();
+        List<Seller> sellers = sellerRepository.findAll();
+        Map<String, BigDecimal> salesByStore = orders.stream().flatMap(o -> o.getItems().stream())
+                .collect(Collectors.groupingBy(i -> i.getSellerName() == null ? "Unknown Store" : i.getSellerName(),
+                        Collectors.mapping(i -> i.getLineTotal() == null ? BigDecimal.ZERO : i.getLineTotal(), Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))));
+        Map<String, BigDecimal> salesByProduct = orders.stream().flatMap(o -> o.getItems().stream())
+                .collect(Collectors.groupingBy(i -> i.getProductName() == null ? "Unknown Product" : i.getProductName(),
+                        Collectors.mapping(i -> i.getLineTotal() == null ? BigDecimal.ZERO : i.getLineTotal(), Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))));
+        model.addAttribute("orders", orders);
+        model.addAttribute("products", products);
+        model.addAttribute("sellers", sellers);
+        model.addAttribute("totalSales", orders.stream().map(CustomerOrder::getTotal).filter(v -> v != null).reduce(BigDecimal.ZERO, BigDecimal::add));
+        model.addAttribute("salesByStore", salesByStore.entrySet().stream().sorted(Map.Entry.<String, BigDecimal>comparingByValue().reversed()).limit(10).toList());
+        model.addAttribute("salesByProduct", salesByProduct.entrySet().stream().sorted(Map.Entry.<String, BigDecimal>comparingByValue().reversed()).limit(10).toList());
+        return "admin-analytics";
+    }
+
 }

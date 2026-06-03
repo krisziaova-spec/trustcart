@@ -84,15 +84,30 @@
     recognition.start();
   }
 
-  function openImagePanel(openFilePicker) {
+  function revealImagePanel() {
     if (!smartSearch) return;
     const panel = smartSearch.querySelector('[data-image-search-panel]');
     if (panel) panel.hidden = false;
     smartSearch.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function hideImagePanelIfEmpty() {
+    if (!smartSearch) return;
+    const panel = smartSearch.querySelector('[data-image-search-panel]');
+    const fileInput = smartSearch.querySelector('.image-search-file');
+    if (panel && (!fileInput || !fileInput.files || !fileInput.files.length)) {
+      panel.hidden = true;
+    }
+  }
+
+  function openImagePanel(openFilePicker) {
+    if (!smartSearch) return;
     const fileInput = smartSearch.querySelector('.image-search-file');
     if (openFilePicker && fileInput) {
-      setTimeout(function () { fileInput.click(); }, 120);
+      fileInput.click();
+      return;
     }
+    revealImagePanel();
   }
 
   function inferImageTerm(fileName, promptText) {
@@ -143,6 +158,11 @@
       const file = input.files && input.files[0];
       const preview = form.querySelector('.image-search-preview');
       const fileName = form.querySelector('[data-image-file-name]');
+      if (file) {
+        revealImagePanel();
+      } else {
+        hideImagePanelIfEmpty();
+      }
       if (file && preview) {
         preview.src = URL.createObjectURL(file);
         preview.hidden = false;
@@ -150,7 +170,7 @@
         preview.hidden = true;
         preview.removeAttribute('src');
       }
-      if (fileName) fileName.textContent = file ? file.name : 'No file selected';
+      if (fileName) fileName.textContent = file ? file.name : '';
       setStatus(form, file ? 'Selected image: ' + file.name : 'No image selected.');
     });
   });

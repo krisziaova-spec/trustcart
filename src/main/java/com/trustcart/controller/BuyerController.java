@@ -63,24 +63,41 @@ public class BuyerController {
                        @RequestParam(required = false) ProductCategory category,
                        @RequestParam(required = false) Boolean nearbyOnly,
                        @RequestParam(required = false) Boolean pickupOnly,
+                       @RequestParam(required = false) String searchMode,
+                       @RequestParam(required = false) String imageQuery,
                        Model model, HttpSession session) {
-        addCommon(model, session);
         if (nearbyOnly != null) session.setAttribute("nearbyOnly", nearbyOnly);
         if (pickupOnly != null) session.setAttribute("pickupOnly", pickupOnly);
+        addCommon(model, session);
+
+        String searchTerm = normalizeSearchTerm(q);
+        if (searchTerm == null && imageQuery != null && !imageQuery.isBlank()) {
+            searchTerm = normalizeSearchTerm(imageQuery);
+        }
+
         List<Product> products;
         if (category != null) {
             products = productRepository.findByCategoryAndStatusOrderByCreatedAtDesc(category, "APPROVED");
-        } else if (q != null && !q.isBlank()) {
-            products = productRepository.findByNameContainingIgnoreCaseAndStatusOrderByCreatedAtDesc(q.trim(), "APPROVED");
+        } else if (searchTerm != null) {
+            products = productRepository.searchApprovedProducts(searchTerm, "APPROVED");
         } else {
             products = productRepository.findByStatusOrderByCreatedAtDesc("APPROVED");
         }
+        products = applyMarketFilters(products, session);
         // Keep homepage clean but make all results accessible.
-        model.addAttribute("products", products.stream().limit(24).collect(Collectors.toList()));
-        model.addAttribute("query", q);
+        model.addAttribute("products", products.stream().limit(48).collect(Collectors.toList()));
+        model.addAttribute("query", searchTerm);
         model.addAttribute("selectedCategory", category);
+        model.addAttribute("searchMode", searchMode);
+        model.addAttribute("imageQuery", imageQuery);
         model.addAttribute("discounts", discountCodeRepository.findByActiveTrueOrderByCreatedAtDesc().stream().limit(4).collect(Collectors.toList()));
         return "home";
+    }
+
+    private String normalizeSearchTerm(String raw) {
+        if (raw == null || raw.isBlank()) return null;
+        String cleaned = raw.trim().replaceAll("\\s+", " ");
+        return cleaned.length() > 80 ? cleaned.substring(0, 80) : cleaned;
     }
 
     @PostMapping("/buyer/location")
@@ -352,7 +369,7 @@ public class BuyerController {
     @GetMapping("/autoship")
     public String autoship(Model model, HttpSession session) {
         addCommon(model, session);
-        model.addAttribute("eligibleProducts", productRepository.findByStatusOrderByCreatedAtDesc("APPROVED").stream().filter(Product::isSubscriptionEligible).limit(20).toList());
+        model.addAttribute("eligibleProducts", productRepository.findBySubscriptionEligibleTrueAndStatusOrderByCreatedAtDesc("APPROVED").stream().limit(48).toList());
         BuyerAccount buyer = currentBuyer(session);
         model.addAttribute("subscriptions", buyer == null ? List.of() : autoshipRepository.findByBuyerOrderByCreatedAtDesc(buyer));
         return "autoship";

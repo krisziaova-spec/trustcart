@@ -42,6 +42,12 @@ public class Seller {
     private boolean storeLocationVerified = true;
     @Column(length = 1000)
     private String locationProofUrl;
+    @Column(length = 1200)
+    private String storeProfileImageUrl;
+    @Column(length = 1200)
+    private String storeBannerImageUrl;
+    @Column(length = 1200)
+    private String storeDescription;
     private String status = "APPROVED";
     private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime approvedAt = LocalDateTime.now();
@@ -116,6 +122,12 @@ public class Seller {
     public void setStoreLocationVerified(boolean storeLocationVerified) { this.storeLocationVerified = storeLocationVerified; }
     public String getLocationProofUrl() { return locationProofUrl; }
     public void setLocationProofUrl(String locationProofUrl) { this.locationProofUrl = locationProofUrl; }
+    public String getStoreProfileImageUrl() { return storeProfileImageUrl; }
+    public void setStoreProfileImageUrl(String storeProfileImageUrl) { this.storeProfileImageUrl = storeProfileImageUrl; }
+    public String getStoreBannerImageUrl() { return storeBannerImageUrl; }
+    public void setStoreBannerImageUrl(String storeBannerImageUrl) { this.storeBannerImageUrl = storeBannerImageUrl; }
+    public String getStoreDescription() { return storeDescription; }
+    public void setStoreDescription(String storeDescription) { this.storeDescription = storeDescription; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
     public LocalDateTime getCreatedAt() { return createdAt; }

@@ -7,11 +7,18 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/seller")
@@ -19,13 +26,37 @@ public class SellerController {
     private final SellerRepository sellerRepository;
     private final ProductRepository productRepository;
     private final DiscountCodeRepository discountCodeRepository;
+    private final CustomerOrderRepository orderRepository;
 
-    public SellerController(SellerRepository sellerRepository, ProductRepository productRepository, DiscountCodeRepository discountCodeRepository) {
+    public SellerController(SellerRepository sellerRepository, ProductRepository productRepository,
+                            DiscountCodeRepository discountCodeRepository, CustomerOrderRepository orderRepository) {
         this.sellerRepository = sellerRepository;
         this.productRepository = productRepository;
         this.discountCodeRepository = discountCodeRepository;
+        this.orderRepository = orderRepository;
     }
 
+
+    private String saveUpload(MultipartFile file) throws IOException {
+        if (file == null || file.isEmpty()) return null;
+        String originalName = file.getOriginalFilename() == null ? "upload" : file.getOriginalFilename();
+        String extension = "";
+        int dot = originalName.lastIndexOf('.');
+        if (dot >= 0 && dot < originalName.length() - 1) {
+            extension = originalName.substring(dot).toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9.]", "");
+        }
+        if (extension.isBlank()) extension = ".jpg";
+        Path uploadDir = Path.of("uploads");
+        Files.createDirectories(uploadDir);
+        String fileName = UUID.randomUUID() + extension;
+        Path destination = uploadDir.resolve(fileName).normalize();
+        file.transferTo(destination.toFile());
+        return "/uploads/" + fileName;
+    }
+
+    private String firstNonBlank(String primary, String fallback) {
+        return primary == null || primary.isBlank() ? fallback : primary;
+    }
     private Seller currentSeller(HttpSession session) {
         Object id = session.getAttribute("sellerId");
         if (id instanceof Long sellerId) return sellerRepository.findById(sellerId).orElse(null);
@@ -101,6 +132,9 @@ public class SellerController {
         seller.setStoreLocationVerified(true);
         seller.setApprovedAt(LocalDateTime.now());
         seller.setApprovedBy("TrustCart Verification");
+        seller.setStoreDescription("Verified TrustCart seller with protected checkout and seller-area visibility only.");
+        seller.setStoreProfileImageUrl("https://images.unsplash.com/photo-1556745753-b2904692b3cd?auto=format&fit=crop&w=700&q=80");
+        seller.setStoreBannerImageUrl("https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1600&q=80");
         sellerRepository.save(seller);
         session.setAttribute("sellerId", seller.getId());
         return "redirect:/seller/dashboard";
@@ -111,9 +145,64 @@ public class SellerController {
         Seller seller = currentSeller(session);
         if (seller == null) return "redirect:/seller/login";
         sellerCommon(model, session);
-        model.addAttribute("products", productRepository.findBySellerOrderByCreatedAtDesc(seller));
-        model.addAttribute("discounts", discountCodeRepository.findBySellerOrderByCreatedAtDesc(seller));
+        List<Product> sellerProducts = productRepository.findBySellerOrderByCreatedAtDesc(seller);
+        List<DiscountCode> sellerDiscounts = discountCodeRepository.findBySellerOrderByCreatedAtDesc(seller);
+        List<CustomerOrder> sellerOrders = orderRepository.findOrdersForSeller(seller);
+        BigDecimal salesTotal = orderRepository.sumSalesForSeller(seller);
+        Long unitsSold = orderRepository.sumUnitsForSeller(seller);
+        model.addAttribute("products", sellerProducts);
+        model.addAttribute("discounts", sellerDiscounts);
+        model.addAttribute("orders", sellerOrders.stream().limit(20).toList());
+        model.addAttribute("salesTotal", salesTotal == null ? BigDecimal.ZERO : salesTotal);
+        model.addAttribute("unitsSold", unitsSold == null ? 0 : unitsSold);
+        model.addAttribute("orderCount", sellerOrders.size());
         return "seller-dashboard";
+    }
+
+    @GetMapping("/profile")
+    public String profile(Model model, HttpSession session) {
+        if (currentSeller(session) == null) return "redirect:/seller/login";
+        sellerCommon(model, session);
+        return "seller-profile-form";
+    }
+
+    @PostMapping("/profile")
+    public String updateProfile(@RequestParam String storeName,
+                                @RequestParam(required = false) String businessType,
+                                @RequestParam(required = false) String phone,
+                                @RequestParam(required = false) String storeDescription,
+                                @RequestParam(required = false) String storeProfileImageUrl,
+                                @RequestParam(required = false) String storeBannerImageUrl,
+                                @RequestParam(required = false) MultipartFile storeProfileImage,
+                                @RequestParam(required = false) MultipartFile storeBannerImage,
+                                @RequestParam(required = false) String sustainabilityBadge,
+                                @RequestParam(required = false) String ecoCommitment,
+                                @RequestParam(required = false) String storeCity,
+                                @RequestParam(required = false) String storeProvince,
+                                @RequestParam(required = false) Double latitude,
+                                @RequestParam(required = false) Double longitude,
+                                @RequestParam(required = false, defaultValue = "false") boolean pickupAvailable,
+                                @RequestParam(required = false, defaultValue = "5") Integer serviceRadiusKm,
+                                HttpSession session, RedirectAttributes ra) throws IOException {
+        Seller seller = currentSeller(session);
+        if (seller == null) return "redirect:/seller/login";
+        seller.setStoreName(storeName);
+        seller.setBusinessType(businessType);
+        seller.setPhone(phone);
+        seller.setStoreDescription(storeDescription);
+        seller.setStoreProfileImageUrl(firstNonBlank(saveUpload(storeProfileImage), storeProfileImageUrl));
+        seller.setStoreBannerImageUrl(firstNonBlank(saveUpload(storeBannerImage), storeBannerImageUrl));
+        seller.setSustainabilityBadge(sustainabilityBadge);
+        seller.setEcoCommitment(ecoCommitment);
+        seller.setStoreCity(storeCity);
+        seller.setStoreProvince(storeProvince);
+        if (latitude != null) seller.setLatitude(latitude);
+        if (longitude != null) seller.setLongitude(longitude);
+        seller.setPickupAvailable(pickupAvailable);
+        seller.setServiceRadiusKm(serviceRadiusKm == null ? 5 : serviceRadiusKm);
+        sellerRepository.save(seller);
+        ra.addFlashAttribute("success", "Storefront profile updated.");
+        return "redirect:/seller/dashboard";
     }
 
     @GetMapping("/products/new")
@@ -126,14 +215,19 @@ public class SellerController {
     @PostMapping("/products")
     public String createProduct(@RequestParam String name, @RequestParam String description,
                                 @RequestParam ProductCategory category, @RequestParam BigDecimal price,
-                                @RequestParam Integer stock, @RequestParam String imageUrl,
+                                @RequestParam Integer stock,
+                                @RequestParam(required = false) String imageUrl,
+                                @RequestParam(required = false) MultipartFile productImage,
+                                @RequestParam(required = false) String productOrigin,
+                                @RequestParam(required = false) String sustainabilityTag,
                                 @RequestParam(required = false, defaultValue = "false") boolean ecoFriendly,
                                 @RequestParam(required = false, defaultValue = "false") boolean locallySourced,
                                 @RequestParam(required = false, defaultValue = "false") boolean subscriptionEligible,
+                                @RequestParam(required = false, defaultValue = "5") int subscriptionDiscountPercent,
                                 @RequestParam(required = false, defaultValue = "false") boolean tryOnEligible,
                                 @RequestParam(required = false) String tryOnGender,
                                 @RequestParam(required = false) String tryOnAssetUrl,
-                                HttpSession session) {
+                                HttpSession session) throws IOException {
         Seller seller = currentSeller(session);
         if (seller == null) return "redirect:/seller/login";
         Product p = new Product();
@@ -142,11 +236,14 @@ public class SellerController {
         p.setCategory(category);
         p.setPrice(price);
         p.setStock(stock);
-        p.setImageUrl(imageUrl);
+        p.setImageUrl(firstNonBlank(saveUpload(productImage), firstNonBlank(imageUrl, "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=80")));
         p.setPhotoAltText(name + " product photo");
+        p.setProductOrigin(productOrigin == null || productOrigin.isBlank() ? seller.getPublicLocationLabel() : productOrigin);
+        p.setSustainabilityTag(sustainabilityTag == null || sustainabilityTag.isBlank() ? "Seller-managed verified listing" : sustainabilityTag);
         p.setEcoFriendly(ecoFriendly);
         p.setLocallySourced(locallySourced);
         p.setSubscriptionEligible(subscriptionEligible);
+        p.setSubscriptionDiscountPercent(Math.max(0, subscriptionDiscountPercent));
         p.setTryOnEligible(tryOnEligible);
         p.setTryOnGender(tryOnGender);
         p.setTryOnAssetUrl(tryOnAssetUrl);
@@ -173,6 +270,7 @@ public class SellerController {
                                  @RequestParam(defaultValue = "0") int percentOff,
                                  @RequestParam(defaultValue = "0") BigDecimal amountOff,
                                  @RequestParam(required = false, defaultValue = "false") boolean firstOrderOnly,
+                                 @RequestParam(required = false, defaultValue = "false") boolean subscriptionBoost,
                                  HttpSession session, RedirectAttributes ra) {
         Seller seller = currentSeller(session);
         if (seller == null) return "redirect:/seller/login";
@@ -187,6 +285,7 @@ public class SellerController {
         dc.setPercentOff(percentOff);
         dc.setAmountOff(amountOff);
         dc.setFirstOrderOnly(firstOrderOnly);
+        dc.setSubscriptionBoost(subscriptionBoost);
         dc.setSeller(seller);
         dc.setCreatedBySeller(seller.getStoreName());
         discountCodeRepository.save(dc);

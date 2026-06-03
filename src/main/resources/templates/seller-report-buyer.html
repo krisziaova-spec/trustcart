@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Report Buyer</title>
+    <link rel="icon" th:href="@{/favicon.png}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<main class="container">
+    <section class="form-card auth-card wide">
+        <span class="section-pill">Seller Safety</span>
+        <h1>Report Buyer</h1>
+        <p class="muted">Use this only for valid concerns such as fake orders, abusive behavior, repeated cancellation, or unsafe transaction behavior. TrustCart Admin will review before restricting any buyer.</p>
+        <form method="post" th:action="@{/seller/report-buyer}" enctype="multipart/form-data" class="stack-form">
+            <label>Buyer Email</label>
+            <input name="buyerEmail" type="email" placeholder="buyer@email.com" required>
+            <label>Order Code, if available</label>
+            <input name="orderCode" placeholder="TC-...">
+            <label>Reason / Concern</label>
+            <label>Attach proof<input type="file" name="proofFile" accept="image/*,.pdf,.doc,.docx"></label><textarea name="reason" rows="6" placeholder="Describe what happened and include any relevant details." required></textarea>
+            <button class="btn btn-primary">Submit Buyer Report</button>
+        </form>
+        <div class="auth-links"><a th:href="@{/seller/dashboard}">Back to dashboard</a></div>
+    </section>
+</main>
+</body>
+</html>

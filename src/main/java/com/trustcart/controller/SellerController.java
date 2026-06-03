@@ -1,6 +1,7 @@
 package com.trustcart.controller;
 
 import com.trustcart.model.CustomerOrder;
+import com.trustcart.model.DiscountCode;
 import com.trustcart.model.OrderItem;
 import com.trustcart.model.Product;
 import com.trustcart.model.ProductCategory;

@@ -3,26 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Buyer Login</title>
+    <title>TrustCart Command Center Login</title>
     <link rel="icon" th:href="@{/favicon.png}">
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
 <main class="auth-card">
     <img th:src="@{/img/logo-uploaded.png}" class="auth-logo" alt="TrustCart logo">
-    <p class="muted">Secure Shopping Starts Here</p>
-    <h1>Buyer Login</h1>
+    <p class="muted">Restricted Admin Access</p>
+    <h1>Command Center Login</h1>
     <p class="error" th:text="${error}"></p>
-    <p class="success" th:text="${success}"></p>
-    <form method="post">
-        <input name="email" type="email" placeholder="buyer@trustcart.ph" required>
-        <input name="password" type="password" placeholder="trust123" required>
-        <button class="btn btn-primary">Login</button>
+    <form method="post" th:action="@{/command-center/login}">
+        <input name="email" type="email" placeholder="admin@trustcart.ph" required>
+        <input name="password" type="password" placeholder="Admin password" required>
+        <button class="btn btn-primary">Login to Admin</button>
     </form>
     <div class="auth-links">
-        <a th:href="@{/buyer/register}">Create buyer account</a>
+        <a th:href="@{/}">Go to Store</a>
         <a th:href="@{/forgot-password(type='buyer')}">Forgot password?</a>
-        <a th:href="@{/}">Back to shop</a>
     </div>
 </main>
 </body>

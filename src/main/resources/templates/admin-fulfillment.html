@@ -1,51 +1,7 @@
-<!doctype html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Admin - Fulfillment Requests</title>
-    <link rel="icon" th:href="@{/favicon.png}">
-    <link rel="stylesheet" th:href="@{/css/styles.css}">
-</head>
-<body>
-<main class="container admin-page">
-    <div class="section-title">
-        <div><span class="section-pill">TrustCart Admin</span><h1>Fulfillment Requests</h1><p class="muted">Only admin can mark a product as Fulfilled by TrustCart after inventory is received/verified.</p></div>
-        <a class="btn btn-outline" th:href="@{/trustcart-admin-portal-2026/sellers}">Seller Applications</a>
-    </div>
-    <p class="success" th:text="${success}"></p>
-
-    <section class="table-card">
-        <h2>Pending FBT Review</h2>
-        <table>
-            <tr><th>Product</th><th>Seller</th><th>Current Stock</th><th>Note</th><th>Action</th></tr>
-            <tr th:each="p:${pendingProducts}">
-                <td><strong th:text="${p.name}">Product</strong><br><span class="badge" th:text="${p.fulfillmentLabel}">FBS</span></td>
-                <td th:text="${p.seller.storeName}">Seller</td>
-                <td th:text="${p.stock}">0</td>
-                <td th:text="${p.fulfillmentNote}">Note</td>
-                <td>
-                    <form th:action="@{/trustcart-admin-portal-2026/fulfillment/{id}/approve(id=${p.id})}" method="post" class="inline-admin-form">
-                        <input type="number" name="receivedStock" min="0" th:value="${p.stock}" placeholder="Received stock">
-                        <input name="note" placeholder="Inventory verification note">
-                        <button class="btn btn-primary">Approve FBT</button>
-                    </form>
-                    <form th:action="@{/trustcart-admin-portal-2026/fulfillment/{id}/seller(id=${p.id})}" method="post"><button class="btn btn-outline">Keep as FBS</button></form>
-                </td>
-            </tr>
-            <tr th:if="${pendingProducts.isEmpty()}"><td colspan="5">No pending FBT requests.</td></tr>
-        </table>
-    </section>
-
-    <section class="table-card">
-        <h2>Fulfilled by TrustCart Products</h2>
-        <table>
-            <tr><th>Product</th><th>Seller</th><th>TrustCart Stock</th><th>Status</th></tr>
-            <tr th:each="p:${trustCartProducts}">
-                <td th:text="${p.name}">Product</td><td th:text="${p.seller.storeName}">Seller</td><td th:text="${p.trustCartStock}">0</td><td><span class="badge shield">Fulfilled by TrustCart</span></td>
-            </tr>
-        </table>
-    </section>
-</main>
-</body>
-</html>
+<!doctype html><html lang="en" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Admin Fulfillment</title><link rel="icon" th:href="@{/favicon.png}"><link rel="stylesheet" th:href="@{/css/styles.css}"></head>
+<body><main class="container admin-page"><header class="admin-shell-header"><div><span class="section-pill">TrustCart Command Center</span><h1>Fulfillment Center</h1><p class="muted">Approve products for Fulfilled by TrustCart after inventory verification.</p></div><form th:action="@{/command-center/logout}" method="post"><button class="btn btn-outline">Logout</button></form></header><nav class="admin-tabs"><a th:href="@{/command-center}">Overview</a><a th:href="@{/command-center/sellers}">Stores</a><a class="active" th:href="@{/command-center/fulfillment}">Fulfillment</a><a th:href="@{/command-center/tickets}">Tickets</a><a th:href="@{/command-center/buyers}">Buyers</a><a th:href="@{/command-center/analytics}">Analytics</a></nav>
+<p class="success" th:text="${success}"></p>
+<section class="table-card"><h2>Pending FBT Requests</h2><table><tr><th>Product</th><th>Seller</th><th>Current Stock</th><th>Action</th></tr><tr th:each="p:${pendingProducts}"><td><strong th:text="${p.name}">Product</strong><br><small th:text="${p.fulfillmentNote}">Note</small></td><td th:text="${p.seller.storeName}">Seller</td><td th:text="${p.stock}">0</td><td><form th:action="@{/command-center/fulfillment/{id}/approve(id=${p.id})}" method="post" class="inline-admin-form"><input name="receivedStock" type="number" min="0" placeholder="Verified stock"><input name="note" placeholder="Inventory note"><button class="btn btn-primary">Approve FBT</button></form><form th:action="@{/command-center/fulfillment/{id}/seller(id=${p.id})}" method="post"><button class="btn btn-outline">Keep FBS</button></form></td></tr><tr th:if="${pendingProducts.isEmpty()}"><td colspan="4">No pending FBT requests.</td></tr></table></section>
+<section class="table-card"><h2>Fulfilled by TrustCart Products</h2><table><tr><th>Product</th><th>Seller</th><th>TrustCart Stock</th><th>Action</th></tr><tr th:each="p:${trustCartProducts}"><td th:text="${p.name}">Product</td><td th:text="${p.seller.storeName}">Seller</td><td th:text="${p.trustCartStock}">0</td><td><form th:action="@{/command-center/fulfillment/{id}/seller(id=${p.id})}" method="post"><button class="btn btn-outline">Move to FBS</button></form></td></tr></table></section>
+<section class="table-card"><h2>Fulfilled by Seller Products</h2><table><tr><th>Product</th><th>Seller</th><th>Status</th></tr><tr th:each="p:${sellerProducts}"><td th:text="${p.name}">Product</td><td th:text="${p.seller.storeName}">Seller</td><td><span class="badge" th:text="${p.fulfillmentStatus}">FBS</span></td></tr></table></section>
+</main></body></html>

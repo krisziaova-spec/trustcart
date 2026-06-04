@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Buyer Profile | TrustCart</title>
+    <link rel="icon" th:href="@{/favicon.png}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<nav class="nav">
+    <div class="nav-inner">
+        <a class="logo" th:href="@{/}"><img th:src="@{/img/logo-uploaded.png}" alt="TrustCart"></a>
+        <div class="nav-links buyer-clean-nav"><a th:href="@{/}">Shop</a><a th:href="@{/buyer/orders}">My Orders</a><a th:href="@{/buyer/messages}">Messages</a><a class="active-profile-link" th:href="@{/buyer/profile}">Profile</a><a class="logout-link" th:href="@{/buyer/logout}">Logout</a></div>
+    </div>
+</nav>
+<main class="container">
+    <section class="table-card buyer-profile-hero">
+        <div class="section-title">
+            <div>
+                <span class="section-pill">Buyer Account</span>
+                <h1 th:text="${buyer.fullName}">Buyer Name</h1>
+                <p class="muted" th:text="${buyer.email}">buyer@trustcart.ph</p>
+            </div>
+            <a class="btn btn-outline" th:href="@{/buyer/orders}">View My Orders</a>
+        </div>
+        <div class="seller-stats-grid compact-stats">
+            <article class="stat-card trustpoints-card"><span>Available TrustPoints</span><strong><span th:text="${buyer.loyaltyPointsBalance}">0</span></strong><small>1 point = ₱1 discount</small></article>
+            <article class="stat-card"><span>Pending Points</span><strong th:text="${pendingPoints}">0</strong><small>Credited after Confirm Received</small></article>
+            <article class="stat-card"><span>Lifetime Points</span><strong th:text="${buyer.lifetimeLoyaltyPoints}">0</strong><small>Earned from completed purchases</small></article>
+            <article class="stat-card"><span>Loyalty Tier</span><strong th:text="${buyer.loyaltyTier}">Starter Green Member</strong><small>Based on completed spend</small></article>
+        </div>
+        <div class="trustpoints-explainer">
+            <strong>How TrustPoints work:</strong>
+            <span>Earn <b>1 point for every ₱100</b> purchase. Points are credited after you confirm received delivery. Redeem points at checkout where <b>1 point = ₱1</b>.</span>
+        </div>
+    </section>
+
+    <section class="table-card">
+        <div class="section-title"><h2>Account Standing</h2><a class="btn btn-outline" th:href="@{/buyer/faq}">Buyer FAQ</a></div>
+        <div class="profile-standing-grid">
+            <div><span class="muted">Account Status</span><strong th:text="${buyer.status}">ACTIVE</strong></div>
+            <div><span class="muted">Verification</span><strong th:text="${buyer.verificationStatus}">VERIFIED</strong></div>
+            <div><span class="muted">Completed Orders</span><strong th:text="${completedOrders}">0</strong></div>
+            <div><span class="muted">Available TrustPoints</span><strong><span th:text="${buyer.loyaltyPointsBalance}">0</span> pts</strong></div>
+        </div>
+        <p class="risk-dashboard-note" th:if="${buyer.verificationStatus == 'VERIFICATION_REQUIRED' or buyer.verificationStatus == 'PENDING_REVIEW'}">Your account requires ID and face verification due to TrustCart safety review. Please complete verification to keep full access.</p>
+        <div class="footer-actions" th:if="${buyer.verificationStatus == 'VERIFICATION_REQUIRED' or buyer.verificationStatus == 'PENDING_REVIEW'}"><a class="btn btn-danger" th:href="@{/buyer/verification}">Complete Verification</a></div>
+    </section>
+
+    <section class="table-card support-profile-card">
+        <div class="section-title"><h2>Help & Support</h2><a class="btn btn-outline" th:href="@{/support/contact}">Open a Ticket</a></div>
+        <p class="muted">Need help with an order, payment, delivery, refund, or seller concern? Open a support ticket here and attach proof if needed.</p>
+        <div class="footer-actions">
+            <a class="btn btn-primary" th:href="@{/support/contact}">Open Support Ticket</a>
+            <a class="btn btn-outline" th:href="@{/buyer/faq}">Buyer FAQ</a>
+        </div>
+    </section>
+
+    <section class="table-card">
+        <div class="section-title"><h2>Recent Orders</h2><a class="btn btn-outline" th:href="@{/buyer/orders}">Open Order Center</a></div>
+        <table>
+            <tr><th>Order</th><th>Status</th><th>Total</th><th>Points</th></tr>
+            <tr th:each="o,iter:${orders}" th:if="${iter.index < 6}">
+                <td th:text="${o.orderCode}">TC</td>
+                <td><span class="badge" th:text="${o.orderStatus}">Status</span></td>
+                <td>₱<span th:text="${o.total}">0</span></td>
+                <td><span th:text="${o.loyaltyPointsEarned}">0</span> pts</td>
+            </tr>
+            <tr th:if="${orders.isEmpty()}"><td colspan="4">No purchases yet.</td></tr>
+        </table>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Buyer Verification | TrustCart</title>
+    <link rel="icon" th:href="@{/favicon.png}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<nav class="nav"><div class="nav-inner"><a class="logo" th:href="@{/}"><img th:src="@{/img/logo-uploaded.png}" alt="TrustCart"></a><div class="nav-links buyer-clean-nav"><a th:href="@{/}">Shop</a><a th:href="@{/buyer/orders}">My Orders</a><a th:href="@{/buyer/messages}">Messages</a><a th:href="@{/buyer/profile}">Profile</a><a class="logout-link" th:href="@{/buyer/logout}">Logout</a></div></div></nav>
+<main class="container">
+    <a class="btn btn-outline quick-back" href="javascript:history.back()">← Back</a>
+    <p class="success" th:text="${success}"></p><p class="error" th:text="${error}"></p>
+    <section class="form-card auth-card wide">
+        <span class="section-pill">TrustCart Buyer Verification</span>
+        <h1>Submit Valid ID and Face Verification</h1>
+        <p class="muted">For high-risk or under-review accounts, TrustCart may request valid ID and face verification to protect buyers, sellers, and the marketplace.</p>
+        <div class="store-risk-panel">
+            <strong>Current Account Standing</strong>
+            <div class="risk-meter" th:classappend="${buyer.riskLevel == 'HIGH'} ? ' high' : (${buyer.riskLevel == 'MEDIUM'} ? ' medium' : ' low')"><span></span></div>
+            <div class="risk-labels"><b>Low</b><b>Medium</b><b>High</b></div>
+            <small><span th:text="${buyer.riskLevel}">LOW</span> risk · <span th:text="${buyer.verificationStatus}">VERIFIED</span> · <span th:text="${buyer.credibilityScore}">95</span>/100</small>
+        </div>
+        <form th:action="@{/buyer/verification}" method="post" enctype="multipart/form-data" class="stack-form">
+            <label>Valid government ID image or PDF<input type="file" name="idProof" accept="image/*,.pdf"></label>
+            <label>Selfie / face verification photo<input type="file" name="facePhoto" accept="image/*"></label>
+            <label>Optional note<textarea name="note" placeholder="Add context for TrustCart Admin review"></textarea></label>
+            <button class="btn btn-primary">Submit Verification</button>
+        </form>
+        <div class="footer-actions"><a class="proof-link" th:if="${buyer.idProofUrl != null}" th:href="${buyer.idProofUrl}" target="_blank">View submitted ID</a><a class="proof-link" th:if="${buyer.faceVerificationUrl != null}" th:href="${buyer.faceVerificationUrl}" target="_blank">View submitted face photo</a></div>
+        <p class="tiny">Prototype note: For production, ID and face verification should use encrypted storage, clear consent, restricted admin access, and a retention policy.</p>
+    </section>
+</main>
+</body>
+</html>

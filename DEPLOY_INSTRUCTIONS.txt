@@ -1,0 +1,11 @@
+Deploy order:
+1. Backup database.
+2. Run database/migration-admin-security-hotfix.sql once on the existing database.
+3. Replace/push the full project.
+4. Render: Clear build cache and deploy.
+5. Test /, /buyer/profile, /seller/dashboard, and /command-center/risk.
+
+TrustPoints rule:
+- Earn 1 point per PHP 100 purchase.
+- 1 TrustPoint = PHP 1 discount.
+- Points are credited after Confirm Received.

@@ -17,7 +17,7 @@
 </div>
 <nav class="nav marketplace-nav">
     <div class="nav-inner">
-        <a class="logo" th:href="@{/}"><img th:src="@{/img/logo-uploaded.png}" alt="TrustCart"></a>
+        <a class="logo" th:href="@{/}"><img th:src="@{/img/logo-uploaded.png}" alt="TrustCart" onerror="this.onerror=null;this.src='/img/products/placeholder-product.png';"></a>
         <form class="header-search enhanced-search" data-search-form th:action="@{/}" method="get">
             <input class="search-input" type="text" name="q" placeholder="Search verified products, local goods, sustainable items" th:value="${query}">
             <input class="search-mode-input" type="hidden" name="searchMode" value="text">
@@ -188,7 +188,7 @@
         <div class="section-title"><h2>Trusted Products</h2><span class="muted" th:text="${products.size()} + ' approved items shown'">0 items</span></div>
         <div class="grid">
             <article class="product-card premium-card" th:each="product : ${products}">
-                <a class="product-photo-wrap" th:href="@{/product/{id}(id=${product.id})}"><img class="product-photo" th:src="${product.imageUrl}" th:alt="${product.photoAltText}"></a>
+                <a class="product-photo-wrap" th:href="@{/product/{id}(id=${product.id})}"><img class="product-photo" th:src="${product.imageUrl}" th:alt="${product.photoAltText}" onerror="this.onerror=null;this.src='/img/products/placeholder-product.png';"></a>
                 <div class="product-body">
                     <div class="badges"><span class="badge shield">Verified Seller</span><span class="badge shield" th:if="${product.fulfilledByTrustCart}">Fulfilled by TrustCart</span><span class="badge" th:unless="${product.fulfilledByTrustCart}">Fulfilled by Seller</span><a class="badge" th:href="@{/(category=${product.category})}" th:text="${product.category.displayName}">Category</a><span class="badge" th:if="${product.ecoFriendly}">Eco</span><a class="badge" th:if="${product.tryOnEligible}" th:href="@{/try-on}">Try-On</a><a class="badge" th:if="${product.subscriptionEligible}" th:href="@{/autoship}">Autoship</a></div>
                     <a class="product-name" th:href="@{/product/{id}(id=${product.id})}" th:text="${product.name}">Product Name</a>

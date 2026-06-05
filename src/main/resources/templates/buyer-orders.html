@@ -10,7 +10,7 @@
 <body>
 <nav class="nav">
     <div class="nav-inner">
-        <a class="logo" th:href="@{/}"><img th:src="@{/img/logo-uploaded.png}" alt="TrustCart"></a>
+        <a class="logo" th:href="@{/}"><img th:src="@{/img/logo-uploaded.png}" alt="TrustCart" onerror="this.onerror=null;this.src='/img/products/placeholder-product.png';"></a>
         <div class="nav-links buyer-clean-nav"><a th:href="@{/}">Shop</a><a th:href="@{/buyer/orders}">My Orders</a><a th:href="@{/buyer/messages}">Messages</a><a th:href="@{/buyer/profile}">Profile</a><a class="logout-link" th:href="@{/buyer/logout}">Logout</a></div>
     </div>
 </nav>
@@ -49,7 +49,7 @@
                     <span class="badge" th:text="${o.orderStatus}">Status</span>
                 </div>
                 <div class="purchase-item" th:each="item:${o.items}">
-                    <img th:if="${item.product != null}" th:src="${item.product.imageUrl}" alt="Product">
+                    <img th:if="${item.product != null}" th:src="${item.product.imageUrl}" alt="Product" onerror="this.onerror=null;this.src='/img/products/placeholder-product.png';">
                     <div class="purchase-info">
                         <strong th:text="${item.productName}">Product</strong>
                         <small th:text="${item.sellerName}">Seller</small>
@@ -81,7 +81,7 @@
             <article class="purchase-card" th:each="o:${completedOrders}">
                 <div class="purchase-head"><strong th:text="${o.orderCode}">TC</strong><span class="badge shield">Completed</span></div>
                 <div class="purchase-item" th:each="item:${o.items}">
-                    <img th:if="${item.product != null}" th:src="${item.product.imageUrl}" alt="Product">
+                    <img th:if="${item.product != null}" th:src="${item.product.imageUrl}" alt="Product" onerror="this.onerror=null;this.src='/img/products/placeholder-product.png';">
                     <div class="purchase-info"><strong th:text="${item.productName}">Product</strong><small th:text="${item.sellerName}">Seller</small><small>Qty: <span th:text="${item.quantity}">1</span></small></div>
                     <a class="btn btn-primary" th:if="${item.product != null}" th:href="@{|/product/${item.product.id}?reviewOrderCode=${o.orderCode}#reviews|}">Rate</a>
                 </div>

@@ -10,7 +10,7 @@
 <body>
 <nav class="nav">
     <div class="nav-inner">
-        <a class="logo" th:href="@{/}"><img th:src="@{/img/logo-uploaded.png}" alt="TrustCart"></a>
+        <a class="logo" th:href="@{/}"><img th:src="@{/img/logo-uploaded.png}" alt="TrustCart" onerror="this.onerror=null;this.src='/img/products/placeholder-product.png';"></a>
         <div class="nav-links">
             <a th:href="@{/}">Shop</a>
             <a th:href="@{/buyer/orders}" th:if="${buyerLoggedIn}">My Orders</a>
@@ -25,7 +25,7 @@
     <a class="btn btn-outline quick-back" href="javascript:history.back()">← Back</a>
     <p class="success" th:text="${success}"></p><p class="error" th:text="${error}"></p>
     <section class="detail-layout premium-detail-card">
-        <img class="detail-photo" th:src="${product.imageUrl}" th:alt="${product.name}">
+        <img class="detail-photo" th:src="${product.imageUrl}" th:alt="${product.name}" onerror="this.onerror=null;this.src='/img/products/placeholder-product.png';">
         <div>
             <div class="badges"><span class="badge shield">TrustCart Shield</span><span class="badge shield" th:if="${product.fulfilledByTrustCart}">Fulfilled by TrustCart</span><span class="badge" th:unless="${product.fulfilledByTrustCart}">Fulfilled by Seller</span><span class="badge" th:if="${product.ecoFriendly}">Eco</span><a class="badge" th:if="${product.subscriptionEligible}" th:href="@{/autoship}">Autoship Eligible</a><a class="badge" th:if="${product.tryOnEligible}" th:href="@{/try-on}">Virtual Try-On Available</a></div>
             <h1 th:text="${product.name}">Product</h1>

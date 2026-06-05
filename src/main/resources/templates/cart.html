@@ -16,7 +16,7 @@
         <table>
             <tr><th>Product</th><th>Fulfillment</th><th>Qty</th><th>Total</th><th></th></tr>
             <tr th:each="item:${items}">
-                <td class="cart-product-cell"><img class="cart-thumb" th:src="${item.product.imageUrl}" th:alt="${item.product.photoAltText}"><div><strong th:text="${item.product.name}">Product</strong><br><small th:text="${item.product.seller.storeName}">Seller</small></div></td>
+                <td class="cart-product-cell"><img class="cart-thumb" th:src="${item.product.imageUrl}" th:alt="${item.product.photoAltText}" onerror="this.onerror=null;this.src='/img/products/placeholder-product.png';"><div><strong th:text="${item.product.name}">Product</strong><br><small th:text="${item.product.seller.storeName}">Seller</small></div></td>
                 <td><span class="badge shield" th:if="${item.product.fulfilledByTrustCart}">Fulfilled by TrustCart</span><span class="badge" th:unless="${item.product.fulfilledByTrustCart}">Fulfilled by Seller</span></td>
                 <td>
                     <div class="qty-controls">

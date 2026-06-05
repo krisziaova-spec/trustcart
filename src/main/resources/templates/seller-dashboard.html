@@ -41,9 +41,9 @@
     </section>
 
     <section class="store-preview-card">
-        <img class="store-preview-banner" th:src="${#strings.isEmpty(seller.storeBannerImageUrl) ? 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1600&q=80' : seller.storeBannerImageUrl}" alt="Store banner preview">
+        <img class="store-preview-banner" th:src="${#strings.isEmpty(seller.storeBannerImageUrl) ? 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1600&q=80' : seller.storeBannerImageUrl}" alt="Store banner preview" onerror="this.onerror=null;this.src='/img/products/placeholder-product.png';">
         <div class="store-preview-body">
-            <img class="store-avatar" th:src="${#strings.isEmpty(seller.storeProfileImageUrl) ? 'https://images.unsplash.com/photo-1556745753-b2904692b3cd?auto=format&fit=crop&w=700&q=80' : seller.storeProfileImageUrl}" alt="Store profile photo">
+            <img class="store-avatar" th:src="${#strings.isEmpty(seller.storeProfileImageUrl) ? 'https://images.unsplash.com/photo-1556745753-b2904692b3cd?auto=format&fit=crop&w=700&q=80' : seller.storeProfileImageUrl}" alt="Store profile photo" onerror="this.onerror=null;this.src='/img/products/placeholder-product.png';">
             <div><h2 th:text="${seller.storeName}">Store Name</h2><p th:text="${#strings.isEmpty(seller.storeDescription) ? 'Add a store description to make your storefront more credible.' : seller.storeDescription}">Description</p><span class="badge" th:text="${seller.publicLocationLabel}">Area</span></div>
         </div>
     </section>
@@ -52,7 +52,7 @@
         <div class="section-title"><h2>Your Products</h2><a class="btn btn-outline" th:href="@{/seller/products/new}">Add Product</a></div>
         <div class="grid">
             <article class="product-card" th:each="p:${products}">
-                <img class="product-photo" th:src="${p.imageUrl}" th:alt="${p.photoAltText}">
+                <img class="product-photo" th:src="${p.imageUrl}" th:alt="${p.photoAltText}" onerror="this.onerror=null;this.src='/img/products/placeholder-product.png';">
                 <div class="product-body"><strong th:text="${p.name}">Product</strong><p>₱<span th:text="${p.price}">0</span></p><div class="badges"><span class="badge" th:text="${p.category.displayName}">Category</span><span class="badge shield" th:if="${p.fulfilledByTrustCart}">Fulfilled by TrustCart</span><span class="badge" th:unless="${p.fulfilledByTrustCart}">Fulfilled by Seller</span><span class="badge" th:if="${p.fulfillmentStatus == 'PENDING_TRUSTCART_REVIEW'}">FBT Pending Review</span><span class="badge" th:if="${p.subscriptionEligible}">Autoship</span></div></div>
             </article>
         </div>

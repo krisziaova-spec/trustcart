@@ -8,14 +8,14 @@
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
-<nav class="nav"><div class="nav-inner"><a class="logo" th:href="@{/}"><img th:src="@{/img/logo-uploaded.png}" alt="TrustCart"></a><div class="nav-links"><a th:href="@{/}">Shop</a><a th:href="@{/autoship}">Autoship</a><a th:href="@{/buyer/orders}" th:if="${buyerLoggedIn}">Orders</a><a th:href="@{/cart}">Cart (<span th:text="${cartCount}">0</span>)</a><a th:href="@{/buyer/logout}" th:if="${buyerLoggedIn}">Logout</a></div></div></nav>
+<nav class="nav"><div class="nav-inner"><a class="logo" th:href="@{/}"><img th:src="@{/img/logo-uploaded.png}" alt="TrustCart" onerror="this.onerror=null;this.src='/img/products/placeholder-product.png';"></a><div class="nav-links"><a th:href="@{/}">Shop</a><a th:href="@{/autoship}">Autoship</a><a th:href="@{/buyer/orders}" th:if="${buyerLoggedIn}">Orders</a><a th:href="@{/cart}">Cart (<span th:text="${cartCount}">0</span>)</a><a th:href="@{/buyer/logout}" th:if="${buyerLoggedIn}">Logout</a></div></div></nav>
 <main class="container">
     <a class="btn btn-outline quick-back" href="javascript:history.back()">← Back</a>
     <p class="success" th:text="${success}"></p><p class="error" th:text="${error}"></p>
     <section class="storefront-hero">
-        <img class="storefront-banner" th:src="${#strings.isEmpty(seller.storeBannerImageUrl) ? 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1600&q=80' : seller.storeBannerImageUrl}" alt="Store banner">
+        <img class="storefront-banner" th:src="${#strings.isEmpty(seller.storeBannerImageUrl) ? 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1600&q=80' : seller.storeBannerImageUrl}" alt="Store banner" onerror="this.onerror=null;this.src='/img/products/placeholder-product.png';">
         <div class="storefront-profile">
-            <img class="store-avatar large" th:src="${#strings.isEmpty(seller.storeProfileImageUrl) ? 'https://images.unsplash.com/photo-1556745753-b2904692b3cd?auto=format&fit=crop&w=700&q=80' : seller.storeProfileImageUrl}" alt="Store profile photo">
+            <img class="store-avatar large" th:src="${#strings.isEmpty(seller.storeProfileImageUrl) ? 'https://images.unsplash.com/photo-1556745753-b2904692b3cd?auto=format&fit=crop&w=700&q=80' : seller.storeProfileImageUrl}" alt="Store profile photo" onerror="this.onerror=null;this.src='/img/products/placeholder-product.png';">
             <div>
                 <div class="badges"><span class="badge shield">Verified Seller</span><span class="badge" th:text="${#strings.isEmpty(seller.sustainabilityBadge) ? 'TrustCart Seller' : seller.sustainabilityBadge}">Badge</span><span class="badge" th:text="${seller.protectedPickupLabel}">Pickup</span></div>
                 <h1 th:text="${seller.storeName}">Store Name</h1>
@@ -45,7 +45,7 @@
         <div class="section-title"><h2>Autoship from this Store</h2><a class="btn btn-outline" th:href="@{/autoship}">View Autoship</a></div>
         <div class="grid">
             <article class="product-card" th:each="product : ${subscriptionProducts}">
-                <a class="product-photo-wrap" th:href="@{/product/{id}(id=${product.id})}"><img class="product-photo" th:src="${product.imageUrl}" th:alt="${product.photoAltText}"></a>
+                <a class="product-photo-wrap" th:href="@{/product/{id}(id=${product.id})}"><img class="product-photo" th:src="${product.imageUrl}" th:alt="${product.photoAltText}" onerror="this.onerror=null;this.src='/img/products/placeholder-product.png';"></a>
                 <div class="product-body"><div class="badges"><span class="badge">Autoship</span><span class="badge" th:text="${product.category.displayName}">Category</span></div><a class="product-name" th:href="@{/product/{id}(id=${product.id})}" th:text="${product.name}">Product</a><div class="price">₱<span th:text="${product.price}">0</span></div></div>
             </article>
         </div>
@@ -55,7 +55,7 @@
         <div class="section-title"><h2>All Store Products</h2><span class="muted" th:text="${products.size()} + ' visible listings'">0 visible listings</span></div>
         <div class="grid">
             <article class="product-card premium-card" th:each="product : ${products}">
-                <a class="product-photo-wrap" th:href="@{/product/{id}(id=${product.id})}"><img class="product-photo" th:src="${product.imageUrl}" th:alt="${product.photoAltText}"></a>
+                <a class="product-photo-wrap" th:href="@{/product/{id}(id=${product.id})}"><img class="product-photo" th:src="${product.imageUrl}" th:alt="${product.photoAltText}" onerror="this.onerror=null;this.src='/img/products/placeholder-product.png';"></a>
                 <div class="product-body">
                     <div class="badges"><span class="badge shield">Shield</span><span class="badge" th:text="${product.category.displayName}">Category</span><span class="badge" th:if="${product.subscriptionEligible}">Autoship</span></div>
                     <a class="product-name" th:href="@{/product/{id}(id=${product.id})}" th:text="${product.name}">Product Name</a>

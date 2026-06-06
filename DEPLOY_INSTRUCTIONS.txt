@@ -1,0 +1,23 @@
+TRUSTCART FINAL DEPLOY INSTRUCTIONS
+
+1) Replace the whole project/repository with ALL files in this ZIP.
+   Do not copy selected files only.
+
+2) Confirm these required files exist before deploying:
+   src/main/java/com/trustcart/model/ProductCategory.java
+   src/main/java/com/trustcart/model/RefundRequest.java
+   src/main/java/com/trustcart/model/AutoshipSubscription.java
+   src/main/java/com/trustcart/service/CartService.java
+
+3) For existing database, run only:
+   database/migration-fbt-hotfix.sql
+
+4) Do NOT run database/supabase-setup.sql unless you want to reset all data.
+
+5) Hidden admin URLs:
+   /trustcart-admin-portal-2026/sellers
+   /trustcart-admin-portal-2026/fulfillment
+
+Render error note:
+If Render still shows cannot find symbol ProductCategory or CartService,
+the deployed repository is missing files. Re-upload/replace the whole project.

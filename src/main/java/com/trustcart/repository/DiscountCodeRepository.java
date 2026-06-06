@@ -7,7 +7,12 @@ import java.util.List;
 import java.util.Optional;
 
 public interface DiscountCodeRepository extends JpaRepository<DiscountCode, Long> {
-    Optional<DiscountCode> findByCodeIgnoreCase(String code);
+    List<DiscountCode> findAllByCodeIgnoreCaseOrderByIdAsc(String code);
+
+    default Optional<DiscountCode> findByCodeIgnoreCase(String code) {
+        return findAllByCodeIgnoreCaseOrderByIdAsc(code).stream().findFirst();
+    }
+
     List<DiscountCode> findByActiveTrueOrderByCreatedAtDesc();
     List<DiscountCode> findBySellerOrderByCreatedAtDesc(Seller seller);
 }

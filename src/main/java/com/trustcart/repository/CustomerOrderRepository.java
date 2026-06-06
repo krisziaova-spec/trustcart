@@ -10,12 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CustomerOrderRepository extends JpaRepository<CustomerOrder, Long> {
-    List<CustomerOrder> findAllByOrderCodeIgnoreCaseOrderByIdAsc(String orderCode);
-
-    default Optional<CustomerOrder> findByOrderCodeIgnoreCase(String orderCode) {
-        return findAllByOrderCodeIgnoreCaseOrderByIdAsc(orderCode).stream().findFirst();
-    }
-
+    Optional<CustomerOrder> findByOrderCodeIgnoreCase(String orderCode);
     List<CustomerOrder> findByEmailIgnoreCaseOrderByCreatedAtDesc(String email);
 
     @Query("""
@@ -55,3 +50,4 @@ public interface CustomerOrderRepository extends JpaRepository<CustomerOrder, Lo
             """)
     Long sumUnitsForSeller(@Param("seller") Seller seller);
 }
+

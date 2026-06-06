@@ -47,7 +47,7 @@ public class GiftRegistryController {
         model.addAttribute("buyerLoggedIn", buyer != null);
         model.addAttribute("buyer", buyer);
         model.addAttribute("cartCount", cartService.countItems(session));
-        model.addAttribute("categories", ProductCategory.storefrontCategories());
+        model.addAttribute("categories", ProductCategory.values());
     }
 
     @GetMapping("/registry")

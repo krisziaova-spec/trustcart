@@ -25,7 +25,6 @@ public class DataSeeder {
             Seller eco = seller(sellers,"EcoHome Essentials","ecohome@trustcart.ph","Sustainable home products","Low-Waste Packaging","Calamba","Laguna",14.2117,121.1653);
             Seller daily = seller(sellers,"Daily Essentials Co.","daily@trustcart.ph","FMCG and household essentials","Autoship Essentials","San Pablo City","Laguna",14.0740,121.3250);
             Seller pantry = seller(sellers,"FreshPack Staples","freshpack@trustcart.ph","Packaged goods and consumer staples","Sealed Packaged Goods","Calamba","Laguna",14.2104,121.1650);
-            Seller kitchen = seller(sellers,"Kusina San Pablo","kusina@trustcart.ph","Prepared meals and ready-to-cook local food","Nearby Food Seller","San Pablo City","Laguna",14.0702,121.3268);
             Seller chrys = seller(sellers,"Chrysanthemum Rice Depot","chrysanthemumrice@trustcart.ph","Local rice and grocery store","Verified Local Seller","San Pedro","Laguna",14.3440,121.0576);
             Seller lagunaFarm = seller(sellers,"Laguna Farmers Hub","lagunafarmers@trustcart.ph","Farm staples and rice supplier","Fulfilled by TrustCart Partner","San Pedro","Laguna",14.3475,121.0558); lagunaFarm.setCanUseFbt(true); sellers.save(lagunaFarm);
             Seller southGrain = seller(sellers,"South Grain Trading","southgrain@trustcart.ph","Rice trading store","Verified Local Seller","San Pedro","Laguna",14.3412,121.0610);
@@ -95,13 +94,6 @@ public class DataSeeder {
                 for(int i=0;i<women.length;i++) tryon(products,women[i],"WOMEN",wa[i],local,459+i*25);
             }
             seedEverydaySubscriptionGoods(products, daily, pantry, eco);
-            seedCommunityEssentialsAndSustainableGoods(products, daily, pantry, eco, local);
-            seedPreparedFoodAndMealKits(products, kitchen, local);
-            seedProfessionalTryOnItems(products, local);
-            seedToneMatchFashion(products, local);
-            repairDemoProductRecords(products);
-            repairTryOnAndToneMatchRecords(products);
-            normalizeEssentialCategories(products);
 
             seedDemoRiceAndLocalStores(products, chrys, lagunaFarm, southGrain, greenBasket, caviteRice, malagasang, goldenHarvest, caviteFresh, binanRice, southLuzon, dasmaFarm, kadiwaDasma, rosaFresh, valleyRice);
 
@@ -159,14 +151,14 @@ public class DataSeeder {
             baseIfMissing(repo, productName, ProductCategory.GROCERIES, prices[i % prices.length], seller,
                     "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=900&q=80",
                     true, false,
-                    "Fast-moving product for nearby seller search and community marketplace presentation.",
+                    "Demo fast-moving product for nearby seller search and presentation sample.",
                     seller.isCanUseFbt() ? "TrustCart hub inventory sample" : "Seller-managed local fulfillment");
             repo.findByNameIgnoreCase(productName).ifPresent(p -> {
                 if (seller.isCanUseFbt()) {
                     p.setFulfilledBy("TRUSTCART");
                     p.setFulfillmentStatus("TRUSTCART_APPROVED");
                     p.setTrustCartStock(p.getStock());
-                    p.setFulfillmentNote("Inventory verified and stored at a TrustCart partner hub.");
+                    p.setFulfillmentNote("Sample inventory verified and stored at TrustCart partner hub for demo.");
                     p.setEstimatedDelivery("ETA: TrustCart hub delivery");
                     repo.save(p);
                 }
@@ -174,201 +166,23 @@ public class DataSeeder {
         }
     }
 
-    private void seedCommunityEssentialsAndSustainableGoods(ProductRepository repo, Seller daily, Seller pantry, Seller eco, Seller local) {
-        baseIfMissing(repo,"Community Hygiene Kit",ProductCategory.GROCERIES,299,daily,"https://images.unsplash.com/photo-1584305574647-0cc949a2bb9f?auto=format&fit=crop&w=900&q=80",true,false,"Barangay-ready hygiene bundle with soap, alcohol, tissue, and basic care items.","Community essentials bundle");
-        baseIfMissing(repo,"Rice and Egg Community Bundle",ProductCategory.GROCERIES,549,local,"https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=900&q=80",true,false,"Local household food bundle for community pantry and family replenishment.","Local food essentials");
-        baseIfMissing(repo,"Sardines 6-Pack",ProductCategory.GROCERIES,189,pantry,"/img/products/canned-tuna.png",true,false,"Shelf-stable canned goods pack for everyday household needs.","Sealed pantry pack");
-        baseIfMissing(repo,"Instant Noodles Family Pack",ProductCategory.GROCERIES,165,pantry,"https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?auto=format&fit=crop&w=900&q=80",true,false,"Affordable household food pack for quick meals and emergency pantry use.","Budget pantry staple");
-        baseIfMissing(repo,"Local Coffee Sachet Bundle",ProductCategory.GROCERIES,120,pantry,"https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=900&q=80",true,false,"Community-friendly coffee bundle for daily household consumption.","Sealed local pantry goods");
-        baseIfMissing(repo,"Bath Soap Family Pack",ProductCategory.GROCERIES,145,daily,"https://images.unsplash.com/photo-1607006483224-37fb2fabc3fa?auto=format&fit=crop&w=900&q=80",true,false,"Family-size personal care basic for repeat replenishment.","Everyday hygiene essential");
-        baseIfMissing(repo,"Sanitary Pads Value Pack",ProductCategory.GROCERIES,159,daily,"https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=900&q=80",true,false,"Essential care item for household and community support purchases.","Personal care essential");
-        baseIfMissing(repo,"Soy Sauce and Vinegar Bundle",ProductCategory.GROCERIES,138,pantry,"https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=900&q=80",true,false,"Basic cooking condiments for Filipino household kitchens.","Kitchen staples bundle");
-        baseIfMissing(repo,"Locally Packed Salt and Sugar Set",ProductCategory.GROCERIES,95,local,"https://images.unsplash.com/photo-1587486937303-32eaa2134b78?auto=format&fit=crop&w=900&q=80",true,false,"Affordable local pantry staples for daily cooking needs.","Local pantry essentials");
-        baseIfMissing(repo,"Drinking Water Refill Voucher",ProductCategory.GROCERIES,75,daily,"https://images.unsplash.com/photo-1523362628745-0c100150b504?auto=format&fit=crop&w=900&q=80",true,false,"Refill voucher for drinking water access in local communities.","Refill-first household essential");
-
-        baseIfMissing(repo,"Reusable Eco Bag 3-Pack",ProductCategory.SUSTAINABLE_PRODUCTS,179,eco,"https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=80",true,false,"Washable reusable bags for local market and grocery purchases.","Reusable alternative to single-use plastic");
-        baseIfMissing(repo,"Bamboo Toothbrush Family Pack",ProductCategory.SUSTAINABLE_PRODUCTS,199,eco,"https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?auto=format&fit=crop&w=900&q=80",true,false,"Family pack of bamboo toothbrushes for low-waste personal care.","Bamboo and low-waste hygiene");
-        baseIfMissing(repo,"Refillable Dish Soap Starter Kit",ProductCategory.SUSTAINABLE_PRODUCTS,249,eco,"https://images.unsplash.com/photo-1626806819282-2c1dc01a5e0c?auto=format&fit=crop&w=900&q=80",true,false,"Starter bottle with refill pouch to reduce plastic use.","Refill system for household cleaning");
-        baseIfMissing(repo,"Eco Laundry Sheets",ProductCategory.SUSTAINABLE_PRODUCTS,229,eco,"https://images.unsplash.com/photo-1626806819282-2c1dc01a5e0c?auto=format&fit=crop&w=900&q=80",true,false,"Lightweight laundry sheets for lower packaging waste and easier delivery.","Low-waste laundry option");
-        baseIfMissing(repo,"Bamboo Utensil Set",ProductCategory.SUSTAINABLE_PRODUCTS,159,local,"https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=900&q=80",true,false,"Portable reusable utensil set for school, office, and travel.","Reusable dining essential");
-        baseIfMissing(repo,"Beeswax Food Wrap Set",ProductCategory.SUSTAINABLE_PRODUCTS,219,eco,"https://images.unsplash.com/photo-1584346133934-a3afd2a33c4c?auto=format&fit=crop&w=900&q=80",true,false,"Reusable food wraps for household food storage.","Plastic-wrap alternative");
-        baseIfMissing(repo,"Coconut Coir Scrub Pads",ProductCategory.SUSTAINABLE_PRODUCTS,99,local,"https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?auto=format&fit=crop&w=900&q=80",true,false,"Local coconut-fiber scrub pads for dishes and cleaning.","Locally sourced biodegradable scrub");
-        baseIfMissing(repo,"Abaca Market Basket",ProductCategory.SUSTAINABLE_PRODUCTS,499,local,"https://images.unsplash.com/photo-1603204077779-bed963ea7d0e?auto=format&fit=crop&w=900&q=80",false,false,"Locally made abaca basket for market shopping and home storage.","Local Filipino sustainable craft");
-        baseIfMissing(repo,"Stainless Tumbler 500ml",ProductCategory.SUSTAINABLE_PRODUCTS,299,eco,"https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&w=900&q=80",true,false,"Reusable tumbler for school, office, and community events.","Reusable bottle alternative");
-        baseIfMissing(repo,"Compost Starter Kit",ProductCategory.SUSTAINABLE_PRODUCTS,349,eco,"https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?auto=format&fit=crop&w=900&q=80",false,false,"Starter kit for household composting and waste reduction.","Waste reduction starter kit");
-        baseIfMissing(repo,"Solar Study Lamp",ProductCategory.SUSTAINABLE_PRODUCTS,399,eco,"https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=900&q=80",false,false,"Rechargeable study lamp for energy-saving community use.","Energy-saving household item");
-    }
-
-    private void seedPreparedFoodAndMealKits(ProductRepository repo, Seller kitchen, Seller local) {
-        preparedFoodIfMissing(repo,"Chicken Adobo Rice Meal",149,kitchen,"https://images.unsplash.com/photo-1562967916-eb82221dfb36?auto=format&fit=crop&w=900&q=80","Ready-to-eat Filipino meal available only from nearby food sellers.");
-        preparedFoodIfMissing(repo,"Pancit Bihon Bilao",499,kitchen,"https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?auto=format&fit=crop&w=900&q=80","Freshly prepared local sharing tray for same-day nearby delivery.");
-        preparedFoodIfMissing(repo,"Lumpiang Shanghai Party Tray",389,kitchen,"https://images.unsplash.com/photo-1567620832903-9fc6debc209f?auto=format&fit=crop&w=900&q=80","Ready-to-eat party tray available within close delivery range.");
-        preparedFoodIfMissing(repo,"Ready-to-Cook Marinated Chicken",259,kitchen,"https://images.unsplash.com/photo-1604503468506-a8da13d82791?auto=format&fit=crop&w=900&q=80","Ready-to-cook local food pack for nearby household orders.");
-        preparedFoodIfMissing(repo,"Sinigang Meal Kit",299,kitchen,"https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=900&q=80","Ready-to-cook soup kit with local ingredients for same-day fulfillment.");
-        preparedFoodIfMissing(repo,"Local Kakanin Box",199,local,"https://images.unsplash.com/photo-1606312619070-d48b4c652a52?auto=format&fit=crop&w=900&q=80","Community-made Filipino snacks available through nearby sellers.");
-    }
-
-    private void preparedFoodIfMissing(ProductRepository repo, String name, int price, Seller seller, String image, String description) {
-        if (repo.findByNameIgnoreCase(name).isPresent()) return;
-        Product p = new Product();
-        p.setName(name);
-        p.setDescription(description + " Food listings are shown only within a close local range for quality and consumption safety.");
-        p.setCategory(ProductCategory.PREPARED_FOODS);
-        p.setPrice(BigDecimal.valueOf(price));
-        p.setStock(35);
-        p.setEcoFriendly(true);
-        p.setSustainabilityTag("Nearby-only prepared food");
-        p.setTrustScore(94);
-        p.setGreenScore(90);
-        p.setImageUrl(image);
-        p.setProductOrigin(seller.getPublicLocationLabel());
-        p.setWarrantyPolicy("Same-day protected order handling. Food availability depends on local seller range and preparation time.");
-        p.setSubscriptionEligible(false);
-        p.setPhotoAltText(name + " local prepared food photo");
-        p.setStockStatus("Prepared today");
-        p.setEstimatedDelivery("Nearby only · Same-day");
-        p.setReviewSummary("Verified local food seller. Prepared-food visibility is restricted to nearby buyers.");
-        p.setRedFlagSummary("Close-range purchase only to reduce spoilage and preserve food quality.");
-        p.setSeller(seller);
-        repo.save(p);
-    }
-
-    private void seedProfessionalTryOnItems(ProductRepository repo, Seller seller) {
-        tryonIfMissing(repo,"Men Realistic T-Shirt Try-On","MEN","/img/tryon/men-realistic-tshirt.png",seller,399);
-        tryonIfMissing(repo,"Women Realistic Dress Try-On","WOMEN","/img/tryon/women-realistic-dress.png",seller,499);
-    }
-
-    private void tryonIfMissing(ProductRepository repo, String name, String gender, String asset, Seller seller, int price) {
-        if (repo.findByNameIgnoreCase(name).isPresent()) return;
-        tryon(repo, name, gender, asset, seller, price);
-    }
-
-    private void seedToneMatchFashion(ProductRepository repo, Seller seller) {
-        baseIfMissing(repo,"Spring Warm Coral Top",ProductCategory.FASHION,389,seller,"/img/products/tone-spring-coral-top.png",false,false,"ToneMatch Korean color analysis: Spring Warm. Best for peach, coral, ivory, light yellow, and warm beige clothing palettes.","ToneMatch: Spring Warm");
-        baseIfMissing(repo,"Spring Warm Ivory Shirt",ProductCategory.FASHION,349,seller,"/img/products/tone-spring-ivory-shirt.png",false,false,"ToneMatch Korean color analysis: Spring Warm. Recommended for clear warm and bright clothing colors.","ToneMatch: Spring Warm");
-        baseIfMissing(repo,"Summer Cool Lavender Blouse",ProductCategory.FASHION,429,seller,"/img/products/tone-summer-lavender-blouse.png",false,false,"ToneMatch Korean color analysis: Summer Cool. Best for lavender, powder blue, soft pink, cool gray, and pearl white.","ToneMatch: Summer Cool");
-        baseIfMissing(repo,"Summer Cool Powder Blue Top",ProductCategory.FASHION,499,seller,"/img/products/tone-summer-powder-blue-top.png",false,false,"ToneMatch Korean color analysis: Summer Cool. Recommended for soft cool and muted clothing colors.","ToneMatch: Summer Cool");
-        baseIfMissing(repo,"Autumn Warm Olive Overshirt",ProductCategory.FASHION,529,seller,"/img/products/tone-autumn-olive-overshirt.png",false,false,"ToneMatch Korean color analysis: Autumn Warm. Best for olive, camel, terracotta, mustard, and chocolate brown.","ToneMatch: Autumn Warm");
-        baseIfMissing(repo,"Autumn Warm Camel Shirt",ProductCategory.FASHION,599,seller,"/img/products/tone-autumn-camel-shirt.png",false,false,"ToneMatch Korean color analysis: Autumn Warm. Recommended for earthy warm clothing palettes.","ToneMatch: Autumn Warm");
-        baseIfMissing(repo,"Winter Cool Black Top",ProductCategory.FASHION,799,seller,"/img/products/tone-winter-black-top.png",false,false,"ToneMatch Korean color analysis: Winter Cool. Best for black, white, navy, royal blue, burgundy, and high contrast colors.","ToneMatch: Winter Cool");
-        baseIfMissing(repo,"Winter Cool Navy Dress",ProductCategory.FASHION,699,seller,"/img/products/tone-winter-navy-dress.png",false,false,"ToneMatch Korean color analysis: Winter Cool. Recommended for sharp cool and high-contrast fashion colors.","ToneMatch: Winter Cool");
-    }
-
-    private void repairDemoProductRecords(ProductRepository repo) {
-        setProductImage(repo,"Canned Tuna 6-Pack","/img/products/canned-tuna.png");
-        setProductImage(repo,"Paper Towel 6 Rolls","/img/products/paper-towel.png");
-        repo.findAll().stream()
-                .filter(product -> product.getImageUrl() == null || product.getImageUrl().isBlank())
-                .forEach(product -> {
-                    product.setImageUrl("/img/products/placeholder-product.png");
-                    repo.save(product);
-                });
-    }
-
-    private void setProductImage(ProductRepository repo, String productName, String imageUrl) {
-        repo.findByNameIgnoreCase(productName).ifPresent(product -> {
-            product.setImageUrl(imageUrl);
-            product.setPhotoAltText(productName + " product photo");
-            repo.save(product);
-        });
-    }
-
-    private void repairTryOnAndToneMatchRecords(ProductRepository repo) {
-        archiveOldTryOnProduct(repo,"Men Basic T-Shirt - Green");
-        archiveOldTryOnProduct(repo,"Men Basic T-Shirt - Navy");
-        archiveOldTryOnProduct(repo,"Men Basic T-Shirt - White");
-        archiveOldTryOnProduct(repo,"Men Basic T-Shirt - Black");
-        archiveOldTryOnProduct(repo,"Women Simple Dress - Sage");
-        archiveOldTryOnProduct(repo,"Women Simple Dress - Rose");
-        archiveOldTryOnProduct(repo,"Women Simple Dress - Navy");
-        archiveOldTryOnProduct(repo,"Women Simple Dress - Cream");
-        setTryOnProduct(repo,"Men Realistic T-Shirt Try-On","MEN","/img/tryon/men-realistic-tshirt.png");
-        setTryOnProduct(repo,"Women Realistic Dress Try-On","WOMEN","/img/tryon/women-realistic-dress.png");
-
-        repairToneProduct(repo,"Spring Warm Coral Top","Spring Warm Coral Top","/img/products/tone-spring-coral-top.png","ToneMatch Korean color analysis: Spring Warm. Best for peach, coral, ivory, light yellow, and warm beige clothing palettes.","ToneMatch: Spring Warm");
-        repairToneProduct(repo,"Spring Warm Ivory Shirt","Spring Warm Ivory Shirt","/img/products/tone-spring-ivory-shirt.png","ToneMatch Korean color analysis: Spring Warm. Recommended for clear warm and bright clothing colors.","ToneMatch: Spring Warm");
-        repairToneProduct(repo,"Summer Cool Lavender Blouse","Summer Cool Lavender Blouse","/img/products/tone-summer-lavender-blouse.png","ToneMatch Korean color analysis: Summer Cool. Best for lavender, powder blue, soft pink, cool gray, and pearl white.","ToneMatch: Summer Cool");
-        repairToneProduct(repo,"Summer Cool Powder Blue Cardigan","Summer Cool Powder Blue Top","/img/products/tone-summer-powder-blue-top.png","ToneMatch Korean color analysis: Summer Cool. Recommended for soft cool and muted clothing colors.","ToneMatch: Summer Cool");
-        repairToneProduct(repo,"Summer Cool Powder Blue Top","Summer Cool Powder Blue Top","/img/products/tone-summer-powder-blue-top.png","ToneMatch Korean color analysis: Summer Cool. Recommended for soft cool and muted clothing colors.","ToneMatch: Summer Cool");
-        repairToneProduct(repo,"Autumn Warm Olive Overshirt","Autumn Warm Olive Overshirt","/img/products/tone-autumn-olive-overshirt.png","ToneMatch Korean color analysis: Autumn Warm. Best for olive, camel, terracotta, mustard, and chocolate brown.","ToneMatch: Autumn Warm");
-        repairToneProduct(repo,"Autumn Warm Camel Pants","Autumn Warm Camel Shirt","/img/products/tone-autumn-camel-shirt.png","ToneMatch Korean color analysis: Autumn Warm. Recommended for earthy warm clothing palettes.","ToneMatch: Autumn Warm");
-        repairToneProduct(repo,"Autumn Warm Camel Shirt","Autumn Warm Camel Shirt","/img/products/tone-autumn-camel-shirt.png","ToneMatch Korean color analysis: Autumn Warm. Recommended for earthy warm clothing palettes.","ToneMatch: Autumn Warm");
-        repairToneProduct(repo,"Winter Cool Black Blazer","Winter Cool Black Top","/img/products/tone-winter-black-top.png","ToneMatch Korean color analysis: Winter Cool. Best for black, white, navy, royal blue, burgundy, and high contrast colors.","ToneMatch: Winter Cool");
-        repairToneProduct(repo,"Winter Cool Black Top","Winter Cool Black Top","/img/products/tone-winter-black-top.png","ToneMatch Korean color analysis: Winter Cool. Best for black, white, navy, royal blue, burgundy, and high contrast colors.","ToneMatch: Winter Cool");
-        repairToneProduct(repo,"Winter Cool Navy Dress","Winter Cool Navy Dress","/img/products/tone-winter-navy-dress.png","ToneMatch Korean color analysis: Winter Cool. Recommended for sharp cool and high-contrast fashion colors.","ToneMatch: Winter Cool");
-    }
-
-    private void archiveOldTryOnProduct(ProductRepository repo, String productName) {
-        repo.findByNameIgnoreCase(productName).ifPresent(product -> {
-            product.setStatus("ARCHIVED");
-            product.setTryOnEligible(false);
-            product.setTryOnGender(null);
-            product.setTryOnAssetUrl(null);
-            repo.save(product);
-        });
-    }
-
-    private void setTryOnProduct(ProductRepository repo, String productName, String gender, String assetUrl) {
-        repo.findByNameIgnoreCase(productName).ifPresent(product -> {
-            product.setCategory(ProductCategory.FASHION);
-            product.setImageUrl(assetUrl);
-            product.setPhotoAltText(productName + " try-on product photo");
-            product.setTryOnEligible(true);
-            product.setTryOnGender(gender);
-            product.setTryOnAssetUrl(assetUrl);
-            repo.save(product);
-        });
-    }
-
-    private void repairToneProduct(ProductRepository repo, String currentName, String cleanName, String imageUrl, String description, String tag) {
-        repo.findByNameIgnoreCase(currentName).ifPresent(product -> {
-            product.setName(cleanName);
-            product.setCategory(ProductCategory.FASHION);
-            product.setImageUrl(imageUrl);
-            product.setPhotoAltText(cleanName + " ToneMatch product photo");
-            product.setDescription(description);
-            product.setSustainabilityTag(tag);
-            product.setTryOnEligible(false);
-            product.setTryOnGender(null);
-            product.setTryOnAssetUrl(null);
-            repo.save(product);
-        });
-    }
-
-    private void normalizeEssentialCategories(ProductRepository repo) {
-        EnumSet<ProductCategory> legacyEssentialCategories = EnumSet.of(
-                ProductCategory.FMCG,
-                ProductCategory.CONVENIENCE_GOODS,
-                ProductCategory.CONSUMER_STAPLES,
-                ProductCategory.EVERYDAY_ESSENTIALS,
-                ProductCategory.DAILY_NECESSITIES,
-                ProductCategory.PACKAGED_GOODS
-        );
-        repo.findAll().stream()
-                .filter(product -> product.getCategory() != null && legacyEssentialCategories.contains(product.getCategory()))
-                .forEach(product -> {
-                    product.setCategory(ProductCategory.GROCERIES);
-                    repo.save(product);
-                });
-    }
-
     private void seedEverydaySubscriptionGoods(ProductRepository repo, Seller daily, Seller pantry, Seller eco) {
-        baseIfMissing(repo,"Eco Laundry Detergent 1L",ProductCategory.GROCERIES,189,daily,"https://images.unsplash.com/photo-1626806819282-2c1dc01a5e0c?auto=format&fit=crop&w=900&q=80",true,false,"Fast-moving household detergent for repeat purchase.","Low-waste refill option available");
-        baseIfMissing(repo,"Dishwashing Liquid Refill 1L",ProductCategory.GROCERIES,129,daily,"https://images.unsplash.com/photo-1626806819282-2c1dc01a5e0c?auto=format&fit=crop&w=900&q=80",true,false,"Repeat-use kitchen cleaning essential.","Refill-ready packaged goods");
-        baseIfMissing(repo,"Hand Soap Refill Pack",ProductCategory.GROCERIES,99,daily,"https://images.unsplash.com/photo-1584305574647-0cc949a2bb9f?auto=format&fit=crop&w=900&q=80",true,false,"Convenience goods for household hygiene.","Reduced plastic refill pack");
-        baseIfMissing(repo,"Toilet Tissue 12 Rolls",ProductCategory.GROCERIES,239,daily,"https://images.unsplash.com/photo-1583947581924-860bda6a26df?auto=format&fit=crop&w=900&q=80",true,false,"Daily necessity and subscription-ready household staple.","Bulk pack for fewer deliveries");
-        baseIfMissing(repo,"Paper Towel 6 Rolls",ProductCategory.GROCERIES,199,daily,"/img/products/paper-towel.png",true,false,"Everyday cleaning and kitchen essential.","Consolidated delivery recommended");
-        baseIfMissing(repo,"Trash Bags 30 Pieces",ProductCategory.GROCERIES,149,eco,"https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?auto=format&fit=crop&w=900&q=80",true,false,"Daily home necessity for scheduled replenishment.","Compostable option highlighted");
-        baseIfMissing(repo,"Brown Rice 5kg Autoship Pack",ProductCategory.GROCERIES,420,pantry,"https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=900&q=80",true,false,"Consumer staple for repeat pantry replenishment.","Local staple source");
-        baseIfMissing(repo,"Rolled Oats 1kg",ProductCategory.GROCERIES,210,pantry,"https://images.unsplash.com/photo-1517673132405-a56a62b18caf?auto=format&fit=crop&w=900&q=80",true,false,"Breakfast staple with monthly autoship option.","Sealed pantry pack");
-        baseIfMissing(repo,"Instant Coffee 200g",ProductCategory.GROCERIES,230,pantry,"https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=900&q=80",true,false,"Packaged consumer good for repeat purchase.","Sealed packaged goods");
-        baseIfMissing(repo,"Canned Tuna 6-Pack",ProductCategory.GROCERIES,349,pantry,"/img/products/canned-tuna.png",true,false,"Shelf-stable packaged goods for pantry subscription.","Batch-packed for delivery efficiency");
-        baseIfMissing(repo,"Powdered Milk 1kg",ProductCategory.GROCERIES,399,pantry,"https://images.unsplash.com/photo-1563636619-e9143da7973b?auto=format&fit=crop&w=900&q=80",true,false,"Consumer staple suitable for scheduled replenishment.","Sealed family pack");
-        baseIfMissing(repo,"Baby Wipes Monthly Pack",ProductCategory.GROCERIES,299,daily,"https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&w=900&q=80",true,false,"Everyday family essential for autoship.","Bulk pack reduces delivery frequency");
-        baseIfMissing(repo,"Shampoo and Conditioner Set",ProductCategory.GROCERIES,289,daily,"https://images.unsplash.com/photo-1625772452859-1c03d5bf1137?auto=format&fit=crop&w=900&q=80",true,false,"Convenience personal care goods for repeat purchase.","Refill or bundle pack");
-        baseIfMissing(repo,"Toothpaste Family Pack",ProductCategory.GROCERIES,179,daily,"https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&w=900&q=80",true,false,"Daily oral care necessity for household autoship.","Family pack");
-        baseIfMissing(repo,"All-Purpose Cleaner 1L",ProductCategory.GROCERIES,159,eco,"https://images.unsplash.com/photo-1585421514284-efb74c2b69ba?auto=format&fit=crop&w=900&q=80",true,false,"Fast-moving household cleaner for repeat purchase.","Low-tox cleaning formula");
-        baseIfMissing(repo,"Cooking Oil 2L",ProductCategory.GROCERIES,289,pantry,"https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=900&q=80",true,false,"Consumer staple for kitchen replenishment.","Sealed pantry bottle");
+        baseIfMissing(repo,"Eco Laundry Detergent 1L",ProductCategory.FMCG,189,daily,"https://images.unsplash.com/photo-1626806819282-2c1dc01a5e0c?auto=format&fit=crop&w=900&q=80",true,false,"Fast-moving household detergent for repeat purchase.","Low-waste refill option available");
+        baseIfMissing(repo,"Dishwashing Liquid Refill 1L",ProductCategory.FMCG,129,daily,"https://images.unsplash.com/photo-1626806819282-2c1dc01a5e0c?auto=format&fit=crop&w=900&q=80",true,false,"Repeat-use kitchen cleaning essential.","Refill-ready packaged goods");
+        baseIfMissing(repo,"Hand Soap Refill Pack",ProductCategory.CONVENIENCE_GOODS,99,daily,"https://images.unsplash.com/photo-1584305574647-0cc949a2bb9f?auto=format&fit=crop&w=900&q=80",true,false,"Convenience goods for household hygiene.","Reduced plastic refill pack");
+        baseIfMissing(repo,"Toilet Tissue 12 Rolls",ProductCategory.DAILY_NECESSITIES,239,daily,"https://images.unsplash.com/photo-1583947581924-860bda6a26df?auto=format&fit=crop&w=900&q=80",true,false,"Daily necessity and subscription-ready household staple.","Bulk pack for fewer deliveries");
+        baseIfMissing(repo,"Paper Towel 6 Rolls",ProductCategory.EVERYDAY_ESSENTIALS,199,daily,"/img/products/paper-towel.png",true,false,"Everyday cleaning and kitchen essential.","Consolidated delivery recommended");
+        baseIfMissing(repo,"Trash Bags 30 Pieces",ProductCategory.DAILY_NECESSITIES,149,eco,"https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?auto=format&fit=crop&w=900&q=80",true,false,"Daily home necessity for scheduled replenishment.","Compostable option highlighted");
+        baseIfMissing(repo,"Brown Rice 5kg Autoship Pack",ProductCategory.CONSUMER_STAPLES,420,pantry,"https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=900&q=80",true,false,"Consumer staple for repeat pantry replenishment.","Local staple source");
+        baseIfMissing(repo,"Rolled Oats 1kg",ProductCategory.CONSUMER_STAPLES,210,pantry,"https://images.unsplash.com/photo-1517673132405-a56a62b18caf?auto=format&fit=crop&w=900&q=80",true,false,"Breakfast staple with monthly autoship option.","Sealed pantry pack");
+        baseIfMissing(repo,"Instant Coffee 200g",ProductCategory.PACKAGED_GOODS,230,pantry,"https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=900&q=80",true,false,"Packaged consumer good for repeat purchase.","Sealed packaged goods");
+        baseIfMissing(repo,"Canned Tuna 6-Pack",ProductCategory.PACKAGED_GOODS,349,pantry,"/img/products/canned-tuna.png",true,false,"Shelf-stable packaged goods for pantry subscription.","Batch-packed for delivery efficiency");
+        baseIfMissing(repo,"Powdered Milk 1kg",ProductCategory.CONSUMER_STAPLES,399,pantry,"https://images.unsplash.com/photo-1563636619-e9143da7973b?auto=format&fit=crop&w=900&q=80",true,false,"Consumer staple suitable for scheduled replenishment.","Sealed family pack");
+        baseIfMissing(repo,"Baby Wipes Monthly Pack",ProductCategory.EVERYDAY_ESSENTIALS,299,daily,"https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&w=900&q=80",true,false,"Everyday family essential for autoship.","Bulk pack reduces delivery frequency");
+        baseIfMissing(repo,"Shampoo and Conditioner Set",ProductCategory.CONVENIENCE_GOODS,289,daily,"https://images.unsplash.com/photo-1625772452859-1c03d5bf1137?auto=format&fit=crop&w=900&q=80",true,false,"Convenience personal care goods for repeat purchase.","Refill or bundle pack");
+        baseIfMissing(repo,"Toothpaste Family Pack",ProductCategory.DAILY_NECESSITIES,179,daily,"https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&w=900&q=80",true,false,"Daily oral care necessity for household autoship.","Family pack");
+        baseIfMissing(repo,"All-Purpose Cleaner 1L",ProductCategory.FMCG,159,eco,"https://images.unsplash.com/photo-1585421514284-efb74c2b69ba?auto=format&fit=crop&w=900&q=80",true,false,"Fast-moving household cleaner for repeat purchase.","Low-tox cleaning formula");
+        baseIfMissing(repo,"Cooking Oil 2L",ProductCategory.CONSUMER_STAPLES,289,pantry,"https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=900&q=80",true,false,"Consumer staple for kitchen replenishment.","Sealed pantry bottle");
     }
 
     private void baseIfMissing(ProductRepository repo,String name,ProductCategory cat,int price,Seller seller,String image,boolean sub,boolean tryEligible,String description,String sustainabilityTag){

@@ -10,10 +10,5 @@ public interface IncomingStockShipmentRepository extends JpaRepository<IncomingS
     List<IncomingStockShipment> findAllByOrderByCreatedAtDesc();
     List<IncomingStockShipment> findBySellerOrderByCreatedAtDesc(Seller seller);
     List<IncomingStockShipment> findByStatusOrderByCreatedAtDesc(String status);
-
-    List<IncomingStockShipment> findAllByShipmentCodeIgnoreCaseOrderByIdAsc(String shipmentCode);
-
-    default Optional<IncomingStockShipment> findByShipmentCodeIgnoreCase(String shipmentCode) {
-        return findAllByShipmentCodeIgnoreCaseOrderByIdAsc(shipmentCode).stream().findFirst();
-    }
+    Optional<IncomingStockShipment> findByShipmentCodeIgnoreCase(String shipmentCode);
 }

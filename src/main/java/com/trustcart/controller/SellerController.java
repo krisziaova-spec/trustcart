@@ -157,7 +157,7 @@ public class SellerController {
         Seller seller = currentSeller(session);
         model.addAttribute("sellerLoggedIn", seller != null);
         model.addAttribute("seller", seller);
-        model.addAttribute("categories", ProductCategory.storefrontCategories());
+        model.addAttribute("categories", ProductCategory.values());
     }
 
     @GetMapping

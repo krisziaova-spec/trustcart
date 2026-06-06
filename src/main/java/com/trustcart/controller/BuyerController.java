@@ -74,7 +74,7 @@ public class BuyerController {
         model.addAttribute("buyerLoggedIn", buyer != null);
         model.addAttribute("buyer", buyer);
         model.addAttribute("cartCount", cartService.countItems(session));
-        model.addAttribute("categories", ProductCategory.storefrontCategories());
+        model.addAttribute("categories", ProductCategory.values());
         model.addAttribute("marketCity", session.getAttribute("marketCity") != null ? session.getAttribute("marketCity") : "San Pablo City");
         model.addAttribute("marketLatitude", session.getAttribute("marketLatitude") != null ? session.getAttribute("marketLatitude") : 14.0683);
         model.addAttribute("marketLongitude", session.getAttribute("marketLongitude") != null ? session.getAttribute("marketLongitude") : 121.3256);
@@ -124,31 +124,16 @@ public class BuyerController {
         }
 
         List<Product> products;
-        final String finalSearchTerm = searchTerm;
-        if (category != null && finalSearchTerm != null) {
-            products = productRepository.findByCategoryAndStatusOrderByCreatedAtDesc(category, "APPROVED")
-                    .stream()
-                    .filter(product -> matchesSearchTerm(product, finalSearchTerm))
-                    .collect(Collectors.toList());
-        } else if (category != null) {
+        if (category != null) {
             products = productRepository.findByCategoryAndStatusOrderByCreatedAtDesc(category, "APPROVED");
-        } else if (finalSearchTerm != null) {
-            products = productRepository.searchApprovedProducts(finalSearchTerm, "APPROVED");
+        } else if (searchTerm != null) {
+            products = productRepository.searchApprovedProducts(searchTerm, "APPROVED");
         } else {
             products = productRepository.findByStatusOrderByCreatedAtDesc("APPROVED");
         }
         products = applyMarketFilters(products, session);
-        boolean browsingHome = category == null && finalSearchTerm == null;
-        if (browsingHome) {
-            products = products.stream()
-                    .sorted(Comparator.comparingInt(this::homepagePriority)
-                            .thenComparing(Product::getCreatedAt, Comparator.nullsLast(Comparator.reverseOrder())))
-                    .limit(24)
-                    .collect(Collectors.toList());
-        } else {
-            products = products.stream().limit(48).collect(Collectors.toList());
-        }
-        model.addAttribute("products", products);
+        // Keep homepage clean but make all results accessible.
+        model.addAttribute("products", products.stream().limit(48).collect(Collectors.toList()));
         model.addAttribute("query", searchTerm);
         model.addAttribute("selectedCategory", category);
         model.addAttribute("searchMode", searchMode);
@@ -169,6 +154,10 @@ public class BuyerController {
         boolean nearbyOnly = Boolean.TRUE.equals(session.getAttribute("nearbyOnly"));
         boolean pickupOnly = Boolean.TRUE.equals(session.getAttribute("pickupOnly"));
 
+        if (!nearbyOnly && !pickupOnly) {
+            return products;
+        }
+
         double targetLatitude = sessionNumber(session, "marketLatitude", 14.0683);
         double targetLongitude = sessionNumber(session, "marketLongitude", 121.3256);
         double radiusKm = sessionNumber(session, "marketRadius", 5.0);
@@ -182,11 +171,7 @@ public class BuyerController {
                         return false;
                     }
 
-                    boolean preparedFood = product.getCategory() == ProductCategory.PREPARED_FOODS;
-                    boolean shouldCheckDistance = nearbyOnly || preparedFood;
-                    double allowedRadiusKm = preparedFood ? Math.min(radiusKm, 5.0) : radiusKm;
-
-                    if (shouldCheckDistance) {
+                    if (nearbyOnly) {
                         if (seller.getLatitude() == null || seller.getLongitude() == null) {
                             return false;
                         }
@@ -196,25 +181,12 @@ public class BuyerController {
                                 seller.getLatitude(),
                                 seller.getLongitude()
                         );
-                        return distanceKm <= allowedRadiusKm;
+                        return distanceKm <= radiusKm;
                     }
 
                     return true;
                 })
                 .collect(Collectors.toList());
-    }
-
-    private int homepagePriority(Product product) {
-        if (product == null || product.getCategory() == null) return 99;
-        return switch (product.getCategory()) {
-            case PREPARED_FOODS -> 0;
-            case GROCERIES, FMCG, CONVENIENCE_GOODS, CONSUMER_STAPLES, EVERYDAY_ESSENTIALS, DAILY_NECESSITIES, PACKAGED_GOODS -> 1;
-            case SUSTAINABLE_PRODUCTS -> 2;
-            case LOCAL_FILIPINO_PRODUCTS -> 3;
-            case HEALTH_WELLNESS, BEAUTY_PERSONAL_CARE, HOME_LIVING -> 4;
-            case FASHION -> 5;
-            default -> 6;
-        };
     }
 
     private double sessionNumber(HttpSession session, String key, double defaultValue) {
@@ -247,24 +219,6 @@ public class BuyerController {
         if (raw == null || raw.isBlank()) return null;
         String cleaned = raw.trim().replaceAll("\\s+", " ");
         return cleaned.length() > 80 ? cleaned.substring(0, 80) : cleaned;
-    }
-
-    private boolean matchesSearchTerm(Product product, String term) {
-        if (product == null || term == null || term.isBlank()) return true;
-        String needle = term.toLowerCase(Locale.ROOT);
-        return containsIgnoreCase(product.getName(), needle)
-                || containsIgnoreCase(product.getDescription(), needle)
-                || containsIgnoreCase(product.getSustainabilityTag(), needle)
-                || containsIgnoreCase(product.getPhotoAltText(), needle)
-                || containsIgnoreCase(product.getProductOrigin(), needle)
-                || (product.getCategory() != null && containsIgnoreCase(product.getCategory().getDisplayName(), needle))
-                || (product.getSeller() != null && (containsIgnoreCase(product.getSeller().getStoreName(), needle)
-                || containsIgnoreCase(product.getSeller().getStoreCity(), needle)
-                || containsIgnoreCase(product.getSeller().getStoreProvince(), needle)));
-    }
-
-    private boolean containsIgnoreCase(String haystack, String lowerCaseNeedle) {
-        return haystack != null && haystack.toLowerCase(Locale.ROOT).contains(lowerCaseNeedle);
     }
 
     private boolean orderContainsProduct(CustomerOrder order, Product product) {

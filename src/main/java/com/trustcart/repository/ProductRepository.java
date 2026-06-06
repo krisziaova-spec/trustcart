@@ -31,17 +31,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             order by p.createdAt desc
             """)
     List<Product> searchApprovedProducts(@Param("term") String term, @Param("status") String status);
-
     List<Product> findBySellerOrderByCreatedAtDesc(Seller seller);
     List<Product> findBySellerAndStatusOrderByCreatedAtDesc(Seller seller, String status);
     List<Product> findBySubscriptionEligibleTrueAndStatusOrderByCreatedAtDesc(String status);
     List<Product> findByTryOnEligibleTrueAndStatusOrderByNameAsc(String status);
-
-    // Safe replacement for the old unique-result lookup. The database can contain older duplicate
-    // seeded products, so callers should receive the first match instead of crashing on startup.
-    List<Product> findAllByNameIgnoreCaseOrderByIdAsc(String name);
-
-    default Optional<Product> findByNameIgnoreCase(String name) {
-        return findAllByNameIgnoreCaseOrderByIdAsc(name).stream().findFirst();
-    }
+    Optional<Product> findByNameIgnoreCase(String name);
 }

@@ -706,7 +706,7 @@ public class AdminController {
         model.addAttribute("orders", orders);
         model.addAttribute("products", products);
         model.addAttribute("sellers", sellers);
-        model.addAttribute("categories", ProductCategory.storefrontCategories());
+        model.addAttribute("categories", ProductCategory.values());
         model.addAttribute("totalSales", totalSales);
         model.addAttribute("averageOrderValue", averageOrderValue);
         model.addAttribute("unitsSold", unitsSold);

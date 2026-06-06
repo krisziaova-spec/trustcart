@@ -14,10 +14,5 @@ public interface SupportTicketRepository extends JpaRepository<SupportTicket, Lo
     List<SupportTicket> findByTypeOrderByCreatedAtDesc(String type);
     List<SupportTicket> findBySellerOrderByCreatedAtDesc(Seller seller);
     List<SupportTicket> findByBuyerOrderByCreatedAtDesc(BuyerAccount buyer);
-
-    List<SupportTicket> findAllByTicketCodeIgnoreCaseOrderByIdAsc(String ticketCode);
-
-    default Optional<SupportTicket> findByTicketCodeIgnoreCase(String ticketCode) {
-        return findAllByTicketCodeIgnoreCaseOrderByIdAsc(ticketCode).stream().findFirst();
-    }
+    Optional<SupportTicket> findByTicketCodeIgnoreCase(String ticketCode);
 }

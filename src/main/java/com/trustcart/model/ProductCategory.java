@@ -3,19 +3,17 @@ package com.trustcart.model;
 public enum ProductCategory {
     ELECTRONICS("Electronics", "💻"),
     MOBILE_ACCESSORIES("Mobile Accessories", "📱"),
-    FASHION("Clothing & Fashion", "👕"),
+    FASHION("Fashion", "👕"),
     BEAUTY_PERSONAL_CARE("Beauty & Personal Care", "💄"),
     HOME_LIVING("Home & Living", "🏠"),
-    GROCERIES("Groceries & Daily Essentials", "🛒"),
-    PREPARED_FOODS("Prepared Food & Meal Kits", "🍱"),
+    GROCERIES("Groceries", "🛒"),
 
-    // Kept for database/backward compatibility. These are now grouped under Groceries & Daily Essentials on the storefront.
-    FMCG("Groceries & Daily Essentials", "🛒"),
-    CONVENIENCE_GOODS("Groceries & Daily Essentials", "🛒"),
-    CONSUMER_STAPLES("Groceries & Daily Essentials", "🛒"),
-    EVERYDAY_ESSENTIALS("Groceries & Daily Essentials", "🛒"),
-    DAILY_NECESSITIES("Groceries & Daily Essentials", "🛒"),
-    PACKAGED_GOODS("Groceries & Daily Essentials", "🛒"),
+    FMCG("Fast-Moving Consumer Goods", "🛍️"),
+    CONVENIENCE_GOODS("Convenience Goods", "🏪"),
+    CONSUMER_STAPLES("Consumer Staples", "📦"),
+    EVERYDAY_ESSENTIALS("Everyday Essentials", "🧺"),
+    DAILY_NECESSITIES("Daily Necessities", "🧻"),
+    PACKAGED_GOODS("Packaged Goods", "🥫"),
 
     HEALTH_WELLNESS("Health & Wellness", "💚"),
     BABY_KIDS("Baby & Kids", "🧸"),
@@ -40,25 +38,5 @@ public enum ProductCategory {
 
     public String getIcon() {
         return icon;
-    }
-
-    public static ProductCategory[] storefrontCategories() {
-        return new ProductCategory[] {
-                ELECTRONICS,
-                MOBILE_ACCESSORIES,
-                FASHION,
-                BEAUTY_PERSONAL_CARE,
-                HOME_LIVING,
-                GROCERIES,
-                PREPARED_FOODS,
-                HEALTH_WELLNESS,
-                BABY_KIDS,
-                SPORTS_OUTDOORS,
-                SCHOOL_OFFICE,
-                AUTOMOTIVE_MOTORCYCLE,
-                PET_SUPPLIES,
-                SUSTAINABLE_PRODUCTS,
-                LOCAL_FILIPINO_PRODUCTS
-        };
     }
 }

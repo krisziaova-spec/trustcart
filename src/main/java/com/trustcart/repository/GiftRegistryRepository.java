@@ -7,12 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface GiftRegistryRepository extends JpaRepository<GiftRegistry, Long> {
-    List<GiftRegistry> findAllByShareCodeIgnoreCaseOrderByIdAsc(String shareCode);
-
-    default Optional<GiftRegistry> findByShareCodeIgnoreCase(String shareCode) {
-        return findAllByShareCodeIgnoreCaseOrderByIdAsc(shareCode).stream().findFirst();
-    }
-
+    Optional<GiftRegistry> findByShareCodeIgnoreCase(String shareCode);
     boolean existsByShareCodeIgnoreCase(String shareCode);
     List<GiftRegistry> findByBuyerOrderByCreatedAtDesc(BuyerAccount buyer);
     List<GiftRegistry> findByStatusOrderByCreatedAtDesc(String status);

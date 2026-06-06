@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Command Center Login | TrustCart</title>
+    <link rel="icon" th:href="@{/favicon.png}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/auth-premium.css}">
+</head>
+<body class="auth-premium-page admin-auth-page">
+<header class="auth-topbar">
+    <a class="auth-brand" th:href="@{/}">
+        <img th:src="@{/img/logo-uploaded.png}" alt="TrustCart logo">
+        <span>Command Center</span>
+    </a>
+    <nav class="auth-help-links" aria-label="Admin login help links">
+        <a th:href="@{/}">Go to store</a>
+    </nav>
+</header>
+
+<main class="auth-premium-shell admin-layout">
+    <section class="auth-hero-panel admin-hero" aria-label="TrustCart admin controls">
+        <div class="auth-hero-content">
+            <span class="auth-pill">Restricted Admin Access</span>
+            <h1>Manage TrustCart safety, sellers, buyers, fulfillment, and analytics.</h1>
+            <p>The Command Center is the private portal for seller verification, FBT approvals, tickets, buyer safety actions, and platform-wide performance monitoring.</p>
+            <div class="auth-feature-grid">
+                <div><strong>Seller Controls</strong><span>Approve, activate, suspend</span></div>
+                <div><strong>FBT Center</strong><span>Approve fulfillment requests</span></div>
+                <div><strong>Tickets</strong><span>Buyer and product reports</span></div>
+                <div><strong>Analytics</strong><span>Store and product sales</span></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="auth-login-panel" aria-label="Admin login form">
+        <div class="auth-card-premium admin-card">
+            <img th:src="@{/img/logo-uploaded.png}" class="auth-card-logo" alt="TrustCart logo">
+            <p class="auth-kicker">Private Portal</p>
+            <h2>Command Center Login</h2>
+            <p class="auth-subtitle">Authorized TrustCart administrators only.</p>
+
+            <div class="auth-alert error" th:if="${error}" th:text="${error}"></div>
+
+            <form method="post" th:action="@{/command-center/login}" class="auth-form-premium">
+                <label for="admin-email">Admin email</label>
+                <div class="auth-input-wrap">
+                    <span aria-hidden="true">✉</span>
+                    <input id="admin-email" name="email" type="email" placeholder="admin@trustcart.ph" autocomplete="email" required>
+                </div>
+
+                <label for="admin-password">Password</label>
+                <div class="auth-input-wrap">
+                    <span aria-hidden="true">🔐</span>
+                    <input id="admin-password" name="password" type="password" placeholder="Enter admin password" autocomplete="current-password" required>
+                </div>
+
+                <button class="auth-submit" type="submit">Login to Command Center</button>
+            </form>
+
+            <div class="auth-secondary-row">
+                <a th:href="@{/}">Return to store</a>
+            </div>
+
+            <p class="auth-note danger-note">Admin pages are not shown on buyer or seller navigation.</p>
+        </div>
+    </section>
+</main>
+
+<footer class="auth-footer">© 2026 TrustCart Command Center. Access is monitored.</footer>
+</body>
+</html>

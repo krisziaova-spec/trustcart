@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Autoship Essentials</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<nav class="nav"><div class="nav-inner"><a class="logo" th:href="@{/}"><img th:src="@{/img/logo-uploaded.png}" alt="TrustCart"></a><div class="nav-links"><a th:href="@{/}">Shop</a><a th:href="@{/cart}">Cart (<span th:text="${cartCount}">0</span>)</a></div></div></nav>
+<main class="container">
+    <section class="autoship-hero">
+        <span class="section-pill">Subscriptions</span>
+        <h1>Autoship Essentials</h1>
+        <p>Subscribe to recurring groceries, hygiene, cleaning, pantry, baby, pet, and household essentials by your preferred frequency.</p>
+        <div class="filter-hints"><a th:href="@{/(category=${T(com.trustcart.model.ProductCategory).GROCERIES})}">Groceries & Daily Essentials</a><a th:href="@{/(category=${T(com.trustcart.model.ProductCategory).HOME_LIVING})}">Home & Cleaning</a><a th:href="@{/(category=${T(com.trustcart.model.ProductCategory).BEAUTY_PERSONAL_CARE})}">Personal Care</a><a th:href="@{/(category=${T(com.trustcart.model.ProductCategory).BABY_KIDS})}">Baby & Kids</a><a th:href="@{/(category=${T(com.trustcart.model.ProductCategory).PET_SUPPLIES})}">Pet Supplies</a></div>
+        <p class="success" th:text="${success}"></p>
+    </section>
+
+    <section th:if="${!subscriptions.isEmpty()}">
+        <div class="section-title"><h2>Your Active Autoship</h2><span class="muted">Protected recurring orders</span></div>
+        <div class="table-card">
+            <table>
+                <tr><th>Product</th><th>Frequency</th><th>Qty</th><th>Recurring Price</th><th>Next Shipment</th></tr>
+                <tr th:each="s:${subscriptions}"><td th:text="${s.product.name}">Product</td><td th:text="${s.frequency}">Monthly</td><td th:text="${s.quantity}">1</td><td>₱<span th:text="${s.recurringPrice}">0</span></td><td th:text="${s.nextShipmentDate}">Date</td></tr>
+            </table>
+        </div>
+    </section>
+
+    <section>
+        <div class="section-title"><h2>Subscription-Ready Goods</h2><span class="muted" th:text="${eligibleProducts.size()} + ' essentials available'">0 essentials available</span></div>
+        <div class="grid">
+            <article class="product-card" th:each="p:${eligibleProducts}">
+                <a class="product-photo-wrap" th:href="@{/product/{id}(id=${p.id})}"><img class="product-photo" th:src="${p.imageUrl}" th:alt="${p.photoAltText}"></a>
+                <div class="product-body">
+                    <div class="badges"><span class="badge">Autoship</span><span class="badge" th:text="${p.category.displayName}">Category</span></div>
+                    <a class="product-name" th:href="@{/product/{id}(id=${p.id})}" th:text="${p.name}">Product</a>
+                    <div class="price">₱<span th:text="${p.price}">0</span></div>
+                    <p class="tiny">Save <span th:text="${p.subscriptionDiscountPercent}">5</span>% on repeat orders · Seller: <a th:href="@{/store/{id}(id=${p.seller.id})}" th:text="${p.seller.storeName}">Seller</a></p>
+                    <form th:action="@{/autoship/create}" method="post" class="subscription-form">
+                        <input type="hidden" name="productId" th:value="${p.id}">
+                        <select name="frequency"><option>WEEKLY</option><option>EVERY_2_WEEKS</option><option selected>MONTHLY</option><option>EVERY_2_MONTHS</option></select>
+                        <input name="quantity" type="number" min="1" value="1">
+                        <button class="btn btn-primary">Subscribe</button>
+                    </form>
+                </div>
+            </article>
+        </div>
+    </section>
+</main>
+</body>
+</html>

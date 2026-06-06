@@ -6,6 +6,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TrustCartWarehouseRepository extends JpaRepository<TrustCartWarehouse, Long> {
-    Optional<TrustCartWarehouse> findByCodeIgnoreCase(String code);
+    List<TrustCartWarehouse> findAllByCodeIgnoreCaseOrderByIdAsc(String code);
+
+    default Optional<TrustCartWarehouse> findByCodeIgnoreCase(String code) {
+        return findAllByCodeIgnoreCaseOrderByIdAsc(code).stream().findFirst();
+    }
+
     List<TrustCartWarehouse> findByActiveTrueOrderByCityAsc();
 }

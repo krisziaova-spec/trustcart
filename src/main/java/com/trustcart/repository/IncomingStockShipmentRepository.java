@@ -1,19 +1,19 @@
 package com.trustcart.repository;
 
-import com.trustcart.model.BuyerAccount;
-import com.trustcart.model.GiftRegistry;
+import com.trustcart.model.IncomingStockShipment;
+import com.trustcart.model.Seller;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface GiftRegistryRepository extends JpaRepository<GiftRegistry, Long> {
-    List<GiftRegistry> findAllByShareCodeIgnoreCaseOrderByIdAsc(String shareCode);
+public interface IncomingStockShipmentRepository extends JpaRepository<IncomingStockShipment, Long> {
+    List<IncomingStockShipment> findAllByOrderByCreatedAtDesc();
+    List<IncomingStockShipment> findBySellerOrderByCreatedAtDesc(Seller seller);
+    List<IncomingStockShipment> findByStatusOrderByCreatedAtDesc(String status);
 
-    default Optional<GiftRegistry> findByShareCodeIgnoreCase(String shareCode) {
-        return findAllByShareCodeIgnoreCaseOrderByIdAsc(shareCode).stream().findFirst();
+    List<IncomingStockShipment> findAllByShipmentCodeIgnoreCaseOrderByIdAsc(String shipmentCode);
+
+    default Optional<IncomingStockShipment> findByShipmentCodeIgnoreCase(String shipmentCode) {
+        return findAllByShipmentCodeIgnoreCaseOrderByIdAsc(shipmentCode).stream().findFirst();
     }
-
-    boolean existsByShareCodeIgnoreCase(String shareCode);
-    List<GiftRegistry> findByBuyerOrderByCreatedAtDesc(BuyerAccount buyer);
-    List<GiftRegistry> findByStatusOrderByCreatedAtDesc(String status);
 }

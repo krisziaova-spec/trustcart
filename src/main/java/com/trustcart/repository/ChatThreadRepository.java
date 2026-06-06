@@ -11,5 +11,10 @@ import java.util.Optional;
 public interface ChatThreadRepository extends JpaRepository<ChatThread, Long> {
     List<ChatThread> findByBuyerOrderByUpdatedAtDesc(BuyerAccount buyer);
     List<ChatThread> findBySellerOrderByUpdatedAtDesc(Seller seller);
-    Optional<ChatThread> findByBuyerAndSellerAndProduct(BuyerAccount buyer, Seller seller, Product product);
+
+    List<ChatThread> findAllByBuyerAndSellerAndProductOrderByIdAsc(BuyerAccount buyer, Seller seller, Product product);
+
+    default Optional<ChatThread> findByBuyerAndSellerAndProduct(BuyerAccount buyer, Seller seller, Product product) {
+        return findAllByBuyerAndSellerAndProductOrderByIdAsc(buyer, seller, product).stream().findFirst();
+    }
 }

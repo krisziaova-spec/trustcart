@@ -12,8 +12,8 @@
     <section class="autoship-hero">
         <span class="section-pill">Subscriptions</span>
         <h1>Autoship Essentials</h1>
-        <p>Subscribe to groceries, household basics, personal care essentials, pantry goods, and sustainable refills by your preferred frequency.</p>
-        <div class="filter-hints"><a th:href="@{/(category=${T(com.trustcart.model.ProductCategory).GROCERIES})}">Groceries & Daily Essentials</a><a th:href="@{/(category=${T(com.trustcart.model.ProductCategory).SUSTAINABLE_PRODUCTS})}">Sustainable Products</a><a th:href="@{/}">All Trusted Products</a></div>
+        <p>Subscribe to fast-moving consumer goods, convenience goods, consumer staples, everyday essentials, daily necessities, and packaged goods by your preferred frequency.</p>
+        <div class="filter-hints"><a th:href="@{/(category=${T(com.trustcart.model.ProductCategory).FMCG})}">FMCG</a><a th:href="@{/(category=${T(com.trustcart.model.ProductCategory).CONVENIENCE_GOODS})}">Convenience Goods</a><a th:href="@{/(category=${T(com.trustcart.model.ProductCategory).CONSUMER_STAPLES})}">Consumer Staples</a><a th:href="@{/(category=${T(com.trustcart.model.ProductCategory).EVERYDAY_ESSENTIALS})}">Everyday Essentials</a><a th:href="@{/(category=${T(com.trustcart.model.ProductCategory).DAILY_NECESSITIES})}">Daily Necessities</a><a th:href="@{/(category=${T(com.trustcart.model.ProductCategory).PACKAGED_GOODS})}">Packaged Goods</a></div>
         <p class="success" th:text="${success}"></p>
     </section>
 
@@ -31,7 +31,7 @@
         <div class="section-title"><h2>Subscription-Ready Goods</h2><span class="muted" th:text="${eligibleProducts.size()} + ' essentials available'">0 essentials available</span></div>
         <div class="grid">
             <article class="product-card" th:each="p:${eligibleProducts}">
-                <a class="product-photo-wrap" th:href="@{/product/{id}(id=${p.id})}"><img class="product-photo" th:src="${p.imageUrl}" th:alt="${p.photoAltText}" onerror="this.onerror=null;this.src='/img/products/placeholder-product.png';"></a>
+                <a class="product-photo-wrap" th:href="@{/product/{id}(id=${p.id})}"><img class="product-photo" th:src="${p.imageUrl}" th:alt="${p.photoAltText}"></a>
                 <div class="product-body">
                     <div class="badges"><span class="badge">Autoship</span><span class="badge" th:text="${p.category.displayName}">Category</span></div>
                     <a class="product-name" th:href="@{/product/{id}(id=${p.id})}" th:text="${p.name}">Product</a>

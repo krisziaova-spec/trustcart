@@ -51,14 +51,14 @@
                 <label>Rotate <input id="rotateRange" type="range" min="-45" max="45" value="0"></label>
                 <button class="btn btn-outline" id="resetBtn" type="button">Reset</button>
             </div>
-            <p class="tiny">Drag the clothing image to position it. This preview is designed for visual shopping guidance before checkout.</p>
+            <p class="tiny">Drag the clothing image to position it. This is a working prototype preview, not full AI body-fitting.</p>
         </div>
 
         <div class="tryon-products">
             <div class="section-title compact-title">
                 <div>
-                    <h2>Choose a Try-On Item</h2>
-                    <p class="muted">Clean, realistic garment previews with simple color options for selected try-on items.</p>
+                    <h2>Choose a Try-On Demo Item</h2>
+                    <p class="muted">Clean, realistic garment previews with simple color options for the demo items.</p>
                 </div>
                 <a class="btn btn-outline" th:href="@{/(category=${T(com.trustcart.model.ProductCategory).FASHION})}">Shop Fashion</a>
             </div>
@@ -82,6 +82,5 @@
 </main>
 
 <script th:src="@{/js/tryon.js}"></script>
-<script th:src="@{/js/image-fallback.js}"></script>
 </body>
 </html>

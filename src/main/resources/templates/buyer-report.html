@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Report Concern | TrustCart</title><link rel="icon" th:href="@{/favicon.png}"><link rel="stylesheet" th:href="@{/css/styles.css}"></head>
+<body>
+<nav class="nav"><div class="nav-inner"><a class="logo" th:href="@{/}"><img th:src="@{/img/logo-uploaded.png}" alt="TrustCart" onerror="this.onerror=null;this.src='/img/products/placeholder-product.png';"></a><div class="nav-links"><a th:href="@{/}">Shop</a><a th:href="@{/cart}">Cart (<span th:text="${cartCount}">0</span>)</a><a th:href="@{/buyer/logout}" th:if="${buyerLoggedIn}">Logout</a><a th:href="@{/buyer/login}" th:if="${!buyerLoggedIn}">Buyer Login</a></div></div></nav>
+<main class="container"><a class="btn btn-outline quick-back" href="javascript:history.back()">← Back</a>
+    <section class="form-card auth-card wide">
+        <span class="section-pill">TrustCart Safety Center</span>
+        <h1>Report a Concern</h1>
+        <p class="muted">Submit concerns about products or sellers. You may attach proof such as photos, screenshots, or order files.</p>
+        <div class="platform-warning"><strong>Reporting:</strong> <span th:text="${targetLabel}">Target</span> · <span th:text="${reportType}">Type</span></div>
+        <form method="post" th:action="${postUrl}" enctype="multipart/form-data" class="stack-form">
+            <label th:if="${buyer == null}">Your name<input name="reporterName" required placeholder="Full name"></label>
+            <label th:if="${buyer == null}">Your email<input type="email" name="reporterEmail" required placeholder="email@example.com"></label>
+            <label>Concern type<select name="subject" required><option value="Possible scam or unsafe transaction">Possible scam or unsafe transaction</option><option value="Wrong or misleading product information">Wrong or misleading product information</option><option value="Counterfeit or suspicious product">Counterfeit or suspicious product</option><option value="Harassment or abusive behavior">Harassment or abusive behavior</option><option value="Delivery or fulfillment concern">Delivery or fulfillment concern</option><option value="Other TrustCart safety concern">Other TrustCart safety concern</option></select></label>
+            <label>Details<textarea name="message" required placeholder="Please describe what happened, order details if applicable, and any proof available."></textarea></label>
+            <label>Attach proof<input type="file" name="proofFile" accept="image/*,.pdf,.doc,.docx"></label>
+            <div class="footer-actions"><button class="btn btn-primary" type="submit">Submit Report</button><a class="btn btn-outline" href="javascript:history.back()">Cancel</a></div>
+        </form>
+    </section>
+</main>
+</body></html>
